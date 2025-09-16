@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>JW Airlines IFE</title>
+  <link rel="stylesheet" href="app.css"/>
+</head>
+<body>
+  <!-- Language modal -->
+  <div id="langScreen" class="lang-screen" role="dialog" aria-modal="true">
+    <div class="lang-card">
+      <h2 id="langTitle" class="center-title">选择语言 / Select Language</h2>
+      <div class="lang-list">
+        <button class="lang-btn" data-lang="zh-CN">简体中文</button>
+        <button class="lang-btn" data-lang="en">English</button>
+        <button class="lang-btn" data-lang="es">Español</button>
+        <button class="lang-btn" data-lang="ru">Русский</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header>
+    <div class="left">
+      <strong id="brandTitle">JW Airlines</strong>
+      <span id="destText" class="muted">Destination: Paris CDG</span>
+    </div>
+    <div class="center"><span id="remainLabel">Remaining</span>: <span id="remain">—</span></div>
+    <div class="actions">
+      <button id="btnCall" class="icon-btn" title="Call crew" aria-label="Call crew">
+        <svg viewBox="0 0 24 24"><path d="M12 2a2 2 0 110 4 2 2 0 010-4zm-3 7h6a2 2 0 012 2v9h-2v-6h-1v6H10v-6H9v6H7v-9a2 2 0 012-2z"/></svg>
+      </button>
+      <span class="badge yellow" id="belt">Seatbelt On</span>
+      <button id="btnHome" class="icon-btn" title="Home" aria-label="Home">
+        <svg viewBox="0 0 24 24"><path d="M12 3l9 8h-3v9h-5v-6H11v6H6v-9H3l9-8z"/></svg>
+      </button>
+      <button id="btnLang" class="icon-btn" title="Language" aria-label="Language">
+        <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm-1 5H7v2h1.7c.3 1.1.8 2.1 1.4 3.1-.9.9-1.9 1.6-3.1 2l.7 1.9c1.5-.6 2.7-1.5 3.8-2.6a13 13 0 003 2.6l1-1.7a11 11 0 01-2.7-2.1c.6-1 .9-2 .9-3.2h2V7h-4V5z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main hub -->
+  <main>
+    <section id="home" class="hub">
+      <div class="hero">
+        <img src="images/paris.jpg" alt="Paris"/>
+        <div class="label">
+          <div class="city" id="heroCity">PARIS</div>
+          <div class="code" id="heroCode">CDG</div>
+        </div>
+      </div>
+      <div class="tile t-music" data-open="music">
+        <h3 id="tileMusic">Music</h3><p id="tileMusicSub">Albums & Playlists</p>
+      </div>
+      <div class="tile t-movies" data-open="movies">
+        <h3 id="tileMovies">Movies</h3><p id="tileMoviesSub">Player & Library</p>
+      </div>
+      <div class="tile t-shopping" data-open="shopping">
+        <h3 id="tileShopping">Shopping</h3><p id="tileShoppingSub">Duty-Free</p>
+      </div>
+      <div class="tile t-dining" data-open="dining">
+        <h3 id="tileDining">Dining</h3><p id="tileDiningSub">Meal & Countdown</p>
+      </div>
+      <div class="tile t-flight" data-open="flight">
+        <h3 id="tileFlight">My Flight</h3><p id="tileFlightSub">Map & Info</p>
+      </div>
+    </section>
+
+    <!-- Music panel -->
+    <section id="panel-music" class="panel" aria-label="Music">
+      <!-- 子主页：专辑封面网格 -->
+      <div id="musicHome" class="music-home">
+        <div class="music-home-header">
+          <h2 id="musicTitle" class="panel-title">Music</h2>
+          <p class="muted" style="margin:6px 0 14px 0">Albums & Playlists</p>
+        </div>
+        <div id="albumCards" class="album-cards"></div>
+      </div>
+
+      <!-- 播放页：左播放列表 + 右侧固定信息/歌词 -->
+      <div id="musicPlay" class="music-play hidden">
+        <div class="music-play-header">
+          <button id="musicBack" class="icon-btn" title="Back" aria-label="Back">
+            <svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>
+          </button>
+          <div class="album-head">
+            <div class="album-cover" id="playCover"></div>
+            <div>
+              <div class="album-name" id="playAlbumName">—</div>
+              <div class="album-artist" id="playArtist">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="music-play-body">
+          <div class="playlist" id="trackList"></div>
+          <aside class="music-side">
+            <div class="side-top" id="albumAbout">
+              <div class="about-title" id="aboutTitle">About this album</div>
+              <p id="albumDesc" class="about-text">—</p>
+            </div>
+            <div class="lyrics">
+              <div class="lyrics-title" id="lyricsTitle">Lyrics</div>
+              <div class="lyrics-body" id="lyricsBody">—</div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- Movies panel -->
+    <section id="panel-movies" class="panel" aria-label="Movies">
+      <h2 class="panel-title" id="movieTitleHead">Movies</h2>
+      <div id="movieGrid" class="movie-grid"></div>
+      <div class="movie-layout">
+        <div class="movie-player">
+          <video id="video" controls playsinline></video>
+        </div>
+        <div class="movie-info">
+          <h3 id="movieTitle">—</h3>
+          <p id="movieDesc" class="muted">—</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Flight panel -->
+    <section id="panel-flight" class="panel" aria-label="My Flight">
+      <h2 class="panel-title" id="flightTitle">My Flight</h2>
+      <div class="flight-wrap">
+        <div class="mapbox">
+          <svg viewBox="0 0 600 320" width="100%" height="100%">
+            <defs>
+              <linearGradient id="g" x1="0" x2="1">
+                <stop offset="0" stop-color="#58c284"/><stop offset="1" stop-color="#a7ffd8"/>
+              </linearGradient>
+            </defs>
+            <path id="route" d="M40,260 C140,120 320,120 560,60" stroke="url(#g)" stroke-width="4" fill="none"/>
+            <g id="plane" transform="translate(40,260)">
+              <polygon points="0,0 14,4 0,8 4,4" fill="#ffd67a"/>
+            </g>
+          </svg>
+        </div>
+        <div class="finfo">
+          <div><strong>Departure:</strong> JFK 22:30</div>
+          <div><strong>Arrival:</strong> CDG 10:00</div>
+          <div><strong id="eta">ETA:</strong></div>
+          <div class="placeholder">A350-1000 · Wi-Fi · USB-C</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="panel-shopping" class="panel" aria-label="Shopping">
+      <h2 class="panel-title">Shopping</h2>
+      <div class="placeholder">Duty-free catalog coming soon.</div>
+    </section>
+
+    <section id="panel-dining" class="panel" aria-label="Dining">
+      <h2 class="panel-title">Dining</h2>
+      <div class="placeholder">Meal service timeline and countdown.</div>
+    </section>
+  </main>
+
+  <!-- Footer Player -->
+  <div class="player" id="player" aria-label="Audio Player">
+    <div class="controls">
+      <button id="btnPrev" class="btn" title="Previous">
+        <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zM20 6l-10 6 10 6z"/></svg>
+      </button>
+      <button id="playPause" class="btn" title="Play/Pause">
+        <svg id="iconPlay" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      </button>
+      <button id="btnNext" class="btn" title="Next">
+        <svg viewBox="0 0 24 24"><path d="M16 6v12h2V6zM4 6l10 6L4 18z"/></svg>
+      </button>
+    </div>
+    <div class="now">
+      <div class="art" id="npArt"></div>
+      <div class="np">
+        <div class="t" id="npTitle">—</div>
+        <div class="m" id="npMeta">—</div>
+      </div>
+    </div>
+    <div class="timeline">
+      <span class="time" id="cur">0:00</span>
+      <div class="rail" id="rail"><div class="bar" id="bar"></div></div>
+      <span class="time" id="dur">0:00</span>
+    </div>
+    <div class="volume">
+      <svg viewBox="0 0 24 24"><path d="M3 10v4h4l5 4V6L7 10H3z"/></svg>
+      <div class="vol-rail" id="volRail"><div class="vol-bar" id="volBar"></div></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
