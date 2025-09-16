@@ -347,6 +347,7 @@ function init(){
   applyLang();
   initMusicView();
   renderMovies();
+  
   goHome();
   updateFlight();
 }
