@@ -5,7 +5,6 @@
 /* 路径基准 */
 const MUSIC_BASE  = "music/";
 const IMAGE_BASE  = "images/";
-const LYRICS_BASE = "lyrics/";
 
 /* ---------- I18N（四语言，中文为“简体中文”） ---------- */
 const I18N = {
@@ -25,7 +24,7 @@ const I18N = {
       seatbeltOff: "安全带关闭",
       crew: "呼叫乘务",
       about: "专辑简介",
-      lyrics: "歌词（按所选语言显示，有文件自动加载）"
+      lyrics: "歌词"
     },
   },
   en: {
@@ -44,7 +43,7 @@ const I18N = {
       seatbeltOff: "Seatbelt Off",
       crew: "Call Crew",
       about: "About this album",
-      lyrics: "Lyrics (auto-loaded in selected language)"
+      lyrics: "Lyrics"
     },
   },
   es: {
@@ -63,7 +62,7 @@ const I18N = {
       seatbeltOff: "Cinturón desabrochado",
       crew: "Llamar tripulación",
       about: "Sobre este álbum",
-      lyrics: "Letras (cargadas automáticamente en el idioma seleccionado)"
+      lyrics: "Letras"
     },
   },
   ru: {
@@ -82,7 +81,7 @@ const I18N = {
       seatbeltOff: "Ремни отстёгнуты",
       crew: "Вызвать бортпроводника",
       about: "Об альбоме",
-      lyrics: "Тексты (автозагрузка на выбранном языке)"
+      lyrics: "Тексты"
     },
   },
 };
@@ -91,6 +90,7 @@ let lang = localStorage.getItem("ife_lang") || document.documentElement.lang || 
 const $ = (id)=>document.getElementById(id);
 const setText = (id, txt)=>{ const el=$(id); if(el) el.textContent = txt; };
 
+/* ---------- 文案与导航 ---------- */
 function applyLang(){
   const t = I18N[lang] || I18N.en;
   document.documentElement.lang = lang;
@@ -117,14 +117,18 @@ function chooseLang(code){
 $("langScreen").addEventListener("click", e => { if(e.target.classList.contains("lang-screen")) e.currentTarget.style.display="none"; });
 document.querySelectorAll(".lang-btn").forEach(b=>b.addEventListener("click",()=>chooseLang(b.dataset.lang)));
 
-function hidePanels(){ document.querySelectorAll(".panel").forEach(p=>p.classList.remove("visible")); $("home").style.display="none"; const mg=$("movieGrid"); if(mg) mg.style.display="grid"; }
+function hidePanels(){
+  document.querySelectorAll(".panel").forEach(p=>p.classList.remove("visible"));
+  $("home").style.display="none";
+  const mg=$("movieGrid"); if(mg) mg.style.display="grid";
+}
 function goHome(){ hidePanels(); $("home").style.display="grid"; showPlayer(true); return true; }
 function openSection(key){
   hidePanels();
   const p=$("panel-"+key); if(!p) return false;
   if(key==="music")  initMusicView();
   if(key==="movies") renderMovies();
-  showPlayer(key!=="movies");
+  showPlayer(key!=="movies");           // 电影页隐藏底部播放器
   p.classList.add("visible");
   return true;
 }
@@ -133,7 +137,7 @@ $("btnLang").addEventListener("click", openLangSwitcher);
 $("btnCall").addEventListener("click", ()=> alert((I18N[lang]||I18N.en).ui.crew));
 document.querySelectorAll(".tile").forEach(t=>t.addEventListener("click",()=>openSection(t.dataset.open)));
 
-/* ---------- Music Library ---------- */
+/* ---------- 音乐库 ---------- */
 const LIB = {
   artangels: {
     artist:"Grimes",
@@ -187,24 +191,20 @@ const LIB = {
 const albumIds = ["artangels","paradigmes"];
 let curAlbum = albumIds[0], curIdx = 0;
 
-/* ---------- Lyrics loading (from /lyrics/) ---------- */
-function slug(s){ return s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,''); }
+/* ---------- 歌词加载（你的最终结构）：lyrics/{albumId}/{slug}.txt ---------- */
+function slug(s){
+  return s.toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g,"")   // 去重音
+    .replace(/[^a-z0-9]+/g, "-")                       // 非字母数字 → -
+    .replace(/^-+|-+$/g, "");                          // 去首尾 -
+}
 async function loadLyrics(albumId, title){
-  const s = slug(title);
-  const candidates = [
-    `${LYRICS_BASE}${albumId}/${s}.${lang}.txt`,
-    `${LYRICS_BASE}${albumId}/${s}.${lang}.lrc`,
-    `${LYRICS_BASE}${albumId}/${s}.${lang}.json`,
-  ];
-  for(const url of candidates){
-    try{
-      const r = await fetch(url, {cache:'no-store'});
-      if(!r.ok) continue;
-      if(url.endsWith('.json')){ const j=await r.json(); return j.text||""; }
-      return await r.text();
-    }catch{ /* ignore */ }
-  }
-  return "";
+  const file = `lyrics/${albumId}/${slug(title)}.txt`;
+  try {
+    const r = await fetch(file, { cache: "no-store" });
+    if (r.ok) return await r.text();
+  } catch (_) {}
+  return ""; // 找不到就返回空
 }
 
 /* ---------- Music UI ---------- */
@@ -263,7 +263,7 @@ function renderTracks(){
   });
 }
 
-/* ---------- Player ---------- */
+/* ---------- 底部播放器 ---------- */
 const audio=new Audio();
 const bar=$("bar"), curT=$("cur"), durT=$("dur"), rail=$("rail"), volBar=$("volBar"), volRail=$("volRail"),
       npTitle=$("npTitle"), npMeta=$("npMeta"), npArt=$("npArt");
@@ -282,14 +282,29 @@ function setPlayIcon(){ $("iconPlay").innerHTML='<path d="M8 5v14l11-7z"/>'; }
 
 function playIdx(i){
   curIdx=i; const album=LIB[curAlbum]; const t=album.tracks[i];
-  if(!t||!t.src){ const n=nextPlayableIndex(curAlbum,i); if(n===i) return; curIdx=n; return playIdx(n); }
+  if(!t||!t.src){
+    const n=nextPlayableIndex(curAlbum,i);
+    if(n===i) return; curIdx=n; return playIdx(n);
+  }
   audio.src=t.src; audio.play().then(setPauseIcon).catch(()=>{});
   npTitle.textContent=t.t; npMeta.textContent=`${album.artist} • ${album.title.en}`;
   npArt.style.backgroundImage=`url('${album.cover}')`;
 }
-function firstPlayableIndex(albumId){ const a=LIB[albumId]; if(!a) return -1; for(let i=0;i<a.tracks.length;i++){ if(a.tracks[i].src) return i; } return -1; }
-function nextPlayableIndex(albumId,from){ const a=LIB[albumId]; if(!a) return from; const n=a.tracks.length; for(let k=1;k<=n;k++){ const idx=(from+k)%n; if(a.tracks[idx].src) return idx; } return from; }
-function prevPlayableIndex(albumId,from){ const a=LIB[albumId]; if(!a) return from; const n=a.tracks.length; for(let k=1;k<=n;k++){ const idx=(from-k+n)%n; if(a.tracks[idx].src) return idx; } return from; }
+function firstPlayableIndex(albumId){
+  const a=LIB[albumId]; if(!a) return -1;
+  for(let i=0;i<a.tracks.length;i++){ if(a.tracks[i].src) return i; }
+  return -1;
+}
+function nextPlayableIndex(albumId,from){
+  const a=LIB[albumId]; if(!a) return from; const n=a.tracks.length;
+  for(let k=1;k<=n;k++){ const idx=(from+k)%n; if(a.tracks[idx].src) return idx; }
+  return from;
+}
+function prevPlayableIndex(albumId,from){
+  const a=LIB[albumId]; if(!a) return from; const n=a.tracks.length;
+  for(let k=1;k<=n;k++){ const idx=(from-k+n)%n; if(a.tracks[idx].src) return idx; }
+  return from;
+}
 
 audio.addEventListener("loadedmetadata", ()=>{ durT.textContent=fmt(audio.duration); });
 audio.addEventListener("timeupdate", ()=>{
@@ -298,48 +313,92 @@ audio.addEventListener("timeupdate", ()=>{
   bar.style.width=(p*100)+"%";
   curT.textContent=fmt(audio.currentTime);
 });
-audio.addEventListener("ended", ()=>{ const n=nextPlayableIndex(curAlbum,curIdx); if(n!==curIdx){ curIdx=n; playIdx(n); updateLyricsForIndex(n);} else { setPlayIcon(); }});
-audio.addEventListener("error", ()=>{ const n=nextPlayableIndex(curAlbum,curIdx); if(n!==curIdx){ curIdx=n; playIdx(n); updateLyricsForIndex(n);} });
+audio.addEventListener("ended", ()=>{
+  const n=nextPlayableIndex(curAlbum,curIdx);
+  if(n!==curIdx){ curIdx=n; playIdx(n); updateLyricsForIndex(n);} else { setPlayIcon(); }
+});
+audio.addEventListener("error", ()=>{
+  const n=nextPlayableIndex(curAlbum,curIdx);
+  if(n!==curIdx){ curIdx=n; playIdx(n); updateLyricsForIndex(n); }
+});
 
-rail.onclick=(e)=>{ const r=rail.getBoundingClientRect(); const ratio=(e.clientX-r.left)/r.width; if(isFinite(audio.duration)) audio.currentTime=(audio.duration||0)*Math.max(0,Math.min(1,ratio)); };
-volRail.onclick=(e)=>{ const r=volRail.getBoundingClientRect(); const ratio=(e.clientX-r.left)/r.width; audio.volume=Math.max(0,Math.min(1,ratio)); volBar.style.width=(audio.volume*100)+"%"; };
+rail.onclick=(e)=>{
+  const r=rail.getBoundingClientRect();
+  const ratio=(e.clientX-r.left)/r.width;
+  if(isFinite(audio.duration)) audio.currentTime=(audio.duration||0)*Math.max(0,Math.min(1,ratio));
+};
+volRail.onclick=(e)=>{
+  const r=volRail.getBoundingClientRect();
+  const ratio=(e.clientX-r.left)/r.width;
+  audio.volume=Math.max(0,Math.min(1,ratio));
+  volBar.style.width=(audio.volume*100)+"%";
+};
 
-/* ---------- Lyrics right panel ---------- */
+/* ---------- 右侧歌词面板 ---------- */
 async function updateLyricsForIndex(i){
-  const a=LIB[curAlbum]; const t=a?.tracks?.[i]; if(!t){ $("lyricsBody").textContent="—"; return; }
+  const a=LIB[curAlbum]; const t=a?.tracks?.[i];
+  if(!t){ $("lyricsBody").textContent="—"; return; }
   setText("lyricsTitle", `${(I18N[lang]||I18N.en).ui.lyrics} — ${t.t}`);
   const txt = await loadLyrics(curAlbum, t.t);
   $("lyricsBody").textContent = txt || "Lyrics unavailable.";
 }
-function refreshAlbumHeader(){ const a=LIB[curAlbum]; if(!a) return; $("playCover").style.backgroundImage=`url('${a.cover}')`; setText("playAlbumName", a.title.en); setText("playArtist", a.artist); setText("albumDesc", a.blurb?.[lang]||a.blurb?.en||""); }
+function refreshAlbumHeader(){
+  const a=LIB[curAlbum]; if(!a) return;
+  $("playCover").style.backgroundImage=`url('${a.cover}')`;
+  setText("playAlbumName", a.title.en);
+  setText("playArtist", a.artist);
+  setText("albumDesc", a.blurb?.[lang]||a.blurb?.en||"");
+}
 
 /* ---------- Movies ---------- */
-const MOVIES=[{id:"m1",title:{en:"Night Flight to Paris","zh-CN":"夜航巴黎",es:"Vuelo nocturno a París",ru:"Ночной рейс в Париж"},desc:{en:"Overnight transatlantic selection.","zh-CN":"跨洋红眼航班精选影片。",es:"Selección trasatlántica nocturna.",ru:"Ночная трансатлантическая подборка."},src:""}];
+const MOVIES=[
+  {
+    id:"m1",
+    title:{en:"Night Flight to Paris","zh-CN":"夜航巴黎",es:"Vuelo nocturno a París",ru:"Ночной рейс в Париж"},
+    desc:{en:"Overnight transatlantic selection.","zh-CN":"跨洋红眼航班精选影片。",es:"Selección trasatlántica nocturna.",ru:"Ночная трансатлантическая подборка."},
+    src:""
+  }
+];
 function renderMovies(){
   const grid=$("movieGrid"); grid.innerHTML="";
-  MOVIES.forEach(m=>{ const el=document.createElement("div"); el.className="poster"; el.textContent=m.title[lang]||m.title.en; el.onclick=()=>openMovie(m); grid.appendChild(el); });
+  MOVIES.forEach(m=>{
+    const el=document.createElement("div");
+    el.className="poster"; el.textContent=m.title[lang]||m.title.en;
+    el.onclick=()=>openMovie(m); grid.appendChild(el);
+  });
 }
 function openMovie(m){
   openSection("movies"); $("movieGrid").style.display="none"; showPlayer(false);
-  $("video").src=m.src||""; setText("movieTitle", m.title[lang]||m.title.en); setText("movieDesc", m.desc[lang]||m.desc.en);
+  $("video").src=m.src||"";
+  setText("movieTitle", m.title[lang]||m.title.en);
+  setText("movieDesc", m.desc[lang]||m.desc.en);
   if(!audio.paused){ audio.pause(); setPlayIcon(); }
 }
 
-/* ---------- Flight countdown ---------- */
+/* ---------- 航班剩余时间 & 小地图动画 ---------- */
 const depart=new Date(); depart.setHours(22,30,0,0);
 const arrive=new Date(depart.getTime()+7.5*3600*1000);
 function fmt(s){ s=Math.floor(s||0); const m=Math.floor(s/60), ss=s%60; return m+":"+(ss<10?"0":"")+ss; }
 function fmtH(s){ s=Math.floor(s); const h=Math.floor(s/3600), m=Math.floor((s%3600)/60), ss=s%60; return `${h}h ${m}m ${ss}s`; }
 function updateFlight(){
-  const now=new Date(); const total=arrive-depart; const pct=Math.max(0,Math.min(1,(now-depart)/total)); const remainMs=Math.max(0,total*(1-pct));
+  const now=new Date(); const total=arrive-depart;
+  const pct=Math.max(0,Math.min(1,(now-depart)/total));
+  const remainMs=Math.max(0,total*(1-pct));
   setText("remain", fmtH(remainMs/1000));
   const eta=$("eta"); if(eta) eta.textContent=`ETA: ${new Date(arrive).toLocaleString()}`;
+
   const path=$("route"), plane=$("plane");
-  if(path&&plane&&path.getTotalLength){ const len=path.getTotalLength(), pos=path.getPointAtLength(len*pct), pos2=path.getPointAtLength(Math.max(0,len*pct-1)); const ang=Math.atan2(pos.y-pos2.y,pos.x-pos2.x)*180/Math.PI; plane.setAttribute("transform",`translate(${pos.x},${pos.y}) rotate(${ang})`); }
+  if(path&&plane&&path.getTotalLength){
+    const len=path.getTotalLength();
+    const pos=path.getPointAtLength(len*pct);
+    const pos2=path.getPointAtLength(Math.max(0,len*pct-1));
+    const ang=Math.atan2(pos.y-pos2.y,pos.x-pos2.x)*180/Math.PI;
+    plane.setAttribute("transform",`translate(${pos.x},${pos.y}) rotate(${ang})`);
+  }
 }
 setInterval(updateFlight,1000);
 
-/* ---------- Init ---------- */
+/* ---------- 初始化 ---------- */
 function initMusicView(){ showMusicHome(); renderAlbumCards(); }
 function showPlayer(v){ $("player").classList.toggle("hidden", !v); }
 
@@ -347,7 +406,6 @@ function init(){
   applyLang();
   initMusicView();
   renderMovies();
-  
   goHome();
   updateFlight();
 }
