@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>JW Airlines IFE update</title>
+  <title>JW Airlines IFE</title>
   <link rel="stylesheet" href="app.css"/>
 </head>
 <body>
   <!-- Language modal -->
   <div id="langScreen" class="lang-screen" role="dialog" aria-modal="true">
     <div class="lang-card">
-      <h2 id="langTitle" class="center-title">选择语言 / Select Language</h2>
+      <h2 class="center-title">选择语言 / Select Language</h2>
       <div class="lang-list">
         <button class="lang-btn" data-lang="zh-CN">简体中文</button>
         <button class="lang-btn" data-lang="en">English</button>
@@ -21,7 +21,7 @@
   </div>
 
   <!-- Header -->
-  <header>
+  <header id="appHeader">
     <div class="left">
       <strong id="brandTitle">JW Airlines</strong>
       <span id="destText" class="muted">Destination: Paris CDG</span>
@@ -36,133 +36,209 @@
         <svg viewBox="0 0 24 24"><path d="M12 3l9 8h-3v9h-5v-6H11v6H6v-9H3l9-8z"/></svg>
       </button>
       <button id="btnLang" class="icon-btn" title="Language" aria-label="Language">
-        <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm-1 5H7v2h1.7c.3 1.1.8 2.1 1.4 3.1-.9.9-1.9 1.6-3.1 2l.7 1.9c1.5-.6 2.7-1.5 3.8-2.6a13 13 0 003 2.6l1-1.7a11 11 0 01-2.7-2.1c.6-1 .9-2 .9-3.2h2V7h-4V5z"/></svg>
+        <!-- globe -->
+        <svg viewBox="0 0 24 24">
+          <path d="M12 2a10 10 0 100 20 10 10 0 000-20zm7.9 9h-3.1a14 14 0 00-1-4.2A8 8 0 0119.9 11zM12 4c1.4 0 2.8 1.9 3.6 5H8.4c.8-3.1 2.2-5 3.6-5zM4.1 13h3.1c.2 1.5.6 2.9 1.1 4.2A8 8 0 014.1 13zm3.1-2H4.1A8 8 0 017.3 6.8 14 14 0 007.2 11zM12 20c-1.4 0-2.8-1.9-3.6-5h7.2c-.8 3.1-2.2 5-3.6 5zm4.5-2.8c.5-1.3.9-2.7 1.1-4.2h3.1a8 8 0 01-4.2 4.2z"/>
+        </svg>
       </button>
     </div>
   </header>
 
-  <!-- Main hub -->
-  <main>
-    <section id="home" class="hub">
-      <div class="hero">
-        <img src="images/paris.jpg" alt="Paris"/>
-        <div class="label">
-          <div class="city" id="heroCity">PARIS</div>
-          <div class="code" id="heroCode">CDG</div>
+  <!-- Viewport -->
+  <main id="viewport">
+    <!-- Home -->
+    <section id="home" class="screen visible">
+      <div class="hub">
+        <div class="hero">
+          <img src="images/paris.jpg" alt="Paris"/>
+          <div class="label">
+            <div class="city">PARIS</div>
+            <div class="code">CDG</div>
+          </div>
         </div>
-      </div>
-      <div class="tile t-music" data-open="music">
-        <h3 id="tileMusic">Music</h3><p id="tileMusicSub">Albums & Playlists</p>
-      </div>
-      <div class="tile t-movies" data-open="movies">
-        <h3 id="tileMovies">Movies</h3><p id="tileMoviesSub">Player & Library</p>
-      </div>
-      <div class="tile t-shopping" data-open="shopping">
-        <h3 id="tileShopping">Shopping</h3><p id="tileShoppingSub">Duty-Free</p>
-      </div>
-      <div class="tile t-dining" data-open="dining">
-        <h3 id="tileDining">Dining</h3><p id="tileDiningSub">Meal & Countdown</p>
-      </div>
-      <div class="tile t-flight" data-open="flight">
-        <h3 id="tileFlight">My Flight</h3><p id="tileFlightSub">Map & Info</p>
+        <div class="tile t-music" data-open="music">
+          <h3 id="tileMusic">Music</h3><p id="tileMusicSub">Albums & Playlists</p>
+        </div>
+        <div class="tile t-movies" data-open="movies">
+          <h3 id="tileMovies">Movies</h3><p id="tileMoviesSub">Player & Library</p>
+        </div>
+        <div class="tile t-shopping" data-open="shopping">
+          <h3 id="tileShopping">Shopping</h3><p id="tileShoppingSub">Duty-Free</p>
+        </div>
+        <div class="tile t-dining" data-open="dining">
+          <h3 id="tileDining">Dining</h3><p id="tileDiningSub">Meal & Countdown</p>
+        </div>
+        <div class="tile t-flight" data-open="flight">
+          <h3 id="tileFlight">My Flight</h3><p id="tileFlightSub">Map & Info</p>
+        </div>
       </div>
     </section>
 
-    <!-- Music panel -->
-    <section id="panel-music" class="panel" aria-label="Music">
-      <!-- 子主页：专辑封面网格 -->
+    <!-- Music -->
+    <section id="panel-music" class="screen">
       <div id="musicHome" class="music-home">
-        <div class="music-home-header">
-          <h2 id="musicTitle" class="panel-title">Music</h2>
-          <p class="muted" style="margin:6px 0 14px 0">Albums & Playlists</p>
-        </div>
+        <h2 class="panel-title" id="musicTitle">Music</h2>
+        <p class="muted subcap">Albums & Playlists</p>
         <div id="albumCards" class="album-cards"></div>
       </div>
 
-      <!-- 播放页：左播放列表 + 右侧固定信息/歌词 -->
       <div id="musicPlay" class="music-play hidden">
-        <div class="music-play-header">
-          <button id="musicBack" class="icon-btn" title="Back" aria-label="Back">
+        <!-- sticky toolbar -->
+        <div class="album-toolbar">
+          <button id="btnPlayAlbum" class="pill-btn">
+            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          </button>
+          <div id="albumTitle" class="album-title">—</div>
+          <button id="musicBack" class="pill-btn pill-right" title="Back">
             <svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>
           </button>
-          <div class="album-head">
-            <div class="album-cover" id="playCover"></div>
-            <div>
-              <div class="album-name" id="playAlbumName">—</div>
-              <div class="album-artist" id="playArtist">—</div>
-            </div>
-          </div>
         </div>
 
-        <div class="music-play-body">
-          <div class="playlist" id="trackList"></div>
-          <aside class="music-side">
-            <div class="side-top" id="albumAbout">
-              <div class="about-title" id="aboutTitle">About this album</div>
-              <p id="albumDesc" class="about-text">—</p>
+        <div class="music-split">
+          <!-- left -->
+          <div class="left-col">
+            <div id="albumBanner" class="banner">
+              <div class="banner-name" id="bannerName">—</div>
+              <div class="banner-desc" id="bannerDesc">—</div>
             </div>
-            <div class="lyrics">
-              <div class="lyrics-title" id="lyricsTitle">Lyrics</div>
-              <div class="lyrics-body" id="lyricsBody">—</div>
+            <div id="trackList" class="track-list"></div>
+            <div class="bottom-spacer"></div>
+          </div>
+
+          <!-- right -->
+          <aside class="right-col" id="rightCol">
+            <div class="card big">
+              <div class="artist-photo" id="artistPhoto"></div>
+              <div class="card-title" id="artistName">—</div>
+              <div class="card-body" id="artistBio">—</div>
             </div>
+            <div class="card">
+              <div class="card-title" id="albumStudyTitle">—</div>
+              <div class="card-body" id="albumStudy">—</div>
+            </div>
+            <div class="card">
+              <div class="card-title" id="lyricsHeading">—</div>
+              <div class="card-body lyrics" id="lyricsBody">—</div>
+            </div>
+            <div class="bottom-spacer"></div>
           </aside>
         </div>
       </div>
     </section>
 
-    <!-- Movies panel -->
-    <section id="panel-movies" class="panel" aria-label="Movies">
-      <h2 class="panel-title" id="movieTitleHead">Movies</h2>
-      <div id="movieGrid" class="movie-grid"></div>
-      <div class="movie-layout">
-        <div class="movie-player">
-          <video id="video" controls playsinline></video>
+    <!-- Dining -->
+    <section id="panel-dining" class="screen">
+      <h2 class="panel-title" id="diningTitle">Dining</h2>
+      <div class="dining-wrap">
+        <!-- 左：菜品 -->
+        <div class="menu-col">
+          <div class="menu-section">
+            <div class="menu-h">Starters 前菜</div>
+            <div class="menu-item">
+              <div class="mi-main">
+                <div class="mi-name">Seasonal Salad</div>
+                <div class="mi-desc">柑橘、羊乳酪、烤坚果、油醋汁</div>
+              </div>
+              <div class="mi-price">$10</div>
+            </div>
+            <div class="menu-item">
+              <div class="mi-main">
+                <div class="mi-name">Pumpkin Soup</div>
+                <div class="mi-desc">南瓜浓汤、奶油、细香葱</div>
+              </div>
+              <div class="mi-price">$9</div>
+            </div>
+          </div>
+
+          <div class="menu-section">
+            <div class="menu-h">Mains 主菜</div>
+            <div class="menu-item">
+              <div class="mi-main">
+                <div class="mi-name">Herb Chicken</div>
+                <div class="mi-desc">香草鸡胸、迷迭香土豆、四季豆</div>
+              </div>
+              <div class="mi-price">$18</div>
+            </div>
+            <div class="menu-item">
+              <div class="mi-main">
+                <div class="mi-name">Miso Salmon</div>
+                <div class="mi-desc">味噌三文鱼、芝麻米饭、时蔬</div>
+              </div>
+              <div class="mi-price">$20</div>
+            </div>
+            <div class="menu-item">
+              <div class="mi-main">
+                <div class="mi-name">Pasta Alfredo</div>
+                <div class="mi-desc">帕玛森奶酪、奶油白酱、黑胡椒</div>
+              </div>
+              <div class="mi-price">$16</div>
+            </div>
+          </div>
+
+          <div class="menu-section">
+            <div class="menu-h">Desserts 甜点</div>
+            <div class="menu-item">
+              <div class="mi-main">
+                <div class="mi-name">Cheesecake</div>
+                <div class="mi-desc">纽约起司蛋糕、蓝莓酱</div>
+              </div>
+              <div class="mi-price">$8</div>
+            </div>
+            <div class="menu-item">
+              <div class="mi-main">
+                <div class="mi-name">Chocolate Mousse</div>
+                <div class="mi-desc">黑巧慕斯、可可碎</div>
+              </div>
+              <div class="mi-price">$8</div>
+            </div>
+          </div>
         </div>
-        <div class="movie-info">
-          <h3 id="movieTitle">—</h3>
-          <p id="movieDesc" class="muted">—</p>
-        </div>
+
+        <!-- 右：酒单 / 饮料 -->
+        <aside class="beverage-col">
+          <div class="bev-card">
+            <div class="bev-title">Wine List 酒单</div>
+            <div class="bev-item">
+              <div class="b-name">Chardonnay, Burgundy</div>
+              <div class="b-desc">清新苹果与轻橡木香，搭配鸡肉与奶油意面。</div>
+            </div>
+            <div class="bev-item">
+              <div class="b-name">Sauvignon Blanc, Marlborough</div>
+              <div class="b-desc">柑橘与青草气息，适配沙拉与海鲜。</div>
+            </div>
+            <div class="bev-item">
+              <div class="b-name">Pinot Noir, Oregon</div>
+              <div class="b-desc">红莓与淡香料，口感丝滑，适合禽类与蘑菇菜。</div>
+            </div>
+          </div>
+
+          <div class="bev-card">
+            <div class="bev-title">Beverages 饮料</div>
+            <div class="bev-row">
+              <div class="bev-kind">Soft Drinks</div>
+              <div class="bev-text">可乐、姜汁汽水、苏打水</div>
+            </div>
+            <div class="bev-row">
+              <div class="bev-kind">Juice</div>
+              <div class="bev-text">橙汁、苹果、番茄</div>
+            </div>
+            <div class="bev-row">
+              <div class="bev-kind">Coffee & Tea</div>
+              <div class="bev-text">现磨咖啡、英式红茶、乌龙茶、花草茶</div>
+            </div>
+          </div>
+          <div class="bottom-spacer"></div>
+        </aside>
       </div>
     </section>
 
-    <!-- Flight panel -->
-    <section id="panel-flight" class="panel" aria-label="My Flight">
-      <h2 class="panel-title" id="flightTitle">My Flight</h2>
-      <div class="flight-wrap">
-        <div class="mapbox">
-          <svg viewBox="0 0 600 320" width="100%" height="100%">
-            <defs>
-              <linearGradient id="g" x1="0" x2="1">
-                <stop offset="0" stop-color="#58c284"/><stop offset="1" stop-color="#a7ffd8"/>
-              </linearGradient>
-            </defs>
-            <path id="route" d="M40,260 C140,120 320,120 560,60" stroke="url(#g)" stroke-width="4" fill="none"/>
-            <g id="plane" transform="translate(40,260)">
-              <polygon points="0,0 14,4 0,8 4,4" fill="#ffd67a"/>
-            </g>
-          </svg>
-        </div>
-        <div class="finfo">
-          <div><strong>Departure:</strong> JFK 22:30</div>
-          <div><strong>Arrival:</strong> CDG 10:00</div>
-          <div><strong id="eta">ETA:</strong></div>
-          <div class="placeholder">A350-1000 · Wi-Fi · USB-C</div>
-        </div>
-      </div>
-    </section>
-
-    <section id="panel-shopping" class="panel" aria-label="Shopping">
-      <h2 class="panel-title">Shopping</h2>
-      <div class="placeholder">Duty-free catalog coming soon.</div>
-    </section>
-
-    <section id="panel-dining" class="panel" aria-label="Dining">
-      <h2 class="panel-title">Dining</h2>
-      <div class="placeholder">Meal service timeline and countdown.</div>
-    </section>
+    <!-- Others (placeholders) -->
+    <section id="panel-movies" class="screen"><h2 class="panel-title">Movies</h2></section>
+    <section id="panel-shopping" class="screen"><h2 class="panel-title">Shopping</h2></section>
+    <section id="panel-flight" class="screen"><h2 class="panel-title">My Flight</h2></section>
   </main>
 
-  <!-- Footer Player -->
+  <!-- Player -->
   <div class="player" id="player" aria-label="Audio Player">
     <div class="controls">
       <button id="btnPrev" class="btn" title="Previous">
