@@ -1,289 +1,490 @@
-/* ===== Paths ===== */
-const MUSIC_BASE = "music/";
-const IMAGE_BASE = "images/";
+// app.js - complete and self-contained
+document.addEventListener('DOMContentLoaded', function () {
+  try {
+    var MUSIC_BASE = "music/";
+    var IMAGE_BASE = "images/";
 
-/* ===== I18N ===== */
-const I18N = {
-  "zh-CN": {
-    brand:"JW Airlines", dest:"目的地：Paris CDG",
-    tiles:{ music:["音乐","专辑与歌单"], movies:["电影","播放器与片库"], shopping:["购物","免税店"], dining:["用餐","餐食与倒计时"], flight:["我的飞行","地图与信息"]},
-    ui:{ remain:"剩余", seatbeltOn:"系好安全带", crew:"呼叫乘务", lyrics:"歌词", study:"专辑研究" }
-  },
-  en:{ brand:"JW Airlines", dest:"Destination: Paris CDG",
-    tiles:{ music:["Music","Albums & Playlists"], movies:["Movies","Player & Library"], shopping:["Shopping","Duty-Free"], dining:["Dining","Meal & Countdown"], flight:["My Flight","Map & Info"]},
-    ui:{ remain:"Remaining", seatbeltOn:"Seatbelt On", crew:"Call Crew", lyrics:"Lyrics", study:"Album Study" }
-  },
-  es:{ brand:"JW Airlines", dest:"Destino: París CDG",
-    tiles:{ music:["Música","Álbumes y listas"], movies:["Cine","Reproductor y biblioteca"], shopping:["Compras","Duty-Free"], dining:["Comidas","Menú y cuenta atrás"], flight:["Mi Vuelo","Mapa e información"]},
-    ui:{ remain:"Restante", seatbeltOn:"Cinturón abrochado", crew:"Llamar tripulación", lyrics:"Letras", study:"Estudio del álbum" }
-  },
-  ru:{ brand:"JW Airlines", dest:"Назначение: Париж CDG",
-    tiles:{ music:["Музыка","Альбомы и плейлисты"], movies:["Фильмы","Плеер и библиотека"], shopping:["Покупки","Дьюти-фри"], dining:["Питание","Меню и таймер"], flight:["Мой рейс","Карта и инфо"]},
-    ui:{ remain:"Осталось", seatbeltOn:"Ремни пристёгнуты", crew:"Вызвать бортпроводника", lyrics:"Тексты", study:"Обзор альбомов" }
-  }
-};
+    // i18n
+    var I18N = {
+      "zh-CN": {
+        brand: "JW Airlines", dest: "目的地： Paris CDG",
+        tiles: { music: ["音乐", "专辑与歌单"], movies: ["电影", "播放器与片库"], shopping: ["购物", "免税店"], dining: ["用餐", "餐食与倒计时"], flight: ["我的飞行", "地图与信息"] },
+        ui: { remain: "剩余", seatbeltOn: "系好安全带", crew: "呼叫乘务", about: "专辑简介", lyrics: "歌词", playAll: "播放全部", home: "主页" }
+      },
+      "zh-TW": {
+        brand: "JW Airlines", dest: "目的地： Paris CDG",
+        tiles: { music: ["音樂", "專輯與歌單"], movies: ["電影", "播放器與片庫"], shopping: ["購物", "免稅店"], dining: ["用餐", "餐食與倒計時"], flight: ["我的飛行", "地圖與資訊"] },
+        ui: { remain: "剩餘", seatbeltOn: "繫好安全帶", crew: "呼叫乘務", about: "專輯簡介", lyrics: "歌詞", playAll: "播放全部", home: "主頁" }
+      },
+      "es": {
+        brand: "JW Airlines", dest: "Destino: Paris CDG",
+        tiles: { music: ["Música", "Álbumes y listas"], movies: ["Películas", "Reproductor y biblioteca"], shopping: ["Compras", "Duty-Free"], dining: ["Comida", "Menú y cuenta atrás"], flight: ["Mi vuelo", "Mapa e info"] },
+        ui: { remain: "Restante", seatbeltOn: "Abróchese el cinturón", crew: "Llamar tripulación", about: "Acerca del álbum", lyrics: "Letras", playAll: "Reproducir todo", home: "Inicio" }
+      },
+      "ru": {
+        brand: "JW Airlines", dest: "Пункт назначения: Paris CDG",
+        tiles: { music: ["Музыка", "Альбомы и плейлисты"], movies: ["Фильмы", "Плеер и библиотека"], shopping: ["Покупки", "Duty-Free"], dining: ["Питание", "Меню и таймер"], flight: ["Мой рейс", "Карта и информация"] },
+        ui: { remain: "Осталось", seatbeltOn: "Пристегните ремень", crew: "Вызвать экипаж", about: "О альбоме", lyrics: "Текст", playAll: "Воспроизвести всё", home: "Главная" }
+      },
+      "fr": {
+        brand: "JW Airlines", dest: "Destination : Paris CDG",
+        tiles: { music: ["Musique", "Albums et playlists"], movies: ["Films", "Lecteur et bibliothèque"], shopping: ["Shopping", "Duty-Free"], dining: ["Restauration", "Repas & compte à rebours"], flight: ["Mon vol", "Carte et infos"] },
+        ui: { remain: "Restant", seatbeltOn: "Bouclez votre ceinture", crew: "Appeler l'équipage", about: "À propos de l'album", lyrics: "Paroles", playAll: "Tout jouer", home: "Accueil" }
+      },
+      "en": {
+        brand: "JW Airlines", dest: "Destination: Paris CDG",
+        tiles: { music: ["Music", "Albums & Playlists"], movies: ["Movies", "Player & Library"], shopping: ["Shopping", "Duty-Free"], dining: ["Dining", "Meal & Countdown"], flight: ["My Flight", "Map & Info"] },
+        ui: { remain: "Remaining", seatbeltOn: "Seatbelt On", crew: "Call Crew", about: "About this album", lyrics: "Lyrics", playAll: "Play All", home: "Home" }
+      }
+    };
 
-let lang = localStorage.getItem("ife_lang") || "en";
-const $ = id => document.getElementById(id);
-const setText = (id, txt)=>{ const el=$(id); if(el) el.textContent = txt; };
+    var LANG_ORDER = ["zh-CN", "zh-TW", "es", "ru", "fr", "en"];
+    var lang = localStorage.getItem("ife_lang") || "zh-CN";
+    if (!I18N[lang]) lang = "zh-CN";
 
-/* ===== Apply language ===== */
-function applyLang(){
-  const t = I18N[lang] || I18N.en;
-  document.documentElement.lang = lang;
-  setText("brandTitle", t.brand); setText("destText", t.dest);
-  setText("tileMusic", t.tiles.music[0]); setText("tileMusicSub", t.tiles.music[1]);
-  setText("tileMovies", t.tiles.movies[0]); setText("tileMoviesSub", t.tiles.movies[1]);
-  setText("tileShopping", t.tiles.shopping[0]); setText("tileShoppingSub", t.tiles.shopping[1]);
-  setText("tileDining", t.tiles.dining[0]); setText("tileDiningSub", t.tiles.dining[1]);
-  setText("tileFlight", t.tiles.flight[0]); setText("tileFlightSub", t.tiles.flight[1]);
-  setText("musicTitle", t.tiles.music[0]);
-  setText("remainLabel", t.ui.remain);
-  setText("belt", t.ui.seatbeltOn);
-  setText("diningTitle", t.tiles.dining[0]);
-}
-$("btnLang").addEventListener("click", ()=> $("langScreen").style.display="grid");
-$("langScreen").addEventListener("click", e => { if(e.target.classList.contains("lang-screen")) e.currentTarget.style.display="none"; });
-document.querySelectorAll(".lang-btn").forEach(b=>b.addEventListener("click",()=>{
-  lang = b.dataset.lang; localStorage.setItem("ife_lang", lang);
-  $("langScreen").style.display="none"; applyLang(); renderAlbumCards(); refreshAlbumTexts();
-}));
+    function $id(id) { return document.getElementById(id); }
+    function setText(id, text) { var el = $id(id); if (el) el.textContent = text; }
 
-/* ===== Navigation ===== */
-function showScreen(id){
-  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("visible"));
-  $(id).classList.add("visible");
-}
-$("btnHome").addEventListener("click", ()=>showScreen("home"));
-document.querySelectorAll(".tile").forEach(t=>t.addEventListener("click",()=> {
-  const key = t.dataset.open;
-  if(key==="music"){ initMusicView(); showScreen("panel-music"); showMusicHome(); }
-  else showScreen("panel-"+key);
-}));
-$("btnCall").addEventListener("click", ()=>alert((I18N[lang]||I18N.en).ui.crew));
+    function applyLang(sel) {
+      if (sel) lang = sel;
+      if (!I18N[lang]) lang = "zh-CN";
+      localStorage.setItem("ife_lang", lang);
+      var t = I18N[lang];
+      setText("brandTitle", t.brand);
+      setText("destText", t.dest);
+      setText("tileMusic", t.tiles.music[0]); setText("tileMusicSub", t.tiles.music[1]);
+      setText("tileMovies", t.tiles.movies[0]); setText("tileMoviesSub", t.tiles.movies[1]);
+      setText("tileShopping", t.tiles.shopping[0]); setText("tileShoppingSub", t.tiles.shopping[1]);
+      setText("tileDining", t.tiles.dining[0]); setText("tileDiningSub", t.tiles.dining[1]);
+      setText("tileFlight", t.tiles.flight[0]); setText("tileFlightSub", t.tiles.flight[1]);
+      var playAllBtn = $id("musicPlayAll"); if (playAllBtn) playAllBtn.title = t.ui.playAll;
+      var belt = $id("btnBelt"); if (belt) belt.textContent = t.ui.seatbeltOn;
+      var albumAboutTitle = $id("albumNotesTitle"); if (albumAboutTitle) albumAboutTitle.textContent = t.ui.about;
+      var lyricsH = $id("lyricsH"); if (lyricsH) lyricsH.textContent = t.ui.lyrics;
+    }
 
-/* ===== Library ===== */
-const LIB = {
-  artangels:{
-    id:"artangels", artist:"Grimes",
-    cover: IMAGE_BASE+"art_angles_cover.jpg",
-    artistBio:{
-      en:"Canadian producer-singer Grimes stitches synth-pop, industrial sandpaper and bubblegum hooks into a neon maximalism that’s playful yet razor-edged.",
-      "zh-CN":"加拿大制作人/歌手 Grimes 将合成流行、工业质感与泡泡旋律缝合成霓虹般的极繁声音：俏皮、锋利、具未来感。",
-      es:"La productora-cantante canadiense Grimes une synth-pop, toques industriales y ganchos azucarados en un maximalismo neón, juguetón y afilado.",
-      ru:"Канадская певица и продюсер Grimes смешивает синти-поп, индустриальный шорох и поп-хуки в неоновый максимализм — игривый и острый."
-    },
-    study:{
-      en:"‘Art Angels’ reboots Grimes as a pop auteur: candy-bright melodies drive hyperactive beats, while knives of guitar and noise keep it feral.",
-      "zh-CN":"《Art Angels》把 Grimes 重启为流行作者型歌手：糖感旋律搭载高能节拍，吉他与噪声像刀锋，保持野性与速度。",
-      es:"‘Art Angels’ relanza a Grimes como autora pop: melodías brillantes sobre ritmos hiperactivos; guitarras y ruido afilan el borde salvaje.",
-      ru:"‘Art Angels’ перезапускает Grimes как поп-автора: яркие мелодии и гиперактивные биты, гитары и шум придают дикость."
-    },
-    title:{en:"Art Angels"},
-    tracks:[
-      { t:"laughing and not being normal", len:"1:48", src: MUSIC_BASE+"Grimes - laughing and not being normal.mp3" },
-      { t:"California", len:"3:16", src: MUSIC_BASE+"Grimes - California.mp3" },
-      { t:"SCREAM (feat. Aristophanes)", len:"2:06", src: MUSIC_BASE+"Grimes - SCREAM.mp3" },
-      { t:"Flesh without Blood", len:"4:24", src: MUSIC_BASE+"Grimes - Flesh without Blood.mp3" },
-      { t:"Belly of the Beat", len:"3:26", src: MUSIC_BASE+"Grimes - Belly of the Beat.mp3" },
-      { t:"Kill V. Maim", len:"4:06", src: MUSIC_BASE+"Grimes - Kill V. Maim.mp3" },
-      { t:"Artangels", len:"4:06", src: MUSIC_BASE+"Grimes - Artangels.mp3" },
-      { t:"Easily", len:"3:03", src: MUSIC_BASE+"Grimes - Easily.mp3" },
-      { t:"Pin", len:"3:31", src: MUSIC_BASE+"Grimes - Pin.mp3" },
-      { t:"REALiTi (album version)", len:"5:06", src: MUSIC_BASE+"Grimes - Realiti.mp3" },
-      { t:"World Princess Part II", len:"5:07", src: MUSIC_BASE+"Grimes - World Princess Part II.mp3" },
-      { t:"Venus Fly (feat. Janelle Monáe)", len:"3:45", src: MUSIC_BASE+"Grimes - Venus Fly.mp3" },
-      { t:"Life in the Vivid Dream", len:"1:29", src: MUSIC_BASE+"Grimes - Life in the Vivid Dream.mp3" },
-      { t:"Butterfly", len:"4:13", src: MUSIC_BASE+"Grimes - Butterfly.mp3" }
-    ]
-  },
-  paradigmes:{
-    id:"paradigmes", artist:"La Femme",
-    cover: IMAGE_BASE+"paradigmes_cover.jpg",
-    artistBio:{
-      en:"La Femme bend surf twang and coldwave chill into noirish road-movie vignettes — a French carousel of organs, drum machines and dead-pan romance.",
-      "zh-CN":"La Femme 把冲浪音色与冷潮气质折叠成通往夜色的公路片：风琴、鼓机与冷调浪漫交替旋转，法式而迷离。",
-      es:"La Femme tuerce surf y coldwave hacia un viaje nocturno: órganos, cajas de ritmo y romance hierático en carrusel francés.",
-      ru:"La Femme сгибают серф-тванг и колдвейв в ночное роуд-кино: органы, драм-машины и невозмутимая романтика."
-    },
-    study:{
-      en:"‘Paradigmes’ cruises like a cinematic night drive: yé-yé vocals, surf riffs and icy synths blur into stylish melancholy — retro but sharply modern.",
-      "zh-CN":"《Paradigmes》像一场电影化的夜驾：yé-yé 腔、人声与冲浪吉他、冰冷合成器交叠成时髦的忧郁；复古却锋利现代。",
-      es:"‘Paradigmes’ avanza como un paseo nocturno: voces yé-yé, riffs surf y sintes fríos se difuminan en melancolía chic — retro y actual.",
-      ru:"‘Paradigmes’ катит как ночная поездка: yé-yé вокал, серф-рифы и холодные синты сплавлены в стильную меланхолию — ретро и современность."
-    },
-    title:{en:"Paradigmes"},
-    tracks:[
-      { t:"Paradigmes Introduction", len:"—", src:MUSIC_BASE+"Paradigmes Introduction.mp3" },
-      { t:"Paradigme", len:"—", src:MUSIC_BASE+"La Femme - Paradigme.mp3" },
-      { t:"Le sang de mon prochain", len:"—", src:MUSIC_BASE+"La Femme - Le Sang De Mon Prochain.mp3" },
-      { t:"Cool Colorado", len:"—", src:MUSIC_BASE+"La Femme - Cool Colorado.mp3" },
-      { t:"Foreigner", len:"—", src:MUSIC_BASE+"La Femme - Foreigner.mp3" },
-      { t:"Nouvelle-Orléans", len:"—", src:MUSIC_BASE+"La Femme - Nouvelle-Orleans.mp3" },
-      { t:"Disconnexion", len:"—", src:MUSIC_BASE+"La Femme - Disconnexion.mp3" },
-      { t:"Pasadena", len:"—", src:MUSIC_BASE+"La Femme - Pasadena.mp3" }
-    ]
-  }
-};
-const albumIds = ["artangels","paradigmes"];
-let curAlbum = "artangels", curIdx = 0;
+    // Library (2 albums)
+    var LIB = {
+      artangels: {
+        id: "artangels",
+        artist: "Grimes",
+        artistImg: IMAGE_BASE + "grimes_artist.jpg",
+        title: { "en": "Art Angels", "zh-CN": "Art Angels", "zh-TW": "Art Angels", "fr": "Art Angels" },
+        cover: IMAGE_BASE + "art_angles_cover.jpg",
+        blurb: { "en": "Grimes’ hyperpop opus blending industrial punch with bubblegum hooks.", "zh-CN": "Grimes 的超流行专辑，工业能量与泡泡旋律的融合。", "zh-TW": "Grimes 的超流行專輯，工業能量與泡泡旋律的融合。", "fr": "Album hyperpop de Grimes mêlant puissance industrielle et refrains sucrés." },
+        notes: { "zh-CN": "《Art Angels》（2015）与《Paradigmes》（2021）两张专辑呈现两种语汇：前者以工业重拍与甜美旋律拉开舞台帷幕；后者则以冷潮与黑梦色彩敞开夜行叙事。", "en": "Art Angels (2015) and Paradigmes (2021) show two vocabularies: industrial punch and sweet melodies vs. coldwave night drives." },
+        year: 2015,
+        tracks: [
+          { t: "laughing and not being normal", len: "1:48", src: MUSIC_BASE + "Grimes - laughing and not being normal.mp3" },
+          { t: "California", len: "3:16", src: MUSIC_BASE + "Grimes - California.mp3" },
+          { t: "SCREAM (feat. Aristophanes)", len: "2:06", src: MUSIC_BASE + "Grimes - SCREAM.mp3" },
+          { t: "Flesh without Blood", len: "4:24", src: MUSIC_BASE + "Grimes - Flesh without Blood.mp3" },
+          { t: "Belly of the Beat", len: "3:26", src: MUSIC_BASE + "Grimes - Belly of the Beat.mp3" },
+          { t: "Kill V. Maim", len: "4:06", src: MUSIC_BASE + "Grimes - Kill V. Maim.mp3" },
+          { t: "Artangels", len: "4:06", src: MUSIC_BASE + "Grimes - Artangels.mp3" },
+          { t: "Easily", len: "3:03", src: MUSIC_BASE + "Grimes - Easily.mp3" },
+          { t: "Pin", len: "3:31", src: MUSIC_BASE + "Grimes - Pin.mp3" },
+          { t: "REALiTi (album version)", len: "5:06", src: MUSIC_BASE + "Grimes - Realiti.mp3" },
+          { t: "World Princess Part II", len: "5:07", src: MUSIC_BASE + "Grimes - World Princess Part II.mp3" },
+          { t: "Venus Fly (feat. Janelle Monáe)", len: "3:45", src: MUSIC_BASE + "Grimes - Venus Fly.mp3" },
+          { t: "Life in the Vivid Dream", len: "1:29", src: MUSIC_BASE + "Grimes - Life in the Vivid Dream.mp3" },
+          { t: "Butterfly", len: "4:13", src: MUSIC_BASE + "Grimes - Butterfly.mp3" }
+        ],
+        artistBio: { "zh-CN": "Grimes — 加拿大艺术家，科幻感与 DIY 狂热混合，将失真、J-pop 光泽与舞台剧性整合。", "en": "Grimes — Canadian artist mixing sci-fi textures with DIY intensity." }
+      },
+      paradigmes: {
+        id: "paradigmes",
+        artist: "La Femme",
+        artistImg: IMAGE_BASE + "lafemme_cover.jpg",
+        title: { "en": "Paradigmes", "zh-CN": "Paradigmes", "zh-TW": "Paradigmes", "fr": "Paradigmes" },
+        cover: IMAGE_BASE + "paradigmes_cover.jpg",
+        blurb: { "en": "French surf-coldwave shapeshifting into a cinematic night drive.", "zh-CN": "法国冷潮与冲浪气质的混融，像一段夜色里的电影公路。", "fr": "Mélange de coldwave et surf français comme une route nocturne cinématographique." },
+        notes: { "zh-CN": "La Femme 的《Paradigmes》（2021）以霓虹冲浪浪得林荫大道的暗影；对照《Art Angels》的甜刀锋，它像午夜磁带般翻涌。", "en": "Paradigmes (2021) by La Femme brings neon surf and coldwave shadows." },
+        year: 2021,
+        tracks: [
+          { t: "Paradigmes Introduction", len: "—", src: MUSIC_BASE + "Paradigmes Introduction.mp3" },
+          { t: "Paradigme", len: "—", src: MUSIC_BASE + "La Femme - Paradigme.mp3" },
+          { t: "Le sang de mon prochain", len: "—", src: MUSIC_BASE + "La Femme - Le Sang De Mon Prochain.mp3" },
+          { t: "Cool Colorado", len: "—", src: MUSIC_BASE + "La Femme - Cool Colorado.mp3" },
+          { t: "Foreigner", len: "—", src: MUSIC_BASE + "La Femme - Foreigner.mp3" },
+          { t: "Nouvelle-Orléans", len: "—", src: MUSIC_BASE + "La Femme - Nouvelle-Orleans.mp3" },
+          { t: "Disconnexion", len: "—", src: MUSIC_BASE + "La Femme - Disconnexion.mp3" },
+          { t: "Pasadena", len: "—", src: MUSIC_BASE + "La Femme - Pasadena.mp3" }
+        ],
+        artistBio: { "zh-CN": "La Femme — 法国乐队，冷潮与冲浪的混搭。", "en": "La Femme — French band mixing coldwave and surf." }
+      }
+    };
 
-/* ===== Utilities ===== */
-function slug(s){
-  return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"")
-    .replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"");
-}
-async function loadLyrics(albumId, title){
-  const file = `lyrics/${albumId}/${slug(title)}.txt`;
-  try{ const r = await fetch(file,{cache:"no-store"}); if(r.ok) return await r.text(); }catch(_){}
-  return "";
-}
+    var albumIds = Object.keys(LIB);
+    var curAlbum = albumIds[0];
+    var curIdx = 0;
 
-/* ===== Music home ===== */
-function renderAlbumCards(){
-  const grid = $("albumCards"); grid.innerHTML = "";
-  albumIds.forEach(id=>{
-    const a=LIB[id];
-    const card=document.createElement("div"); card.className="album-card";
-    card.innerHTML=`
-      <div class="cover" style="background-image:url('${a.cover}')"></div>
-      <div class="meta">
-        <div class="title">${a.title.en}</div>
-        <div class="artist">${a.artist}</div>
-        <div class="desc">${(a.study[lang]||a.study.en).slice(0,120)}...</div>
-      </div>`;
-    card.addEventListener("click", ()=>openPlaylistView(id));
-    grid.appendChild(card);
-  });
-}
-function initMusicView(){ renderAlbumCards(); showMusicHome(); }
-function showMusicHome(){ $("musicHome").classList.remove("hidden"); $("musicPlay").classList.add("hidden"); }
+    function slug(s) {
+      return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    }
+    function fmtSeconds(s) {
+      s = Math.floor(s || 0);
+      var m = Math.floor(s / 60), sec = s % 60;
+      return m + ':' + (sec < 10 ? '0' : '') + sec;
+    }
 
-/* ===== Music play ===== */
-function refreshAlbumTexts(){
-  const a=LIB[curAlbum]; if(!a) return;
-  setText("albumTitle", a.title.en);
-  setText("bannerName", a.title.en);
-  setText("bannerDesc", (a.study[lang]||a.study.en)); // banner 简短介绍
-  $("albumBanner").style.backgroundImage = `url('${a.cover}')`;
+    function renderMusicSelection() {
+      var grid = $id('albumGrid'); if (!grid) return; grid.innerHTML = '';
+      albumIds.forEach(function (id) {
+        var a = LIB[id];
+        var title = (a.title && (a.title[lang] || a.title['zh-CN'] || a.title.en)) || '';
+        var blurb = (a.blurb && (a.blurb[lang] || a.blurb['zh-CN'] || a.blurb.en)) || '';
+        var card = document.createElement('div'); card.className = 'album-card'; card.dataset.album = id;
+        var imgHtml = '<img src="' + a.cover + '" alt="">';
+        var infoHtml = '<div class="album-info"><div class="title">' + title + '</div><div class="meta">' + a.artist + ' • ' + (a.year || '') + '</div><div class="blurb">' + blurb + '</div></div>';
+        card.innerHTML = imgHtml + infoHtml;
+        grid.appendChild(card);
+      });
+    }
 
-  $("artistPhoto").style.backgroundImage = `url('${a.cover}')`;
-  setText("artistName", a.artist);
-  setText("artistBio", a.artistBio[lang]||a.artistBio.en);
+    function openMusicAlbum(albumId) {
+      if (!albumId) return;
+      curAlbum = albumId;
+      var panel = $id('panel-music');
+      if (panel) {
+        var panels = document.querySelectorAll('.panel');
+        for (var i = 0; i < panels.length; i++) panels[i].classList.remove('visible');
+        panel.classList.add('visible');
+      }
+      var home = $id('home'); if (home) home.style.display = 'none';
 
-  setText("albumStudyTitle", (I18N[lang]||I18N.en).ui.study);
-  // 综合两张专辑的 150 字左右研究
-  const aa = LIB.artangels, pd = LIB.paradigmes;
-  const studyCombined = {
-    "zh-CN":"两张专辑像两种速度：Grimes 的《Art Angels》以高能节拍与糖感旋律把锋利与甜美缝在一起；La Femme 的《Paradigmes》则放低心跳，用冲浪吉他与冷潮合成器把旅途拍成夜色电影。前者锐利张扬，后者时髦含蓄，在一起像把公路从白昼驶到凌晨。",
-    en:"The pair reads like two speeds of pop: ‘Art Angels’ fires sugar-rush hooks over hyperactive beats, while ‘Paradigmes’ slows the pulse, blending surf guitars and coldwave synths into a chic night-drive. One is sharp and vivid; the other sleek and restrained — a road trip from daylight to 3 AM.",
-    es:"Dos velocidades del pop: ‘Art Angels’ enciende ganchos azucarados sobre ritmos hiperactivos; ‘Paradigmes’ baja el pulso y mezcla guitarras surf con sintes fríos en un paseo nocturno. Una es afilada y brillante; la otra, elegante y contenida.",
-    ru:"Две скорости поп-музыки: ‘Art Angels’ — сахарные хуки и гиперактивные биты; ‘Paradigmes’ — серф-гитары и холодные синты для ночной поездки. Первая острая и яркая, вторая — стильная и сдержанная."
-  };
-  setText("albumStudy", studyCombined[lang]||studyCombined.en);
-}
-function openPlaylistView(albumId){
-  curAlbum = albumId;
-  refreshAlbumTexts();
-  renderTracks();
-  const first = firstPlayableIndex(curAlbum);
-  updateLyricsForIndex(first!==-1?first:0);
-  $("musicHome").classList.add("hidden");
-  $("musicPlay").classList.remove("hidden");
-  showScreen("panel-music");
-}
-$("musicBack").addEventListener("click", ()=>{ showMusicHome(); });
-$("btnPlayAlbum").addEventListener("click", ()=>{
-  const first = firstPlayableIndex(curAlbum);
-  if(first!==-1){ playIdx(first); updateLyricsForIndex(first); }
-});
+      var a = LIB[curAlbum]; if (!a) return;
+      var title = (a.title && (a.title[lang] || a.title['zh-CN'] || a.title.en)) || '';
+      var blurb = (a.blurb && (a.blurb[lang] || a.blurb['zh-CN'] || a.blurb.en)) || '';
+      var notes = (a.notes && (a.notes[lang] || a.notes['zh-CN'] || a.notes.en)) || a.notes || '';
 
-/* Track list */
-function renderTracks(){
-  const box=$("trackList"); box.innerHTML="";
-  const a=LIB[curAlbum];
-  a.tracks.forEach((trk,i)=>{
-    const row=document.createElement("div"); row.className="row";
-    row.innerHTML = `
-      <div class="row-btn" data-idx="${i}" title="Play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
-      <div>
-        <div class="title">${trk.t}</div>
-        <div class="meta">${a.artist} • ${a.title.en}</div>
-      </div>
-      <div style="text-align:right">${trk.len||"—"}</div>`;
-    row.querySelector(".row-btn").addEventListener("click", ()=>{
-      playIdx(i); updateLyricsForIndex(i);
+      var toolbarTitle = $id('toolbarTitle'); if (toolbarTitle) toolbarTitle.textContent = title;
+      var banner = $id('bannerCover'); if (banner) banner.src = a.cover;
+      var bannerSub = $id('bannerSub'); if (bannerSub) bannerSub.textContent = a.artist + ' • ' + (a.year || '');
+      var bannerBlurb = $id('bannerBlurb'); if (bannerBlurb) bannerBlurb.textContent = blurb;
+      var ai = $id('artistImg'); if (ai) ai.src = a.artistImg || '';
+      var artistName = $id('artistName'); if (artistName) artistName.textContent = a.artist;
+      var artistBioEl = $id('artistBio'); if (artistBioEl) artistBioEl.textContent = (a.artistBio && (a.artistBio[lang] || a.artistBio['zh-CN'] || a.artistBio.en)) || a.artistBio || '';
+      var albumNotes = $id('albumNotes'); if (albumNotes) albumNotes.textContent = notes;
+
+      // show music-grid (banner + tracks), hide selection
+      var ms = $id('music-selection'); if (ms) ms.style.display = 'none';
+      var mg = (panel ? panel.querySelector('.music-grid') : null); if (mg) mg.style.display = '';
+
+      renderTracks();
+
+      if (banner) {
+        banner.onload = function () {
+          extractDominantColor(banner, function (color) {
+            if (color) {
+              try { document.documentElement.style.setProperty('--banner-glow', 'rgba(' + color.r + ',' + color.g + ',' + color.b + ',0.12)'); } catch (e) { }
+            }
+          });
+        };
+      }
+    }
+
+    function renderTracks() {
+      var box = $id('trackList'); if (!box) return; box.innerHTML = '';
+      var a = LIB[curAlbum]; if (!a) return;
+      a.tracks.forEach(function (trk, i) {
+        var r = document.createElement('div'); r.className = 'row';
+        var titleText = trk.t || '';
+        var albumTitle = (a.title && (a.title[lang] || a.title['zh-CN'] || a.title.en)) || '';
+        var lenText = trk.len || '—';
+        var leftSvg = '<div class="row-btn" data-idx="' + i + '" title="Play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>';
+        var mid = '<div><div class="title">' + titleText + '</div><div class="meta">' + a.artist + ' • ' + albumTitle + '</div></div>';
+        var right = '<div style="text-align:right">' + lenText + '</div>';
+        r.innerHTML = leftSvg + mid + right;
+        box.appendChild(r);
+      });
+    }
+
+    var audio = new Audio(); audio.preload = 'metadata';
+
+    function firstPlayableIndex(albumId) { var a = LIB[albumId]; if (!a) return -1; for (var i = 0; i < a.tracks.length; i++) if (a.tracks[i].src) return i; return -1; }
+    function nextPlayableIndex(albumId, from) { var a = LIB[albumId]; if (!a) return from; var n = a.tracks.length; for (var k = 1; k <= n; k++) { var idx = (from + k) % n; if (a.tracks[idx].src) return idx; } return from; }
+    function prevPlayableIndex(albumId, from) { var a = LIB[albumId]; if (!a) return from; var n = a.tracks.length; for (var k = 1; k <= n; k++) { var idx = (from - k + n) % n; if (a.tracks[idx].src) return idx; } return from; }
+
+    function setPlayIcon() { var el = $id('iconPlay'); if (el) el.innerHTML = '<path d="M8 5v14l11-7z"/>'; }
+    function setPauseIcon() { var el = $id('iconPlay'); if (el) el.innerHTML = '<path d="M7 5h4v14H7zM13 5h4v14h-4z"/>'; }
+
+    function playIdx(i) {
+      var album = LIB[curAlbum]; if (!album || !album.tracks || !album.tracks[i]) return;
+      var t = album.tracks[i];
+      if (!t || !t.src) { var n = nextPlayableIndex(curAlbum, i); if (n === i) return; return playIdx(n); }
+      try { audio.src = t.src; audio.play().then(function () { setPauseIcon(); }).catch(function () { setPlayIcon(); }); } catch (err) { console.warn('Audio play error', err); }
+      var npTitleEl = $id('npTitle'), npMetaEl = $id('npMeta'), npArtEl = $id('npArt');
+      if (npTitleEl) npTitleEl.textContent = t.t;
+      if (npMetaEl) npMetaEl.textContent = album.artist + ' • ' + ((album.title && (album.title[lang] || album.title['zh-CN'] || album.title.en)) || '');
+      if (npArtEl) npArtEl.style.backgroundImage = 'url("' + album.cover + '")';
+      curIdx = i;
+    }
+
+    audio.addEventListener('loadedmetadata', function () {
+      var d = Math.floor(audio.duration || 0);
+      var durEl = $id('dur'); if (durEl) durEl.textContent = fmtSeconds(d);
+      updateProgressUI();
     });
-    box.appendChild(row);
-  });
-}
 
-/* ===== Player ===== */
-const audio = new Audio();
-const bar=$("bar"), curT=$("cur"), durT=$("dur"), rail=$("rail"), volBar=$("volBar"), volRail=$("volRail"),
-      npTitle=$("npTitle"), npMeta=$("npMeta"), npArt=$("npArt");
+    audio.addEventListener('timeupdate', function () {
+      updateProgressUI();
+      var curEl = $id('cur'); if (curEl) curEl.textContent = fmtSeconds(Math.floor(audio.currentTime || 0));
+    });
 
-$("btnPrev").onclick=()=>{ curIdx=prevPlayableIndex(curAlbum,curIdx); playIdx(curIdx); updateLyricsForIndex(curIdx); };
-$("btnNext").onclick=()=>{ curIdx=nextPlayableIndex(curAlbum,curIdx); playIdx(curIdx); updateLyricsForIndex(curIdx); };
-$("playPause").onclick=()=>{
-  if(!audio.src){ const first=firstPlayableIndex(curAlbum); if(first!==-1){ playIdx(first); updateLyricsForIndex(first); return; } }
-  if(audio.paused){ audio.play().then(setPauseIcon).catch(()=>{});} else { audio.pause(); setPlayIcon(); }
-};
-function setPauseIcon(){ $("iconPlay").innerHTML='<path d="M7 5h4v14H7zM13 5h4v14h-4z"/>'; }
-function setPlayIcon(){ $("iconPlay").innerHTML='<path d="M8 5v14l11-7z"/>'; }
+    audio.addEventListener('ended', function () { var n = nextPlayableIndex(curAlbum, curIdx); if (n !== curIdx) { playIdx(n); updateLyricsForIndex(n); } else { setPlayIcon(); } });
+    audio.addEventListener('error', function (ev) { console.warn('Audio element error', ev); });
 
-function playIdx(i){
-  const a=LIB[curAlbum]; const t=a.tracks[i]; curIdx=i;
-  if(!t || !t.src){ const n=nextPlayableIndex(curAlbum,i); if(n!==i){ curIdx=n; return playIdx(n);} return; }
-  audio.src = t.src; audio.play().then(setPauseIcon).catch(()=>{});
-  npTitle.textContent=t.t; npMeta.textContent=`${a.artist} • ${a.title.en}`;
-  npArt.style.backgroundImage=`url('${a.cover}')`;
-}
-function firstPlayableIndex(albumId){ const a=LIB[albumId]; for(let i=0;i<a.tracks.length;i++) if(a.tracks[i].src) return i; return -1; }
-function nextPlayableIndex(albumId,from){ const a=LIB[albumId], n=a.tracks.length; for(let k=1;k<=n;k++){ const i=(from+k)%n; if(a.tracks[i].src) return i; } return from; }
-function prevPlayableIndex(albumId,from){ const a=LIB[albumId], n=a.tracks.length; for(let k=1;k<=n;k++){ const i=(from-k+n)%n; if(a.tracks[i].src) return i; } return from; }
+    function updateProgressUI() {
+      var rail = $id('rail'), bar = $id('bar'), seekThumb = $id('seekThumb');
+      if (!rail || !bar || !seekThumb) return;
+      var total = audio.duration || 0;
+      var current = audio.currentTime || 0;
+      var railRect = rail.getBoundingClientRect();
+      var innerW = Math.max(24, railRect.width - 24);
+      var p = (total > 0) ? (current / total) : 0;
+      var px = Math.max(0, Math.min(innerW, Math.round(p * innerW)));
+      bar.style.width = px + 'px';
+      var thumbCenter = 12 + px;
+      seekThumb.style.left = thumbCenter + 'px';
+    }
 
-audio.addEventListener("loadedmetadata", ()=>{ durT.textContent=fmt(audio.duration); });
-audio.addEventListener("timeupdate", ()=>{
-  if(!isFinite(audio.duration)) return;
-  const p=audio.currentTime/audio.duration;
-  bar.style.width=(p*100)+"%";
-  curT.textContent=fmt(audio.currentTime);
+    function pointerToRatio(e, el) {
+      var r = el.getBoundingClientRect();
+      var x = (e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0] && e.touches[0].clientX));
+      var px = Math.max(12, Math.min(r.width - 12, x - r.left));
+      return (px - 12) / Math.max(1, (r.width - 24));
+    }
+
+    var railEl = $id('rail');
+    if (railEl) {
+      railEl.addEventListener('pointerdown', function (e) {
+        try { railEl.setPointerCapture(e.pointerId); } catch (_) { }
+        function ratioFromEvent(ev) {
+          var r = railEl.getBoundingClientRect();
+          var clientX = (ev.clientX !== undefined ? ev.clientX : (ev.touches && ev.touches[0] && ev.touches[0].clientX));
+          var px = Math.max(12, Math.min(r.width - 12, clientX - r.left));
+          return (px - 12) / Math.max(1, (r.width - 24));
+        }
+        var r0 = ratioFromEvent(e);
+        if (isFinite(audio.duration)) audio.currentTime = r0 * audio.duration;
+        var move = function (ev) { var rr = ratioFromEvent(ev); if (isFinite(audio.duration)) audio.currentTime = rr * audio.duration; };
+        var up = function () { try { railEl.releasePointerCapture(e.pointerId); } catch (_) { } window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up); };
+        window.addEventListener('pointermove', move);
+        window.addEventListener('pointerup', up);
+      });
+    }
+
+    var volRail = $id('volRail');
+    if (volRail) {
+      volRail.addEventListener('pointerdown', function (e) {
+        try { volRail.setPointerCapture(e.pointerId); } catch (_) { }
+        var r0 = pointerToRatio(e, volRail);
+        audio.volume = r0; var volBar = $id('volBar'), volThumb = $id('volThumb');
+        if (volBar) volBar.style.width = (r0 * 100) + '%';
+        if (volThumb) volThumb.style.left = (r0 * (volRail.getBoundingClientRect().width - 16) + 8) + 'px';
+        var move = function (ev) { var r = pointerToRatio(ev, volRail); audio.volume = r; if (volBar) volBar.style.width = (r * 100) + '%'; if (volThumb) volThumb.style.left = (r * (volRail.getBoundingClientRect().width - 16) + 8) + 'px'; };
+        var up = function () { try { volRail.releasePointerCapture(e.pointerId); } catch (_) { } window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up); };
+        window.addEventListener('pointermove', move); window.addEventListener('pointerup', up);
+      });
+      volRail.addEventListener('click', function (e) {
+        var r = pointerToRatio(e, volRail);
+        audio.volume = r; var volBar = $id('volBar'), volThumb = $id('volThumb');
+        if (volBar) volBar.style.width = (r * 100) + '%'; if (volThumb) volThumb.style.left = (r * (volRail.getBoundingClientRect().width - 16) + 8) + 'px';
+      });
+    }
+
+    function updateLyricsForIndex(i) {
+      var a = LIB[curAlbum]; var t = a && a.tracks && a.tracks[i];
+      if (!t) { var lb = $id('lyricsBody'); if (lb) lb.textContent = '—'; return; }
+      var lyricsTitle = $id('lyricsH'); if (lyricsTitle) lyricsTitle.textContent = (I18N[lang] || I18N.en).ui.lyrics;
+      loadLyrics(curAlbum, t.t).then(function (txt) { var body = $id('lyricsBody'); if (body) body.textContent = (txt || '').replace(/\r?\n/g, '\n'); });
+    }
+    function loadLyrics(albumId, title) {
+      var file = 'lyrics/' + albumId + '/' + slug(title) + '.txt';
+      return fetch(file, { cache: 'no-store' }).then(function (r) { if (r.ok) return r.text(); return ''; }).catch(function () { return ''; });
+    }
+
+    function extractDominantColor(imgEl, cb) {
+      try {
+        var img = new Image(); img.crossOrigin = 'anonymous'; img.src = imgEl.src;
+        img.onload = function () {
+          try {
+            var w = 40, h = 40;
+            var canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h;
+            var ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, w, h);
+            var data = ctx.getImageData(0, 0, w, h).data;
+            var r = 0, g = 0, b = 0, count = 0;
+            for (var i = 0; i < data.length; i += 4) {
+              var alpha = data[i + 3]; if (alpha < 125) continue;
+              r += data[i]; g += data[i + 1]; b += data[i + 2]; count++;
+            }
+            if (count === 0) return cb(null);
+            r = Math.round(r / count); g = Math.round(g / count); b = Math.round(b / count);
+            return cb({ r: r, g: g, b: b });
+          } catch (err) { return cb(null); }
+        };
+        img.onerror = function () { return cb(null); };
+      } catch (e) { return cb(null); }
+    }
+
+    // keyboard shortcuts
+    window.addEventListener('keydown', function (e) {
+      if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+      if (e.code === 'Space') { e.preventDefault(); var btn = $id('playPause'); if (btn) btn.click(); }
+      if (e.code === 'ArrowRight') { e.preventDefault(); var n = $id('btnNext'); if (n) n.click(); }
+      if (e.code === 'ArrowLeft') { e.preventDefault(); var p = $id('btnPrev'); if (p) p.click(); }
+    });
+
+    function ensureLangModal() {
+      var screen = $id('langScreen'); var listEl = $id('langList');
+      if (listEl) {
+        listEl.innerHTML = '';
+        for (var i = 0; i < LANG_ORDER.length; i++) {
+          var code = LANG_ORDER[i];
+          var mapNames = { "zh-CN": "简体中文", "zh-TW": "繁體中文", "es": "Español", "ru": "Русский", "fr": "Français", "en": "English" };
+          var btn = document.createElement('button'); btn.className = 'lang-btn'; btn.dataset.lang = code; btn.textContent = mapNames[code] || code;
+          listEl.appendChild(btn);
+        }
+      }
+    }
+    ensureLangModal();
+
+    /* ---------- Click handlers & top buttons ---------- */
+    function closeAllPanels() {
+      var panels = document.querySelectorAll('.panel');
+      for (var i = 0; i < panels.length; i++) panels[i].classList.remove('visible');
+      var home = document.getElementById('home');
+      if (home) home.style.display = 'grid';
+      var ms = document.getElementById('music-selection');
+      if (ms) ms.style.display = 'none';
+      var pm = document.getElementById('panel-music'); if (pm) {
+        var mg = pm.querySelector('.music-grid'); if (mg) mg.style.display = 'none';
+      }
+    }
+
+    var btnHomeEl = document.getElementById('btnHome');
+    if (btnHomeEl) {
+      btnHomeEl.addEventListener('click', function (ev) { ev.stopPropagation(); closeAllPanels(); });
+    }
+    var btnBeltEl = document.getElementById('btnBelt');
+    if (btnBeltEl) {
+      btnBeltEl.addEventListener('click', function (ev) { ev.stopPropagation(); alert((I18N && I18N[lang] ? I18N[lang].ui.seatbeltOn : 'Seatbelt On')); });
+    }
+    var userBtnEl = document.getElementById('userBtn');
+    if (userBtnEl) {
+      userBtnEl.addEventListener('click', function (ev) { ev.stopPropagation(); alert('Profile (占位)'); });
+    }
+    var btnLangEl = document.getElementById('btnLang');
+    if (btnLangEl) {
+      btnLangEl.addEventListener('click', function (ev) { ev.stopPropagation(); var ls = document.getElementById('langScreen'); if (!ls) return; ls.style.display = (ls.style.display === 'grid' || ls.style.display === 'flex') ? 'none' : 'grid'; });
+    }
+
+    // delegated click handler (tiles, album-cards, rows, buttons, language)
+    document.body.addEventListener('click', function (e) {
+      var tile = e.target.closest('.tile');
+      if (tile && tile.dataset && tile.dataset.open) {
+        var key = tile.dataset.open;
+        if (key === 'music') {
+          renderMusicSelection();
+          var panelMusic = document.getElementById('panel-music');
+          if (panelMusic) {
+            var allPanels = document.querySelectorAll('.panel'); for (var i = 0; i < allPanels.length; i++) allPanels[i].classList.remove('visible');
+            panelMusic.classList.add('visible');
+            var homeEl = document.getElementById('home'); if (homeEl) homeEl.style.display = 'none';
+            var ms = document.getElementById('music-selection'); if (ms) { ms.style.display = 'block'; ms.classList.add('visible'); }
+            var mg = panelMusic.querySelector('.music-grid'); if (mg) mg.style.display = 'none';
+          } else {
+            var grid = document.getElementById('albumGrid'); if (grid) grid.style.display = 'block';
+            var homeE = document.getElementById('home'); if (homeE) homeE.style.display = 'none';
+          }
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          return;
+        }
+
+        var panel = document.getElementById('panel-' + key);
+        if (panel) {
+          var panels2 = document.querySelectorAll('.panel');
+          for (var pi = 0; pi < panels2.length; pi++) panels2[pi].classList.remove('visible');
+          panel.classList.add('visible');
+          var h = document.getElementById('home'); if (h) h.style.display = 'none';
+        } else {
+          alert('模块“' + key + '”尚未实现（placeholder）。');
+        }
+        return;
+      }
+
+      var albumCard = e.target.closest('.album-card');
+      if (albumCard && albumCard.dataset && albumCard.dataset.album) { 
+        var albumId = albumCard.dataset.album;
+        var panelMusic2 = document.getElementById('panel-music');
+        var ms2 = document.getElementById('music-selection');
+        var mg2 = panelMusic2 ? panelMusic2.querySelector('.music-grid') : null;
+        if (ms2) ms2.style.display = 'none';
+        if (mg2) mg2.style.display = '';
+        openMusicAlbum(albumId); 
+        if (panelMusic2) panelMusic2.scrollTop = 0;
+        return;
+      }
+
+      var rowBtn = e.target.closest('.row-btn');
+      if (rowBtn && rowBtn.dataset && rowBtn.dataset.idx !== undefined) { var idx = parseInt(rowBtn.dataset.idx, 10); playIdx(idx); updateLyricsForIndex(idx); return; }
+
+      var btn = e.target.closest('.pill, .btn, button, .icon-btn, .badge, .lang-btn');
+      if (btn) {
+        var id = btn.id || (btn.dataset && btn.dataset.action);
+        if (id === 'musicBack') { closeAllPanels(); return; }
+        if (id === 'musicPlayAll' || btn.classList.contains('play-pill')) { var first = firstPlayableIndex(curAlbum); if (first !== -1) { playIdx(first); updateLyricsForIndex(first); } return; }
+        if (id === 'btnPrev') { curIdx = prevPlayableIndex(curAlbum, curIdx); playIdx(curIdx); updateLyricsForIndex(curIdx); return; }
+        if (id === 'btnNext') { curIdx = nextPlayableIndex(curAlbum, curIdx); playIdx(curIdx); updateLyricsForIndex(curIdx); return; }
+        if (id === 'playPause') {
+          if (!audio.src) { var f = firstPlayableIndex(curAlbum); if (f !== -1) { playIdx(f); updateLyricsForIndex(f); return; } }
+          if (audio.paused) { audio.play().then(function () { setPauseIcon(); }).catch(function () { setPlayIcon(); }); } else { audio.pause(); setPlayIcon(); }
+          return;
+        }
+        if (id === 'btnHome') { closeAllPanels(); return; }
+        if (id === 'btnCall') { alert((I18N[lang] || I18N.en).ui.crew); return; }
+        if (btn.classList.contains('lang-btn') && btn.dataset && btn.dataset.lang) {
+          var chosen = btn.dataset.lang;
+          applyLang(chosen);
+          renderMusicSelection();
+          var pm = document.getElementById('panel-music');
+          if (pm && pm.classList.contains('visible')) openMusicAlbum(curAlbum);
+          var ls2 = document.getElementById('langScreen'); if (ls2) ls2.style.display = 'none';
+          return;
+        }
+      }
+    }, true);
+
+    // flight remaining countdown (5:40 starting)
+    var FIVE_H_FORTY_MS = (5 * 3600 + 40 * 60) * 1000;
+    var arrive = new Date(Date.now() + FIVE_H_FORTY_MS);
+    function updateFlight() {
+      var now = new Date(); var total = Math.max(0, arrive - now); var secs = Math.floor(total / 1000);
+      var hours = Math.floor(secs / 3600); var mins = Math.floor((secs % 3600) / 60); var s = secs % 60;
+      var center = $id('remain');
+      if (center) { if (hours > 0) center.textContent = hours + ':' + String(mins).padStart(2, '0'); else center.textContent = mins + ':' + String(s).padStart(2, '0'); }
+    }
+    updateFlight(); setInterval(updateFlight, 1000);
+
+    // set initial volume UI
+    setTimeout(function () {
+      try {
+        var vol = audio.volume || 0.6;
+        var vb = $id('volBar'), vt = $id('volThumb'), vr = $id('volRail');
+        if (vb) vb.style.width = (vol * 100) + '%';
+        if (vt && vr) vt.style.left = (vol * (vr.getBoundingClientRect().width - 16) + 8) + 'px';
+      } catch (e) { }
+    }, 200);
+
+    // init view
+    renderMusicSelection();
+    var homeEl = $id('home'); if (homeEl) homeEl.style.display = 'grid';
+    var playerEl = $id('player'); if (playerEl) playerEl.style.display = '';
+
+    applyLang(lang);
+
+  } catch (err) {
+    console.error('Initialization error', err);
+  }
 });
-audio.addEventListener("ended", ()=>{ const n=nextPlayableIndex(curAlbum,curIdx); if(n!==curIdx){ curIdx=n; playIdx(n); updateLyricsForIndex(n);} else setPlayIcon(); });
-audio.addEventListener("error", ()=>{ const n=nextPlayableIndex(curAlbum,curIdx); if(n!==curIdx){ curIdx=n; playIdx(n); updateLyricsForIndex(n);} });
-
-rail.onclick=(e)=>{ const r=rail.getBoundingClientRect(); const ratio=(e.clientX-r.left)/r.width; if(isFinite(audio.duration)) audio.currentTime=(audio.duration||0)*Math.max(0,Math.min(1,ratio)); };
-volRail.onclick=(e)=>{ const r=volRail.getBoundingClientRect(); const ratio=(e.clientX-r.left)/r.width; audio.volume=Math.max(0,Math.min(1,ratio)); volBar.style.width=(audio.volume*100)+"%"; };
-
-/* ===== Lyrics ===== */
-async function updateLyricsForIndex(i){
-  const a=LIB[curAlbum]; const t=a?.tracks?.[i]; if(!t){ $("lyricsBody").textContent="—"; return; }
-  setText("lyricsHeading", (I18N[lang]||I18N.en).ui.lyrics + " — " + t.t);
-  const txt = await loadLyrics(a.id, t.t);
-  // 直接把原文件换行呈现（CSS: white-space: pre-wrap）
-  $("lyricsBody").textContent = txt || "Lyrics unavailable.";
-}
-
-/* ===== Flight remaining ===== */
-const depart=new Date(); depart.setHours(22,30,0,0);
-const arrive=new Date(depart.getTime()+7.5*3600*1000);
-function fmt(s){ s=Math.floor(s||0); const m=Math.floor(s/60), ss=s%60; return m+":"+(ss<10?"0":"")+ss; }
-function fmtH(s){ s=Math.floor(s); const h=Math.floor(s/3600), m=Math.floor((s%3600)/60), ss=s%60; return `${h}h ${m}m ${ss}s`; }
-function updateFlight(){
-  const now=new Date(); const total=arrive-depart;
-  const pct=Math.max(0,Math.min(1,(now-depart)/total));
-  const remainMs=Math.max(0,total*(1-pct));
-  setText("remain", fmtH(remainMs/1000));
-}
-setInterval(updateFlight, 1000);
-
-/* ===== Init ===== */
-function showMusicHome(){ $("musicHome").classList.remove("hidden"); $("musicPlay").classList.add("hidden"); }
-function init(){
-  applyLang();
-  showScreen("home");
-  initMusicView();
-  updateFlight();
-}
-init();
