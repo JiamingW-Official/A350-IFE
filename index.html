@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>IFE — JW Airlines</title>
-  <link rel="stylesheet" href="app.css" />
+  <title>IFE — JW Airlines Music</title>
+  <link rel="stylesheet" href="app.css">
 </head>
 <body>
   <header>
@@ -13,28 +13,21 @@
       <div class="muted" id="destText">目的地： Paris CDG</div>
     </div>
 
-    <!-- centered countdown -->
     <div id="remain">5:40</div>
 
     <div class="actions">
-      <div id="userBtn" class="icon-btn" title="profile">
-        <svg width="18" height="18" viewBox="0 0 24 24"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-5.33 0-8 2.67-8 4v2h16v-2c0-1.33-2.67-4-8-4z"></path></svg>
-      </div>
-      <div id="btnBelt" class="badge yellow">系好安全带</div>
-      <div id="btnHome" class="icon-btn" title="Home">
-        <svg width="18" height="18" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"></path></svg>
-      </div>
-      <div id="btnLang" class="icon-btn" title="Language">
-        <svg width="18" height="18" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 2c.7 0 1.4.07 2.06.2L12 7 9.94 4.2A8 8 0 1 1 12 4zM6.5 9H17.5A8 8 0 0 0 6.5 9z"></path></svg>
-      </div>
+      <button id="userBtn" class="icon-btn" title="Profile" aria-label="profile">👤</button>
+      <button id="btnBelt" class="badge" aria-label="seatbelt">系好安全带</button>
+      <button id="btnHome" class="icon-btn" title="Home" aria-label="home">🏠</button>
+      <button id="btnLang" class="icon-btn" title="语言" aria-label="language">🌐</button>
     </div>
   </header>
 
   <main>
-    <!-- home grid -->
+    <!-- HOME grid -->
     <div id="home" class="hub">
-      <div class="hero tile" style="grid-area:hero;">
-        <img src="images/paris.jpg" alt="paris" />
+      <div class="hero">
+        <img src="images/paris_big.jpg" alt="paris">
         <div class="label">
           <div class="city">PARIS</div>
           <div class="code">CDG</div>
@@ -67,138 +60,103 @@
       </div>
     </div>
 
-    <!-- panels -->
-
-    <!-- Music panel -->
-    <div id="panel-music" class="panel">
-      <!-- album selection (shown first when entering Music) -->
-      <div id="music-selection" class="panel" style="display:block;padding-top:12px;">
-        <div class="album-grid" id="albumGrid"></div>
+    <!-- Panels -->
+    <section id="panel-music" class="panel" aria-hidden="true">
+      <!-- Album selection (grid) -->
+      <div id="music-selection" style="display:block;">
+        <div class="album-grid" id="albumGrid" aria-live="polite"></div>
       </div>
 
-      <!-- album detail grid (hidden until album opened) -->
+      <!-- Album page: banner (with floating toolbar) + tracks + right column -->
       <div class="music-grid" style="display:none;">
         <div class="music-left">
-          <!-- toolbar (darker, low opacity) -->
-          <div class="music-toolbar liquid">
-            <div style="display:flex;align-items:center;gap:12px;">
-              <div class="play-pill pill" id="musicPlayAll" title="Play all">
-                <svg viewBox="0 0 24 24" style="width:18px;height:18px;vertical-align:middle;"><path d="M8 5v14l11-7z"></path></svg>
-              </div>
-            </div>
-            <div style="flex:1"></div>
-            <button id="musicBack" class="pill" title="Back">返回</button>
-          </div>
-
-          <!-- album banner -->
-          <div class="album-banner liquid">
+          <div class="album-banner" id="albumBannerRoot">
             <div class="banner-left">
-              <img id="bannerCover" src="images/art_angles_cover.jpg" alt="cover" />
+              <img id="bannerCover" src="" alt="cover">
             </div>
+
             <div class="banner-right">
               <div class="banner-meta">
                 <div class="small">Album</div>
-                <h1 id="toolbarTitle">Art Angels</h1>
-                <div class="submeta" id="bannerSub">Grimes • 2015</div>
-                <div class="banner-blurb" id="bannerBlurb">Grimes 的超流行专辑，工业能量与泡泡旋律的融合。</div>
+                <h1 id="toolbarTitle">Album Title</h1>
+                <div id="bannerSub" class="submeta">Artist • Year</div>
+                <div id="bannerBlurb" class="banner-blurb">Blurb...</div>
+              </div>
+            </div>
+
+            <!-- Floating toolbar that sits on top of banner (play, album title, back) -->
+            <div class="banner-toolbar" id="bannerToolbar" aria-hidden="false">
+              <div class="toolbar-left">
+                <button id="bannerPlay" class="play-pill" title="Play">
+                  <!-- svg triangle inside -->
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg>
+                </button>
+                <div class="toolbar-title" id="toolbarTitleFloating">Album</div>
+              </div>
+              <div class="toolbar-right">
+                <button id="musicBack" class="icon-btn" title="返回">返回</button>
               </div>
             </div>
           </div>
 
-          <!-- playlist -->
-          <div class="playlist" id="trackList">
-            <!-- rows injected by JS -->
-          </div>
+          <!-- track list -->
+          <div id="trackList" class="playlist" aria-live="polite"></div>
         </div>
 
-        <div class="music-right">
-          <div class="artist-hero card">
-            <img id="artistImg" src="images/grimes_artist.jpg" alt="artist" />
-          </div>
-          <div class="card artist-bio">
-            <div class="card-title" id="artistName">Grimes</div>
-            <div class="card-text" id="artistBio">Grimes — 加拿大艺术家，科幻感与 DIY 狂热混合。</div>
-          </div>
-
-          <div class="card" id="albumNotesCard">
-            <div class="card-title" id="albumNotesTitle">专辑简介</div>
-            <div class="card-text" id="albumNotes">《Art Angels》（2015）与《Paradigmes》（2021）两张专辑呈现两种语汇……</div>
-          </div>
-
+        <aside class="music-right">
+          <div class="artist-hero"><img id="artistImg" src="" alt="artist"></div>
           <div class="card">
-            <div class="card-title" id="lyricsH">歌词</div>
-            <div class="card-lyrics" id="lyricsBody">Lean on the ground with you... </div>
+            <div class="card-title" id="artistName">Artist</div>
+            <p id="artistBio" class="card-text">Artist bio</p>
           </div>
-        </div>
+          <div class="card">
+            <h4 id="albumNotesTitle">专辑简介</h4>
+            <p id="albumNotes" class="card-text">Notes...</p>
+          </div>
+          <div class="card">
+            <h4 id="lyricsH">歌词</h4>
+            <pre id="lyricsBody" class="card-lyrics">—</pre>
+          </div>
+        </aside>
       </div>
-    </div>
-
-    <!-- Movies panel (placeholder) -->
-    <div id="panel-movies" class="panel">
-      <div class="card" style="margin:20px;">
-        <h2>Movies (占位)</h2>
-        <p>播放器与片库模块目前为占位。告诉我需要哪些内容，我会把完整面板加进来。</p>
-      </div>
-    </div>
-
-    <!-- Shopping panel (placeholder) -->
-    <div id="panel-shopping" class="panel">
-      <div class="card" style="margin:20px;">
-        <h2>Shopping (占位)</h2>
-        <p>免税店面板占位。</p>
-      </div>
-    </div>
-
-    <!-- Dining panel (placeholder) -->
-    <div id="panel-dining" class="panel">
-      <div class="card" style="margin:20px;">
-        <h2>Dining (占位)</h2>
-        <p>用餐与倒计时占位。</p>
-      </div>
-    </div>
-
-    <!-- Flight panel (placeholder) -->
-    <div id="panel-flight" class="panel">
-      <div class="card" style="margin:20px;">
-        <h2>Flight (占位)</h2>
-        <p>地图与航班信息占位。</p>
-      </div>
-    </div>
+    </section>
 
   </main>
 
-  <!-- player (fixed bottom) -->
-  <div id="player" class="player" aria-hidden="false" style="display:flex;">
+  <!-- Player (fixed bottom) -->
+  <div id="player" class="player" role="region" aria-label="player">
     <div class="controls">
-      <button id="btnPrev" class="btn" title="Prev"><svg viewBox="0 0 24 24"><path d="M11 18V6l-8 6 8 6zM13 6v12h2V6h-2z"></path></svg></button>
-      <button id="playPause" class="btn" title="Play/Pause"><svg id="iconPlay" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
-      <button id="btnNext" class="btn" title="Next"><svg viewBox="0 0 24 24"><path d="M13 6v12l8-6-8-6zM11 6v12H9V6h2z"></path></svg></button>
+      <button id="btnPrev" class="btn" title="Previous">⏮</button>
+      <button id="playPause" class="btn" title="Play/Pause" aria-pressed="false">
+        <svg id="iconPlay" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
+      </button>
+      <button id="btnNext" class="btn" title="Next">⏭</button>
     </div>
 
     <div class="center-col">
-      <div class="now">
-        <div id="npArt" class="art" style="background-image:url('images/art_angles_cover.jpg')"></div>
-        <div class="np">
-          <div id="npTitle" class="t">laughing and not being normal</div>
-          <div id="npMeta" class="m">Grimes • Art Angels</div>
+      <div class="now np">
+        <div id="npArt" class="art" role="img" aria-label="now playing art"></div>
+        <div>
+          <div id="npTitle" class="t">—</div>
+          <div id="npMeta" class="m">—</div>
         </div>
       </div>
 
       <div class="timeline">
         <div class="time" id="cur">0:00</div>
-        <div id="rail" class="rail">
-          <div id="bar" class="bar" style="left:12px;width:0px;"></div>
-          <div id="seekThumb" class="thumb" style="left:12px;position:absolute;top:50%;transform:translate(-50%,-50%);width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 6px 14px rgba(0,0,0,.45);"></div>
+        <div id="rail" class="rail" aria-label="progress">
+          <div id="bar" class="bar" style="width:0%"></div>
+          <div id="seekThumb" class="thumb" style="left:12px" aria-hidden="true"></div>
         </div>
         <div class="time" id="dur">0:00</div>
       </div>
     </div>
 
     <div class="volume">
-      <svg viewBox="0 0 24 24"><path d="M3 10v4h4l5 5V5L7 10H3z" /></svg>
-      <div id="volRail" class="vol-rail">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10v4h4l5 5V5L7 10H3z"/></svg>
+      <div id="volRail" class="vol-rail" aria-label="volume">
         <div id="volBar" class="vol-bar" style="width:60%"></div>
-        <div id="volThumb" class="vol-thumb" style="position:absolute;left:60%;top:50%;transform:translate(-50%,-50%);width:12px;height:12px;border-radius:50%;background:#a7ffd8;"></div>
+        <div id="volThumb" class="thumb" style="left:60%" aria-hidden="true"></div>
       </div>
     </div>
   </div>
@@ -206,7 +164,7 @@
   <!-- language modal -->
   <div id="langScreen" class="lang-screen" style="display:none;">
     <div class="lang-card glass">
-      <h3 class="center-title">Choose language</h3>
+      <h3 class="center-title">Select language</h3>
       <div id="langList" class="lang-list"></div>
     </div>
   </div>

@@ -1,40 +1,40 @@
-// app.js - complete and self-contained
+// app.js - 完整版
 document.addEventListener('DOMContentLoaded', function () {
   try {
     var MUSIC_BASE = "music/";
     var IMAGE_BASE = "images/";
 
-    // i18n
+    // i18n map (6 languages order)
     var I18N = {
       "zh-CN": {
         brand: "JW Airlines", dest: "目的地： Paris CDG",
         tiles: { music: ["音乐", "专辑与歌单"], movies: ["电影", "播放器与片库"], shopping: ["购物", "免税店"], dining: ["用餐", "餐食与倒计时"], flight: ["我的飞行", "地图与信息"] },
-        ui: { remain: "剩余", seatbeltOn: "系好安全带", crew: "呼叫乘务", about: "专辑简介", lyrics: "歌词", playAll: "播放全部", home: "主页" }
+        ui: { remain: "剩余", seatbeltOn: "系好安全带", crew: "呼叫乘务", about: "专辑简介", lyrics: "歌词", playAll: "播放全部", home: "主页", back: "返回" }
       },
       "zh-TW": {
         brand: "JW Airlines", dest: "目的地： Paris CDG",
         tiles: { music: ["音樂", "專輯與歌單"], movies: ["電影", "播放器與片庫"], shopping: ["購物", "免稅店"], dining: ["用餐", "餐食與倒計時"], flight: ["我的飛行", "地圖與資訊"] },
-        ui: { remain: "剩餘", seatbeltOn: "繫好安全帶", crew: "呼叫乘務", about: "專輯簡介", lyrics: "歌詞", playAll: "播放全部", home: "主頁" }
+        ui: { remain: "剩餘", seatbeltOn: "繫好安全帶", crew: "呼叫乘務", about: "專輯簡介", lyrics: "歌詞", playAll: "播放全部", home: "主頁", back: "返回" }
       },
       "es": {
         brand: "JW Airlines", dest: "Destino: Paris CDG",
         tiles: { music: ["Música", "Álbumes y listas"], movies: ["Películas", "Reproductor y biblioteca"], shopping: ["Compras", "Duty-Free"], dining: ["Comida", "Menú y cuenta atrás"], flight: ["Mi vuelo", "Mapa e info"] },
-        ui: { remain: "Restante", seatbeltOn: "Abróchese el cinturón", crew: "Llamar tripulación", about: "Acerca del álbum", lyrics: "Letras", playAll: "Reproducir todo", home: "Inicio" }
+        ui: { remain: "Restante", seatbeltOn: "Abróchese el cinturón", crew: "Llamar tripulación", about: "Acerca del álbum", lyrics: "Letras", playAll: "Reproducir todo", home: "Inicio", back: "Volver" }
       },
       "ru": {
         brand: "JW Airlines", dest: "Пункт назначения: Paris CDG",
         tiles: { music: ["Музыка", "Альбомы и плейлисты"], movies: ["Фильмы", "Плеер и библиотека"], shopping: ["Покупки", "Duty-Free"], dining: ["Питание", "Меню и таймер"], flight: ["Мой рейс", "Карта и информация"] },
-        ui: { remain: "Осталось", seatbeltOn: "Пристегните ремень", crew: "Вызвать экипаж", about: "О альбоме", lyrics: "Текст", playAll: "Воспроизвести всё", home: "Главная" }
+        ui: { remain: "Осталось", seatbeltOn: "Пристегните ремень", crew: "Вызвать экипаж", about: "О альбоме", lyrics: "Текст", playAll: "Воспроизвести всё", home: "Главная", back: "Назад" }
       },
       "fr": {
         brand: "JW Airlines", dest: "Destination : Paris CDG",
         tiles: { music: ["Musique", "Albums et playlists"], movies: ["Films", "Lecteur et bibliothèque"], shopping: ["Shopping", "Duty-Free"], dining: ["Restauration", "Repas & compte à rebours"], flight: ["Mon vol", "Carte et infos"] },
-        ui: { remain: "Restant", seatbeltOn: "Bouclez votre ceinture", crew: "Appeler l'équipage", about: "À propos de l'album", lyrics: "Paroles", playAll: "Tout jouer", home: "Accueil" }
+        ui: { remain: "Restant", seatbeltOn: "Bouclez votre ceinture", crew: "Appeler l'équipage", about: "À propos de l'album", lyrics: "Paroles", playAll: "Tout jouer", home: "Accueil", back: "Retour" }
       },
       "en": {
         brand: "JW Airlines", dest: "Destination: Paris CDG",
         tiles: { music: ["Music", "Albums & Playlists"], movies: ["Movies", "Player & Library"], shopping: ["Shopping", "Duty-Free"], dining: ["Dining", "Meal & Countdown"], flight: ["My Flight", "Map & Info"] },
-        ui: { remain: "Remaining", seatbeltOn: "Seatbelt On", crew: "Call Crew", about: "About this album", lyrics: "Lyrics", playAll: "Play All", home: "Home" }
+        ui: { remain: "Remaining", seatbeltOn: "Seatbelt On", crew: "Call Crew", about: "About this album", lyrics: "Lyrics", playAll: "Play All", home: "Home", back: "Back" }
       }
     };
 
@@ -61,6 +61,8 @@ document.addEventListener('DOMContentLoaded', function () {
       var belt = $id("btnBelt"); if (belt) belt.textContent = t.ui.seatbeltOn;
       var albumAboutTitle = $id("albumNotesTitle"); if (albumAboutTitle) albumAboutTitle.textContent = t.ui.about;
       var lyricsH = $id("lyricsH"); if (lyricsH) lyricsH.textContent = t.ui.lyrics;
+      // return button text (toolbar)
+      var tb = document.querySelector('.toolbar-back'); if (tb) tb.textContent = t.ui.back;
     }
 
     // Library (2 albums)
@@ -128,6 +130,7 @@ document.addEventListener('DOMContentLoaded', function () {
       return m + ':' + (sec < 10 ? '0' : '') + sec;
     }
 
+    /* ---------- render album selection grid ---------- */
     function renderMusicSelection() {
       var grid = $id('albumGrid'); if (!grid) return; grid.innerHTML = '';
       albumIds.forEach(function (id) {
@@ -142,15 +145,18 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     }
 
+    /* ---------- album view open ---------- */
     function openMusicAlbum(albumId) {
       if (!albumId) return;
       curAlbum = albumId;
+      // hide all other panels, show music panel
       var panel = $id('panel-music');
       if (panel) {
         var panels = document.querySelectorAll('.panel');
         for (var i = 0; i < panels.length; i++) panels[i].classList.remove('visible');
         panel.classList.add('visible');
       }
+      // hide home grid
       var home = $id('home'); if (home) home.style.display = 'none';
 
       var a = LIB[curAlbum]; if (!a) return;
@@ -158,6 +164,7 @@ document.addEventListener('DOMContentLoaded', function () {
       var blurb = (a.blurb && (a.blurb[lang] || a.blurb['zh-CN'] || a.blurb.en)) || '';
       var notes = (a.notes && (a.notes[lang] || a.notes['zh-CN'] || a.notes.en)) || a.notes || '';
 
+      // update banner elements
       var toolbarTitle = $id('toolbarTitle'); if (toolbarTitle) toolbarTitle.textContent = title;
       var banner = $id('bannerCover'); if (banner) banner.src = a.cover;
       var bannerSub = $id('bannerSub'); if (bannerSub) bannerSub.textContent = a.artist + ' • ' + (a.year || '');
@@ -167,17 +174,22 @@ document.addEventListener('DOMContentLoaded', function () {
       var artistBioEl = $id('artistBio'); if (artistBioEl) artistBioEl.textContent = (a.artistBio && (a.artistBio[lang] || a.artistBio['zh-CN'] || a.artistBio.en)) || a.artistBio || '';
       var albumNotes = $id('albumNotes'); if (albumNotes) albumNotes.textContent = notes;
 
-      // show music-grid (banner + tracks), hide selection
+      // show music-selection container collapsed + show music-grid inside panel
       var ms = $id('music-selection'); if (ms) ms.style.display = 'none';
       var mg = (panel ? panel.querySelector('.music-grid') : null); if (mg) mg.style.display = '';
 
+      // ensure toolbar exists and visible (only inside left column)
+      ensureAlbumToolbar(true);
+
+      // render tracks list
       renderTracks();
 
+      // after cover loads, try to get dominant color and set glow var
       if (banner) {
         banner.onload = function () {
           extractDominantColor(banner, function (color) {
             if (color) {
-              try { document.documentElement.style.setProperty('--banner-glow', 'rgba(' + color.r + ',' + color.g + ',' + color.b + ',0.12)'); } catch (e) { }
+              try { document.documentElement.style.setProperty('--banner-glow', 'rgba(' + color.r + ',' + color.g + ',' + color.b + ',0.14)'); } catch (e) { }
             }
           });
         };
@@ -200,6 +212,7 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     }
 
+    /* ---------- audio setup ---------- */
     var audio = new Audio(); audio.preload = 'metadata';
 
     function firstPlayableIndex(albumId) { var a = LIB[albumId]; if (!a) return -1; for (var i = 0; i < a.tracks.length; i++) if (a.tracks[i].src) return i; return -1; }
@@ -235,18 +248,18 @@ document.addEventListener('DOMContentLoaded', function () {
     audio.addEventListener('ended', function () { var n = nextPlayableIndex(curAlbum, curIdx); if (n !== curIdx) { playIdx(n); updateLyricsForIndex(n); } else { setPlayIcon(); } });
     audio.addEventListener('error', function (ev) { console.warn('Audio element error', ev); });
 
+    /* ---------- progress & volume UI handling (no visible thumb dot) ---------- */
     function updateProgressUI() {
-      var rail = $id('rail'), bar = $id('bar'), seekThumb = $id('seekThumb');
-      if (!rail || !bar || !seekThumb) return;
+      var rail = $id('rail'), bar = $id('bar');
+      if (!rail || !bar) return;
       var total = audio.duration || 0;
       var current = audio.currentTime || 0;
       var railRect = rail.getBoundingClientRect();
       var innerW = Math.max(24, railRect.width - 24);
       var p = (total > 0) ? (current / total) : 0;
       var px = Math.max(0, Math.min(innerW, Math.round(p * innerW)));
+      // set bar width as px (pixel-perfect) so dot-free bar exactly follows audio time
       bar.style.width = px + 'px';
-      var thumbCenter = 12 + px;
-      seekThumb.style.left = thumbCenter + 'px';
     }
 
     function pointerToRatio(e, el) {
@@ -256,6 +269,7 @@ document.addEventListener('DOMContentLoaded', function () {
       return (px - 12) / Math.max(1, (r.width - 24));
     }
 
+    // rail drag
     var railEl = $id('rail');
     if (railEl) {
       railEl.addEventListener('pointerdown', function (e) {
@@ -275,25 +289,26 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     }
 
+    // volume drag (no visible thumb but interactive)
     var volRail = $id('volRail');
     if (volRail) {
       volRail.addEventListener('pointerdown', function (e) {
         try { volRail.setPointerCapture(e.pointerId); } catch (_) { }
         var r0 = pointerToRatio(e, volRail);
-        audio.volume = r0; var volBar = $id('volBar'), volThumb = $id('volThumb');
+        audio.volume = r0; var volBar = $id('volBar');
         if (volBar) volBar.style.width = (r0 * 100) + '%';
-        if (volThumb) volThumb.style.left = (r0 * (volRail.getBoundingClientRect().width - 16) + 8) + 'px';
-        var move = function (ev) { var r = pointerToRatio(ev, volRail); audio.volume = r; if (volBar) volBar.style.width = (r * 100) + '%'; if (volThumb) volThumb.style.left = (r * (volRail.getBoundingClientRect().width - 16) + 8) + 'px'; };
+        var move = function (ev) { var r = pointerToRatio(ev, volRail); audio.volume = r; if (volBar) volBar.style.width = (r * 100) + '%'; };
         var up = function () { try { volRail.releasePointerCapture(e.pointerId); } catch (_) { } window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up); };
         window.addEventListener('pointermove', move); window.addEventListener('pointerup', up);
       });
       volRail.addEventListener('click', function (e) {
         var r = pointerToRatio(e, volRail);
-        audio.volume = r; var volBar = $id('volBar'), volThumb = $id('volThumb');
-        if (volBar) volBar.style.width = (r * 100) + '%'; if (volThumb) volThumb.style.left = (r * (volRail.getBoundingClientRect().width - 16) + 8) + 'px';
+        audio.volume = r; var volBar = $id('volBar');
+        if (volBar) volBar.style.width = (r * 100) + '%';
       });
     }
 
+    /* ---------- lyrics loader ---------- */
     function updateLyricsForIndex(i) {
       var a = LIB[curAlbum]; var t = a && a.tracks && a.tracks[i];
       if (!t) { var lb = $id('lyricsBody'); if (lb) lb.textContent = '—'; return; }
@@ -305,6 +320,7 @@ document.addEventListener('DOMContentLoaded', function () {
       return fetch(file, { cache: 'no-store' }).then(function (r) { if (r.ok) return r.text(); return ''; }).catch(function () { return ''; });
     }
 
+    /* ---------- simple color extraction (dominant pixel) ---------- */
     function extractDominantColor(imgEl, cb) {
       try {
         var img = new Image(); img.crossOrigin = 'anonymous'; img.src = imgEl.src;
@@ -328,7 +344,7 @@ document.addEventListener('DOMContentLoaded', function () {
       } catch (e) { return cb(null); }
     }
 
-    // keyboard shortcuts
+    /* ---------- keyboard shortcuts ---------- */
     window.addEventListener('keydown', function (e) {
       if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
       if (e.code === 'Space') { e.preventDefault(); var btn = $id('playPause'); if (btn) btn.click(); }
@@ -336,6 +352,7 @@ document.addEventListener('DOMContentLoaded', function () {
       if (e.code === 'ArrowLeft') { e.preventDefault(); var p = $id('btnPrev'); if (p) p.click(); }
     });
 
+    /* ---------- language modal setup ---------- */
     function ensureLangModal() {
       var screen = $id('langScreen'); var listEl = $id('langList');
       if (listEl) {
@@ -350,17 +367,18 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     ensureLangModal();
 
-    /* ---------- Click handlers & top buttons ---------- */
+    /* ---------- panels open/close ---------- */
     function closeAllPanels() {
       var panels = document.querySelectorAll('.panel');
       for (var i = 0; i < panels.length; i++) panels[i].classList.remove('visible');
       var home = document.getElementById('home');
       if (home) home.style.display = 'grid';
       var ms = document.getElementById('music-selection');
-      if (ms) ms.style.display = 'none';
+      if (ms) ms.style.display = 'block';
       var pm = document.getElementById('panel-music'); if (pm) {
         var mg = pm.querySelector('.music-grid'); if (mg) mg.style.display = 'none';
       }
+      ensureAlbumToolbar(false);
     }
 
     var btnHomeEl = document.getElementById('btnHome');
@@ -369,7 +387,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     var btnBeltEl = document.getElementById('btnBelt');
     if (btnBeltEl) {
-      btnBeltEl.addEventListener('click', function (ev) { ev.stopPropagation(); alert((I18N && I18N[lang] ? I18N[lang].ui.seatbeltOn : 'Seatbelt On')); });
+      btnBeltEl.addEventListener('click', function (ev) { ev.stopPropagation(); alert((I18N[lang] || I18N[lang]).ui.seatbeltOn); });
     }
     var userBtnEl = document.getElementById('userBtn');
     if (userBtnEl) {
@@ -380,7 +398,7 @@ document.addEventListener('DOMContentLoaded', function () {
       btnLangEl.addEventListener('click', function (ev) { ev.stopPropagation(); var ls = document.getElementById('langScreen'); if (!ls) return; ls.style.display = (ls.style.display === 'grid' || ls.style.display === 'flex') ? 'none' : 'grid'; });
     }
 
-    // delegated click handler (tiles, album-cards, rows, buttons, language)
+    /* ---------- delegated click handler ---------- */
     document.body.addEventListener('click', function (e) {
       var tile = e.target.closest('.tile');
       if (tile && tile.dataset && tile.dataset.open) {
@@ -430,9 +448,28 @@ document.addEventListener('DOMContentLoaded', function () {
       var rowBtn = e.target.closest('.row-btn');
       if (rowBtn && rowBtn.dataset && rowBtn.dataset.idx !== undefined) { var idx = parseInt(rowBtn.dataset.idx, 10); playIdx(idx); updateLyricsForIndex(idx); return; }
 
-      var btn = e.target.closest('.pill, .btn, button, .icon-btn, .badge, .lang-btn');
+      var btn = e.target.closest('.pill, .btn, button, .icon-btn, .badge, .lang-btn, .toolbar-back, .toolbar-play');
       if (btn) {
         var id = btn.id || (btn.dataset && btn.dataset.action);
+        // toolbar back
+        if (btn.classList && btn.classList.contains('toolbar-back')) { // go back to music selection (not entire home)
+          renderMusicSelection();
+          var panelMusic3 = document.getElementById('panel-music');
+          if (panelMusic3) {
+            var panels3 = document.querySelectorAll('.panel'); for (var i = 0; i < panels3.length; i++) panels3[i].classList.remove('visible');
+            panelMusic3.classList.add('visible');
+          }
+          var ms3 = document.getElementById('music-selection'); if (ms3) ms3.style.display = 'block';
+          ensureAlbumToolbar(false);
+          return;
+        }
+        // toolbar play
+        if (btn.classList && btn.classList.contains('toolbar-play')) {
+          if (!audio.src) { var f = firstPlayableIndex(curAlbum); if (f !== -1) { playIdx(f); updateLyricsForIndex(f); return; } }
+          if (audio.paused) { audio.play().then(function () { setPauseIcon(); }).catch(function () { setPlayIcon(); }); } else { audio.pause(); setPlayIcon(); }
+          return;
+        }
+
         if (id === 'musicBack') { closeAllPanels(); return; }
         if (id === 'musicPlayAll' || btn.classList.contains('play-pill')) { var first = firstPlayableIndex(curAlbum); if (first !== -1) { playIdx(first); updateLyricsForIndex(first); } return; }
         if (id === 'btnPrev') { curIdx = prevPlayableIndex(curAlbum, curIdx); playIdx(curIdx); updateLyricsForIndex(curIdx); return; }
@@ -456,7 +493,7 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     }, true);
 
-    // flight remaining countdown (5:40 starting)
+    /* ---------- flight remaining countdown (5:40 starting) ---------- */
     var FIVE_H_FORTY_MS = (5 * 3600 + 40 * 60) * 1000;
     var arrive = new Date(Date.now() + FIVE_H_FORTY_MS);
     function updateFlight() {
@@ -467,22 +504,60 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     updateFlight(); setInterval(updateFlight, 1000);
 
-    // set initial volume UI
+    /* ---------- initial volume UI ---------- */
     setTimeout(function () {
       try {
         var vol = audio.volume || 0.6;
-        var vb = $id('volBar'), vt = $id('volThumb'), vr = $id('volRail');
+        var vb = $id('volBar');
         if (vb) vb.style.width = (vol * 100) + '%';
-        if (vt && vr) vt.style.left = (vol * (vr.getBoundingClientRect().width - 16) + 8) + 'px';
       } catch (e) { }
     }, 200);
 
-    // init view
+    /* ---------- album toolbar creation / control ---------- */
+    function ensureAlbumToolbar(show) {
+      // toolbar element expected inside left column (music-left)
+      var leftCol = document.querySelector('.music-left');
+      if (!leftCol) return;
+      var toolbar = document.querySelector('.album-toolbar');
+      if (!toolbar) {
+        toolbar = document.createElement('div'); toolbar.className = 'album-toolbar';
+        // create play, title, back nodes
+        var play = document.createElement('div'); play.className = 'toolbar-play'; play.setAttribute('role','button'); play.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+        var title = document.createElement('div'); title.className = 'toolbar-title'; title.id = 'toolbarTitle'; title.textContent = '';
+        var back = document.createElement('div'); back.className = 'toolbar-back'; back.textContent = (I18N[lang]||I18N['zh-CN']).ui.back;
+        // append
+        toolbar.appendChild(play);
+        toolbar.appendChild(title);
+        toolbar.appendChild(back);
+        // insert toolbar at top of leftCol before banner (so it's visually above)
+        leftCol.insertBefore(toolbar, leftCol.firstChild);
+        // attach events
+        play.addEventListener('click', function (ev) { ev.stopPropagation(); playClickHandler(); });
+        back.addEventListener('click', function (ev) { ev.stopPropagation(); back.click(); }); // reuse delegated handler via .toolbar-back class
+      }
+      // show / hide
+      toolbar.style.display = show ? 'flex' : 'none';
+
+      // ensure banner moved downward so its top doesn't get overlapped
+      var banner = document.querySelector('.album-banner');
+      if (banner) {
+        if (show) banner.style.marginTop = '18px';
+        else banner.style.marginTop = '0';
+      }
+    }
+
+    function playClickHandler() {
+      if (!audio.src) { var f = firstPlayableIndex(curAlbum); if (f !== -1) { playIdx(f); updateLyricsForIndex(f); return; } }
+      if (audio.paused) { audio.play().then(function () { setPauseIcon(); }).catch(function () { setPlayIcon(); }); } else { audio.pause(); setPlayIcon(); }
+    }
+
+    /* ---------- init view ---------- */
     renderMusicSelection();
     var homeEl = $id('home'); if (homeEl) homeEl.style.display = 'grid';
     var playerEl = $id('player'); if (playerEl) playerEl.style.display = '';
 
     applyLang(lang);
+    ensureAlbumToolbar(false);
 
   } catch (err) {
     console.error('Initialization error', err);
