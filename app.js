@@ -1,10 +1,10 @@
-// app.js — complete updated file (toolbar positioning, list fixes, scroll behavior, Liquid-glass glow)
+// app.js — updated: fixed player layout, toolbar visibility rules, highlight-on-play
 document.addEventListener('DOMContentLoaded', function () {
   try {
     var MUSIC_BASE = "music/";
     var IMAGE_BASE = "images/";
 
-    // i18n
+    // i18n (same as before)
     var I18N = {
       "zh-CN": {
         brand: "JW Airlines", dest: "目的地： Paris CDG",
@@ -57,13 +57,14 @@ document.addEventListener('DOMContentLoaded', function () {
       setText("tileShopping", t.tiles.shopping[0]); setText("tileShoppingSub", t.tiles.shopping[1]);
       setText("tileDining", t.tiles.dining[0]); setText("tileDiningSub", t.tiles.dining[1]);
       setText("tileFlight", t.tiles.flight[0]); setText("tileFlightSub", t.tiles.flight[1]);
+      var playAllBtn = $id("musicPlayAll"); if (playAllBtn) playAllBtn.title = t.ui.playAll;
       var belt = $id("btnBelt"); if (belt) belt.textContent = t.ui.seatbeltOn;
       var albumAboutTitle = $id("albumNotesTitle"); if (albumAboutTitle) albumAboutTitle.textContent = t.ui.about;
       var lyricsH = $id("lyricsH"); if (lyricsH) lyricsH.textContent = t.ui.lyrics;
-      var tbBack = $id('tbBack'); if (tbBack) tbBack.textContent = t.ui.back;
+      var tbBack = $id('tbBack'); if (tbBack) tbBack.textContent = (I18N[lang] || I18N.en).ui.back;
     }
 
-    // Library (two albums)
+    // Library — keep your existing structure; durations should be populated in tracks[].len
     var LIB = {
       artangels: {
         id: "artangels",
@@ -90,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function () {
           { t: "Life in the Vivid Dream", len: "1:29", src: MUSIC_BASE + "Grimes - Life in the Vivid Dream.mp3" },
           { t: "Butterfly", len: "4:13", src: MUSIC_BASE + "Grimes - Butterfly.mp3" }
         ],
-        artistBio: { "zh-CN": "Grimes — 加拿大艺术家，科幻感与 DIY 狂热混合。", "en": "Grimes — Canadian artist mixing sci-fi textures with DIY intensity." }
+        artistBio: { "zh-CN": "Grimes — 加拿大艺术家，科幻感与 DIY 狂热混合。", "en": "Grimes — Canadian artist mixing sci-fi textures." }
       },
       paradigmes: {
         id: "paradigmes",
@@ -99,17 +100,18 @@ document.addEventListener('DOMContentLoaded', function () {
         title: { "en": "Paradigmes", "zh-CN": "Paradigmes" },
         cover: IMAGE_BASE + "paradigmes_cover.jpg",
         blurb: { "en": "French surf-coldwave shapeshifting into a cinematic night drive.", "zh-CN": "法国冷潮与冲浪气质的混融，像一段夜色里的电影公路。" },
-        notes: { "zh-CN": "La Femme 的《Paradigmes》（2021）以霓虹冲浪与冷潮的暗影。", "en": "Paradigmes (2021) by La Femme brings neon surf and coldwave shadows." },
+        notes: { "zh-CN": "La Femme 的《Paradigmes》（2021）以霓虹冲浪浪的暗影；对照《Art Angels》的甜刀锋，它像午夜磁带般翻涌。", "en": "Paradigmes (2021) by La Femme brings neon surf and coldwave shadows." },
         year: 2021,
         tracks: [
-          // removed "Paradigmes Introduction" per your request
+          // ensure your tracks[].len are correct in your library; remove intro if file deleted
+          /* example durations (adjust to your files if needed) */
           { t: "Paradigme", len: "3:12", src: MUSIC_BASE + "La Femme - Paradigme.mp3" },
           { t: "Le sang de mon prochain", len: "4:00", src: MUSIC_BASE + "La Femme - Le Sang De Mon Prochain.mp3" },
           { t: "Cool Colorado", len: "3:38", src: MUSIC_BASE + "La Femme - Cool Colorado.mp3" },
           { t: "Foreigner", len: "3:50", src: MUSIC_BASE + "La Femme - Foreigner.mp3" },
           { t: "Nouvelle-Orléans", len: "4:02", src: MUSIC_BASE + "La Femme - Nouvelle-Orleans.mp3" },
           { t: "Disconnexion", len: "3:46", src: MUSIC_BASE + "La Femme - Disconnexion.mp3" },
-          { t: "Pasadena", len: "3:50", src: MUSIC_BASE + "La Femme - Pasadena.mp3" }
+          { t: "Pasadena", len: "4:06", src: MUSIC_BASE + "La Femme - Pasadena.mp3" }
         ],
         artistBio: { "zh-CN": "La Femme — 法国乐队，冷潮与冲浪的混搭。", "en": "La Femme — French band mixing coldwave and surf." }
       }
@@ -117,15 +119,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     var albumIds = Object.keys(LIB);
     var curAlbum = albumIds[0];
-    var curIdx = -1;
+    var curIdx = 0;
 
     function slug(s) {
       return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-    }
-    function fmtSecondsFromString(s) {
-      if (!s) return '—';
-      if (typeof s === 'string' && s.indexOf(':') !== -1) return s;
-      return s;
     }
     function fmtSeconds(s) {
       s = Math.floor(s || 0);
@@ -133,7 +130,7 @@ document.addEventListener('DOMContentLoaded', function () {
       return m + ':' + (sec < 10 ? '0' : '') + sec;
     }
 
-    // Helper: try image candidates sequentially
+    // try image fallback list
     function tryImageSources(imgEl, candidates) {
       if (!imgEl || !candidates || !candidates.length) return;
       var i = 0;
@@ -147,23 +144,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
     /* ---------- CLEANUP: remove stray toolbar controls INSIDE BANNER ---------- */
     function cleanBannerControls() {
-      var banner = document.querySelector('.album-banner');
+      var banner = $id('banner') || document.querySelector('.banner') || document.querySelector('.album-banner');
       if (!banner) return;
-
       var overlaySelectors = [
-        '.tb-play', '.tb-back', '.tb-title', '.banner-local-play', '.local-back', '.banner-controls',
-        '#bannerToolbar', '.banner-toolbar', '.toolbar-overlay', '.mini-btn', '.mini-toolbar', '.overlay-button', '.small-button', '.banner-small'
+        '.tb-play', '.tb-back', '.tb-title', '.banner-local-play', '.local-back',
+        '.banner-controls', '#bannerToolbar', '.banner-toolbar', '.toolbar-overlay',
+        '.mini-btn', '.mini-toolbar', '.overlay-button', '.small-button', '.banner-small'
       ];
       overlaySelectors.forEach(function (sel) {
         try {
           var list = banner.querySelectorAll(sel);
-          list.forEach(function (n) {
-            try { n.parentNode && n.parentNode.removeChild(n); } catch (e) {}
-          });
+          list.forEach(function (n) { try { var rect = n.getBoundingClientRect ? n.getBoundingClientRect() : { width: 0, height: 0 }; var small = (rect.width < 180 && rect.height < 90); var cls = (n.className && String(n.className).toLowerCase()) || ''; var likely = cls.indexOf('tb-') !== -1 || cls.indexOf('toolbar') !== -1 || cls.indexOf('mini') !== -1 || cls.indexOf('overlay') !== -1; if (small || likely) { n.parentNode && n.parentNode.removeChild(n); } } catch (e) {} });
         } catch (e) {}
       });
 
-      // remove small nodes whose text equals Album or localized back
       var textCandidates = [ (I18N[lang] || I18N.en).ui.back, 'Album', 'album' ];
       var nodes = banner.querySelectorAll('*');
       nodes.forEach(function (el) {
@@ -179,7 +173,6 @@ document.addEventListener('DOMContentLoaded', function () {
         } catch (e) {}
       });
 
-      // remove small role=button nodes
       var roleBtns = banner.querySelectorAll('[role="button"]');
       roleBtns.forEach(function (n) {
         try {
@@ -189,8 +182,9 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     }
 
-    /* ---------- render music selection (album grid) ---------- */
+    /* ---------- render music selection (grid) ---------- */
     function renderMusicSelection() {
+      hideAlbumToolbar(); // ensure toolbar gone when viewing album grid
       var grid = $id('albumGrid'); if (!grid) return; grid.innerHTML = '';
       albumIds.forEach(function (id) {
         var a = LIB[id];
@@ -210,36 +204,18 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     }
 
-    /* ---------- TOOLBAR: improved creation + robust positioning ---------- */
+    /* ---------- floating album toolbar control (created in DOM via JS) ---------- */
     function ensureAlbumToolbar() {
       var tb = $id('albumToolbar');
       if (tb) return tb;
-
       tb = document.createElement('div');
       tb.id = 'albumToolbar';
-      tb.style.position = 'fixed';
-      tb.style.left = '12px';
-      tb.style.right = 'auto';
-      tb.style.top = '98px';
-      tb.style.zIndex = '2200';
-      tb.style.display = 'flex';
-      tb.style.alignItems = 'center';
-      tb.style.gap = '18px';
-      tb.style.padding = '12px 18px';
-      tb.style.boxSizing = 'border-box';
-      tb.style.borderRadius = '12px';
-      tb.style.backdropFilter = 'blur(18px) saturate(1.2)';
-      tb.style.background = 'linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01))';
-      tb.style.boxShadow = '0 8px 30px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.02)';
-      tb.style.transition = 'opacity .18s ease, transform .18s ease, left .12s ease, width .12s ease';
-      tb.style.pointerEvents = 'auto';
       tb.style.opacity = '0';
-      tb.style.transform = 'translateY(-6px)';
-
+      tb.style.pointerEvents = 'none';
       tb.innerHTML = [
-        '<div class="tb-play" id="tbPlay" title="Play/Pause" style="width:64px;height:64px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#19d267,#06b56b);box-shadow:0 8px 24px rgba(6,10,14,0.6)"><svg viewBox="0 0 24 24" id="tbPlayIcon" width="28" height="28" fill="#052517"><path d="M8 5v14l11-7z"/></svg></div>',
-        '<div class="tb-title" id="tbTitle" style="font-weight:900;font-size:28px;color:#fff;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-left:6px"></div>',
-        '<div class="tb-back" id="tbBack" style="width:auto;padding:10px 16px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);font-weight:700;color:#fff">返回</div>'
+        '<div class="tb-play" id="tbPlay" title="Play/Pause"><svg viewBox="0 0 24 24" id="tbPlayIcon" width="28" height="28" fill="#052517"><path d="M8 5v14l11-7z"/></svg></div>',
+        '<div class="tb-title" id="tbTitle"></div>',
+        '<div class="tb-back" id="tbBack">返回</div>'
       ].join('');
       document.body.appendChild(tb);
 
@@ -256,6 +232,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
       tb.querySelector('#tbBack').addEventListener('click', function (ev) {
         ev.stopPropagation();
+        // go back to music selection (not main home)
         var panelMusic = $id('panel-music');
         if (panelMusic) {
           var ms = $id('music-selection');
@@ -272,32 +249,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function positionAlbumToolbar() {
       var tb = $id('albumToolbar'); if (!tb) return;
-      var panel = $id('panel-music'); if (!panel || !panel.classList.contains('visible')) { tb.style.opacity='0'; tb.style.pointerEvents='none'; return; }
+      var panel = $id('panel-music'); if (!panel || !panel.classList.contains('visible')) { hideAlbumToolbar(); return; }
       var leftCol = panel.querySelector('.music-left');
-      if (!leftCol) { tb.style.opacity='0'; tb.style.pointerEvents='none'; return; }
-      tb.style.pointerEvents='auto';
+      if (!leftCol) { hideAlbumToolbar(); return; }
       var rect = leftCol.getBoundingClientRect();
-      var cs = getComputedStyle(leftCol);
-      var padLeft = parseFloat(cs.paddingLeft||'0')||0;
-      var padRight = parseFloat(cs.paddingRight||'0')||0;
-      var desiredLeft = Math.round(rect.left + padLeft);
-      var desiredWidth = Math.max(320, Math.round((leftCol.clientWidth || rect.width) - padLeft - padRight));
-      var margin = 12;
-      var maxWidthAllowed = Math.max(280, Math.round(window.innerWidth - desiredLeft - margin));
-      if (desiredWidth > maxWidthAllowed) {
-        desiredWidth = maxWidthAllowed;
-        if (desiredLeft + desiredWidth > window.innerWidth - margin) {
-          desiredLeft = Math.max(margin, window.innerWidth - margin - desiredWidth);
-        }
-      }
-      var headerRect = document.querySelector('header') ? document.querySelector('header').getBoundingClientRect() : { bottom: 12 };
-      var topBase = Math.round(headerRect.bottom + 12);
-      tb.style.left = desiredLeft + 'px';
-      tb.style.width = desiredWidth + 'px';
+      var left = Math.max(12, rect.left);
+      var width = Math.max(320, rect.width);
+      tb.style.left = left + 'px';
+      tb.style.width = width + 'px';
+      var topBase = document.querySelector('header') ? (document.querySelector('header').getBoundingClientRect().bottom + 12) : 12;
       tb.style.top = topBase + 'px';
-      tb.style.opacity = '1';
-      tb.style.transform = 'translateY(0px)';
     }
+
+    var toolbarRaf = null;
+    window.addEventListener('resize', function () { if (toolbarRaf) cancelAnimationFrame(toolbarRaf); toolbarRaf = requestAnimationFrame(positionAlbumToolbar); });
+    window.addEventListener('scroll', function () { if (toolbarRaf) cancelAnimationFrame(toolbarRaf); toolbarRaf = requestAnimationFrame(positionAlbumToolbar); });
 
     function showAlbumToolbar(titleText) {
       var tb = ensureAlbumToolbar();
@@ -305,41 +271,22 @@ document.addEventListener('DOMContentLoaded', function () {
       var back = tb.querySelector('#tbBack');
       if (tbTitle) tbTitle.textContent = titleText || '';
       if (back) back.textContent = (I18N[lang] || I18N.en).ui.back;
+      tb.style.pointerEvents = 'auto';
+      tb.style.opacity = '1'; tb.style.transform = 'translateY(0px)';
       positionAlbumToolbar();
+      // push down content slightly so toolbar doesn't overlap banner content
       var panel = $id('panel-music');
       if (panel) {
         var left = panel.querySelector('.music-left');
-        if (left) {
-          if (!left.dataset.toolbarPushed) {
-            var tbH = parseFloat(getComputedStyle(tb).height || '78') || 78;
-            left.style.paddingTop = (tbH + 10) + 'px';
-            left.dataset.toolbarPushed = '1';
-          }
-        }
-      }
-      if (!positionAlbumToolbar._bound) {
-        positionAlbumToolbar._bound = true;
-        var rafId = null;
-        function schedule() { if (rafId) cancelAnimationFrame(rafId); rafId = requestAnimationFrame(function(){ positionAlbumToolbar(); rafId=null; }); }
-        window.addEventListener('resize', schedule, { passive: true });
-        var panelMusic = $id('panel-music');
-        if (panelMusic) {
-          var leftCol = panelMusic.querySelector('.music-left');
-          if (leftCol) {
-            leftCol.addEventListener('scroll', schedule, { passive: true });
-            var mo = new MutationObserver(schedule);
-            mo.observe(leftCol, { childList: true, subtree: true, attributes: true, characterData: true });
-          }
-        }
+        if (left) left.style.paddingTop = '88px';
       }
     }
-
     function hideAlbumToolbar() {
-      var tb = $id('albumToolbar'); if (tb) { tb.style.opacity = '0'; tb.style.transform = 'translateY(-6px)'; }
+      var tb = $id('albumToolbar'); if (tb) { tb.style.opacity = '0'; tb.style.transform = 'translateY(-6px)'; tb.style.pointerEvents = 'none'; }
       var panel = $id('panel-music');
       if (panel) {
         var left = panel.querySelector('.music-left');
-        if (left && left.dataset.toolbarPushed) { left.style.paddingTop = ''; delete left.dataset.toolbarPushed; }
+        if (left) left.style.paddingTop = '';
       }
     }
 
@@ -347,10 +294,13 @@ document.addEventListener('DOMContentLoaded', function () {
     function openMusicAlbum(albumId) {
       if (!albumId) return;
       curAlbum = albumId;
+
       cleanBannerControls();
+
       var panel = $id('panel-music');
       if (panel) {
-        var panels = document.querySelectorAll('.panel'); for (var i = 0; i < panels.length; i++) panels[i].classList.remove('visible');
+        var panels = document.querySelectorAll('.panel');
+        for (var i = 0; i < panels.length; i++) panels[i].classList.remove('visible');
         panel.classList.add('visible');
       }
       var home = $id('home'); if (home) home.style.display = 'none';
@@ -384,14 +334,16 @@ document.addEventListener('DOMContentLoaded', function () {
       var albumNotes = $id('albumNotes'); if (albumNotes) albumNotes.textContent = notes;
 
       cleanBannerControls();
+
       var ms = $id('music-selection'); if (ms) ms.style.display = 'none';
       var mg = panel ? panel.querySelector('.music-grid') : null; if (mg) mg.style.display = '';
+
       renderTracks();
 
-      // show floating toolbar (top)
+      // show floating toolbar only on album page
       showAlbumToolbar(title);
 
-      // extract color glow
+      // extract color glow and position toolbar
       var tryImg = banner && banner.tagName === 'IMG' ? banner : (ai && ai.tagName === 'IMG' ? ai : null);
       if (tryImg) {
         tryImg.onload = function () {
@@ -415,7 +367,7 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     }
 
-    /* ---------- render tracks list ---------- */
+    /* ---------- render tracks list (uniform list) ---------- */
     function renderTracks() {
       var box = $id('trackList'); if (!box) return; box.innerHTML = '';
       var a = LIB[curAlbum]; if (!a) return;
@@ -423,16 +375,16 @@ document.addEventListener('DOMContentLoaded', function () {
         var r = document.createElement('div'); r.className = 'row'; r.dataset.idx = i;
         var titleText = trk.t || '';
         var albumTitle = (a.title && (a.title[lang] || a.title['zh-CN'] || a.title.en)) || '';
-        var lenText = fmtSecondsFromString(trk.len || '—');
+        var lenText = trk.len || '—';
         var leftSvg = '<div class="row-btn" data-idx="' + i + '" title="Play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>';
         var mid = '<div style="flex:1"><div class="title">' + titleText + '</div><div class="meta">' + a.artist + ' • ' + albumTitle + '</div></div>';
-        var right = '<div style="width:80px;text-align:right">' + lenText + '</div>';
+        var right = '<div style="width:80px;text-align:right;font-weight:700">' + lenText + '</div>';
         r.innerHTML = leftSvg + mid + right;
 
         // click row to play
         r.addEventListener('click', function (ev) {
           if (ev.target && ev.target.closest('.row-btn')) return;
-          document.querySelectorAll('.row').forEach(function (el) { el.classList.remove('active'); });
+          clearActiveRows();
           r.classList.add('active');
           playIdx(i); updateLyricsForIndex(i);
         }, false);
@@ -440,14 +392,24 @@ document.addEventListener('DOMContentLoaded', function () {
         // row-btn click (play single track)
         var rowBtn = r.querySelector('.row-btn');
         if (rowBtn) {
-          rowBtn.addEventListener('click', function (ev) { ev.stopPropagation(); playIdx(i); updateLyricsForIndex(i); });
+          rowBtn.addEventListener('click', function (ev) { ev.stopPropagation(); clearActiveRows(); r.classList.add('active'); playIdx(i); updateLyricsForIndex(i); });
         }
         box.appendChild(r);
       });
+
+      // ensure the list can scroll but doesn't create bottom empty area:
+      // the container .music-left has padding-bottom enough to avoid overlap with player,
+      // but we ensure scrollTop won't create extra whitespace by CSS overflow hidden elsewhere.
+    }
+
+    function clearActiveRows() {
+      var rows = document.querySelectorAll('.row');
+      rows.forEach(function (el) { el.classList.remove('active'); });
     }
 
     /* ---------- audio playback handling ---------- */
-    var audio = new Audio(); audio.preload = 'metadata'; audio.crossOrigin = 'anonymous';
+    var audio = new Audio(); audio.preload = 'metadata';
+    audio.crossOrigin = 'anonymous';
 
     function firstPlayableIndex(albumId) { var a = LIB[albumId]; if (!a) return -1; for (var i = 0; i < a.tracks.length; i++) if (a.tracks[i].src) return i; return -1; }
     function nextPlayableIndex(albumId, from) { var a = LIB[albumId]; if (!a) return from; var n = a.tracks.length; for (var k = 1; k <= n; k++) { var idx = (from + k) % n; if (a.tracks[idx].src) return idx; } return from; }
@@ -470,10 +432,22 @@ document.addEventListener('DOMContentLoaded', function () {
       if (npArtEl) npArtEl.style.backgroundImage = 'url("' + (album.cover || '') + '")';
       curIdx = i;
 
-      // UI: mark playing row
-      document.querySelectorAll('.row').forEach(function (el) { el.classList.remove('playing'); el.classList.remove('active'); });
-      var row = document.querySelector('.row[data-idx="'+i+'"]');
-      if (row) { row.classList.add('playing'); row.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
+      // highlight playing row in the list
+      clearActiveRows();
+      var row = document.querySelector('.row[data-idx="' + i + '"]');
+      if (row) { row.classList.add('active'); scrollRowIntoViewIfNeeded(row); }
+    }
+
+    function scrollRowIntoViewIfNeeded(row) {
+      try {
+        var container = row.closest('.music-left');
+        if (!container) container = document.querySelector('.playlist');
+        if (!container) return;
+        var rRect = row.getBoundingClientRect();
+        var cRect = container.getBoundingClientRect();
+        if (rRect.top < cRect.top) container.scrollTop -= (cRect.top - rRect.top) + 12;
+        else if (rRect.bottom > cRect.bottom) container.scrollTop += (rRect.bottom - cRect.bottom) + 12;
+      } catch (e) {}
     }
 
     audio.addEventListener('loadedmetadata', function () {
@@ -487,6 +461,14 @@ document.addEventListener('DOMContentLoaded', function () {
       var curEl = $id('cur'); if (curEl) curEl.textContent = fmtSeconds(Math.floor(audio.currentTime || 0));
     });
 
+    audio.addEventListener('play', function () {
+      // ensure the currently playing index is highlighted in list
+      var currently = curIdx;
+      clearActiveRows();
+      var row = document.querySelector('.row[data-idx="' + currently + '"]');
+      if (row) row.classList.add('active');
+    });
+
     audio.addEventListener('ended', function () { var n = nextPlayableIndex(curAlbum, curIdx); if (n !== curIdx) { playIdx(n); updateLyricsForIndex(n); } else { setPlayIcon(); } });
     audio.addEventListener('error', function (ev) { console.warn('Audio element error', ev); });
 
@@ -495,8 +477,7 @@ document.addEventListener('DOMContentLoaded', function () {
       if (!rail || !bar) return;
       var total = audio.duration || 0;
       var current = audio.currentTime || 0;
-      var railRect = rail.getBoundingClientRect();
-      var innerW = Math.max(24, railRect.width - 24);
+      var innerW = Math.max(24, rail.getBoundingClientRect().width - 24);
       var p = (total > 0) ? (current / total) : 0;
       var px = Math.max(0, Math.min(innerW, Math.round(p * innerW)));
       bar.style.width = px + 'px';
@@ -587,8 +568,8 @@ document.addEventListener('DOMContentLoaded', function () {
     window.addEventListener('keydown', function (e) {
       if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
       if (e.code === 'Space') { e.preventDefault(); var btn = $id('playPause'); if (btn) btn.click(); }
-      if (e.code === 'ArrowRight') { e.preventDefault(); var n = $id('btnNext'); if (n) n.click(); if (curIdx >= 0) { var next = nextPlayableIndex(curAlbum, curIdx); playIdx(next); updateLyricsForIndex(next); } }
-      if (e.code === 'ArrowLeft') { e.preventDefault(); var p = $id('btnPrev'); if (p) p.click(); if (curIdx >= 0) { var prev = prevPlayableIndex(curAlbum, curIdx); playIdx(prev); updateLyricsForIndex(prev); } }
+      if (e.code === 'ArrowRight') { e.preventDefault(); var n = $id('btnNext'); if (n) n.click(); /* highlight in list */ curIdx = nextPlayableIndex(curAlbum, curIdx); playIdx(curIdx); updateLyricsForIndex(curIdx); }
+      if (e.code === 'ArrowLeft') { e.preventDefault(); var p = $id('btnPrev'); if (p) p.click(); curIdx = prevPlayableIndex(curAlbum, curIdx); playIdx(curIdx); updateLyricsForIndex(curIdx); }
     });
 
     /* ---------- language modal ---------- */
@@ -606,7 +587,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     ensureLangModal();
 
-    /* ---------- UI: click handlers for header buttons ---------- */
+    /* ---------- UI: header buttons ---------- */
     function closeAllPanels() {
       var panels = document.querySelectorAll('.panel');
       for (var i = 0; i < panels.length; i++) panels[i].classList.remove('visible');
@@ -626,7 +607,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     var btnBeltEl = document.getElementById('btnBelt');
     if (btnBeltEl) {
-      btnBeltEl.addEventListener('click', function (ev) { ev.stopPropagation(); alert((I18N[lang] || I18N.en).ui.seatbeltOn); });
+      btnBeltEl.addEventListener('click', function (ev) { ev.stopPropagation(); alert((I18N[lang] || I18N[lang]).ui.seatbeltOn); });
     }
     var userBtnEl = document.getElementById('userBtn');
     if (userBtnEl) {
@@ -637,7 +618,7 @@ document.addEventListener('DOMContentLoaded', function () {
       btnLangEl.addEventListener('click', function (ev) { ev.stopPropagation(); var ls = document.getElementById('langScreen'); if (!ls) return; ls.style.display = (ls.style.display === 'grid' || ls.style.display === 'flex') ? 'none' : 'grid'; });
     }
 
-    /* ---------- delegated body click handler ---------- */
+    /* ---------- delegated click handling ---------- */
     document.body.addEventListener('click', function (e) {
       // tile click (open modules)
       var tile = e.target.closest('.tile');
@@ -688,7 +669,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
       // row btn click (play)
       var rowBtn = e.target.closest('.row-btn');
-      if (rowBtn && rowBtn.dataset && rowBtn.dataset.idx !== undefined) { var idx = parseInt(rowBtn.dataset.idx, 10); playIdx(idx); updateLyricsForIndex(idx); return; }
+      if (rowBtn && rowBtn.dataset && rowBtn.dataset.idx !== undefined) { var idx = parseInt(rowBtn.dataset.idx, 10); clearActiveRows(); var row = document.querySelector('.row[data-idx="' + idx + '"]'); if (row) row.classList.add('active'); playIdx(idx); updateLyricsForIndex(idx); return; }
 
       // generic controls: pill, btn, icon-btn, badge, lang-btn
       var btn = e.target.closest('.pill, .btn, button, .icon-btn, .badge, .lang-btn, .play-pill');
@@ -732,7 +713,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     updateFlight(); setInterval(updateFlight, 1000);
 
-    // set initial volume UI
+    // initial volume UI
     setTimeout(function () {
       try {
         var vol = audio.volume || 0.6;
@@ -742,10 +723,8 @@ document.addEventListener('DOMContentLoaded', function () {
       } catch (e) { }
     }, 200);
 
-    // initial cleanup
+    // init cleanup & view
     setTimeout(function () { cleanBannerControls(); }, 150);
-
-    // init view
     renderMusicSelection();
     var homeEl = $id('home'); if (homeEl) homeEl.style.display = 'grid';
     var playerEl = $id('player'); if (playerEl) playerEl.style.display = '';
