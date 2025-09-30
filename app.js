@@ -1,4 +1,4 @@
-// app.js — complete, unabridged, with banner-cleanup and full handlers
+// app.js — complete updated file (toolbar positioning, list fixes, scroll behavior, Liquid-glass glow)
 document.addEventListener('DOMContentLoaded', function () {
   try {
     var MUSIC_BASE = "music/";
@@ -57,24 +57,22 @@ document.addEventListener('DOMContentLoaded', function () {
       setText("tileShopping", t.tiles.shopping[0]); setText("tileShoppingSub", t.tiles.shopping[1]);
       setText("tileDining", t.tiles.dining[0]); setText("tileDiningSub", t.tiles.dining[1]);
       setText("tileFlight", t.tiles.flight[0]); setText("tileFlightSub", t.tiles.flight[1]);
-      var playAllBtn = $id("musicPlayAll"); if (playAllBtn) playAllBtn.title = t.ui.playAll;
       var belt = $id("btnBelt"); if (belt) belt.textContent = t.ui.seatbeltOn;
       var albumAboutTitle = $id("albumNotesTitle"); if (albumAboutTitle) albumAboutTitle.textContent = t.ui.about;
       var lyricsH = $id("lyricsH"); if (lyricsH) lyricsH.textContent = t.ui.lyrics;
-      // toolbar back label if exists
-      var tbBack = $id('tbBack'); if (tbBack) tbBack.textContent = (I18N[lang] || I18N.en).ui.back;
+      var tbBack = $id('tbBack'); if (tbBack) tbBack.textContent = t.ui.back;
     }
 
-    // Library (2 albums full track lists)
+    // Library (two albums)
     var LIB = {
       artangels: {
         id: "artangels",
         artist: "Grimes",
         artistImg: IMAGE_BASE + "grimes_cover.jpg",
-        title: { "en": "Art Angels", "zh-CN": "Art Angels", "zh-TW": "Art Angels", "fr": "Art Angels" },
+        title: { "en": "Art Angels", "zh-CN": "Art Angels" },
         cover: IMAGE_BASE + "art_angles_cover.jpg",
-        blurb: { "en": "Grimes’ hyperpop opus blending industrial punch with bubblegum hooks.", "zh-CN": "Grimes 的超流行专辑，工业能量与泡泡旋律的融合。", "zh-TW": "Grimes 的超流行專輯，工業能量與泡泡旋律的融合。", "fr": "Album hyperpop de Grimes mêlant puissance industrielle et refrains sucrés." },
-        notes: { "zh-CN": "《Art Angels》（2015）与《Paradigmes》（2021）两张专辑呈现两种语汇：前者以工业重拍与甜美旋律拉开舞台帷幕；后者则以冷潮与黑梦色彩敞开夜行叙事。", "en": "Art Angels (2015) and Paradigmes (2021) show two vocabularies: industrial punch and sweet melodies vs. coldwave night drives." },
+        blurb: { "en": "Grimes’ hyperpop opus blending industrial punch with bubblegum hooks.", "zh-CN": "Grimes 的超流行专辑，工业能量与泡泡旋律的融合。" },
+        notes: { "zh-CN": "《Art Angels》（2015）与《Paradigmes》（2021）两张专辑呈现两种语汇：前者以工业重拍与甜美旋律拉开舞台帷幕；后者则以冷潮与黑梦色彩敞开夜行叙事。", "en": "Art Angels (2015) and Paradigmes (2021) show two vocabularies." },
         year: 2015,
         tracks: [
           { t: "laughing and not being normal", len: "1:48", src: MUSIC_BASE + "Grimes - laughing and not being normal.mp3" },
@@ -92,26 +90,26 @@ document.addEventListener('DOMContentLoaded', function () {
           { t: "Life in the Vivid Dream", len: "1:29", src: MUSIC_BASE + "Grimes - Life in the Vivid Dream.mp3" },
           { t: "Butterfly", len: "4:13", src: MUSIC_BASE + "Grimes - Butterfly.mp3" }
         ],
-        artistBio: { "zh-CN": "Grimes — 加拿大艺术家，科幻感与 DIY 狂热混合，将失真、J-pop 光泽与舞台剧性整合。", "en": "Grimes — Canadian artist mixing sci-fi textures with DIY intensity." }
+        artistBio: { "zh-CN": "Grimes — 加拿大艺术家，科幻感与 DIY 狂热混合。", "en": "Grimes — Canadian artist mixing sci-fi textures with DIY intensity." }
       },
       paradigmes: {
         id: "paradigmes",
         artist: "La Femme",
         artistImg: IMAGE_BASE + "lafemme_cover.jpg",
-        title: { "en": "Paradigmes", "zh-CN": "Paradigmes", "zh-TW": "Paradigmes", "fr": "Paradigmes" },
+        title: { "en": "Paradigmes", "zh-CN": "Paradigmes" },
         cover: IMAGE_BASE + "paradigmes_cover.jpg",
-        blurb: { "en": "French surf-coldwave shapeshifting into a cinematic night drive.", "zh-CN": "法国冷潮与冲浪气质的混融，像一段夜色里的电影公路。", "fr": "Mélange de coldwave et surf français comme une route nocturne cinématographique." },
-        notes: { "zh-CN": "La Femme 的《Paradigmes》（2021）以霓虹冲浪浪得林荫大道的暗影；对照《Art Angels》的甜刀锋，它像午夜磁带般翻涌。", "en": "Paradigmes (2021) by La Femme brings neon surf and coldwave shadows." },
+        blurb: { "en": "French surf-coldwave shapeshifting into a cinematic night drive.", "zh-CN": "法国冷潮与冲浪气质的混融，像一段夜色里的电影公路。" },
+        notes: { "zh-CN": "La Femme 的《Paradigmes》（2021）以霓虹冲浪与冷潮的暗影。", "en": "Paradigmes (2021) by La Femme brings neon surf and coldwave shadows." },
         year: 2021,
         tracks: [
-          /* REMOVED: "Paradigmes Introduction" per user request */
-          { t: "Paradigme", len: "—", src: MUSIC_BASE + "La Femme - Paradigme.mp3" },
-          { t: "Le sang de mon prochain", len: "—", src: MUSIC_BASE + "La Femme - Le Sang De Mon Prochain.mp3" },
-          { t: "Cool Colorado", len: "—", src: MUSIC_BASE + "La Femme - Cool Colorado.mp3" },
-          { t: "Foreigner", len: "—", src: MUSIC_BASE + "La Femme - Foreigner.mp3" },
-          { t: "Nouvelle-Orléans", len: "—", src: MUSIC_BASE + "La Femme - Nouvelle-Orleans.mp3" },
-          { t: "Disconnexion", len: "—", src: MUSIC_BASE + "La Femme - Disconnexion.mp3" },
-          { t: "Pasadena", len: "—", src: MUSIC_BASE + "La Femme - Pasadena.mp3" }
+          // removed "Paradigmes Introduction" per your request
+          { t: "Paradigme", len: "3:12", src: MUSIC_BASE + "La Femme - Paradigme.mp3" },
+          { t: "Le sang de mon prochain", len: "4:00", src: MUSIC_BASE + "La Femme - Le Sang De Mon Prochain.mp3" },
+          { t: "Cool Colorado", len: "3:38", src: MUSIC_BASE + "La Femme - Cool Colorado.mp3" },
+          { t: "Foreigner", len: "3:50", src: MUSIC_BASE + "La Femme - Foreigner.mp3" },
+          { t: "Nouvelle-Orléans", len: "4:02", src: MUSIC_BASE + "La Femme - Nouvelle-Orleans.mp3" },
+          { t: "Disconnexion", len: "3:46", src: MUSIC_BASE + "La Femme - Disconnexion.mp3" },
+          { t: "Pasadena", len: "3:50", src: MUSIC_BASE + "La Femme - Pasadena.mp3" }
         ],
         artistBio: { "zh-CN": "La Femme — 法国乐队，冷潮与冲浪的混搭。", "en": "La Femme — French band mixing coldwave and surf." }
       }
@@ -119,10 +117,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
     var albumIds = Object.keys(LIB);
     var curAlbum = albumIds[0];
-    var curIdx = 0;
+    var curIdx = -1;
 
     function slug(s) {
       return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    }
+    function fmtSecondsFromString(s) {
+      if (!s) return '—';
+      if (typeof s === 'string' && s.indexOf(':') !== -1) return s;
+      return s;
     }
     function fmtSeconds(s) {
       s = Math.floor(s || 0);
@@ -139,38 +142,25 @@ document.addEventListener('DOMContentLoaded', function () {
           imgEl.src = candidates[i++];
         }
       };
-      // set first available
       imgEl.src = candidates[i++] || '';
     }
 
     /* ---------- CLEANUP: remove stray toolbar controls INSIDE BANNER ---------- */
     function cleanBannerControls() {
-      var banner = $id('banner') || document.querySelector('.banner') || document.querySelector('.album-banner');
+      var banner = document.querySelector('.album-banner');
       if (!banner) return;
 
-      // common suspicious selectors (small overlay widgets)
       var overlaySelectors = [
-        '.tb-play', '.tb-back', '.tb-title', '.banner-local-play', '.local-back',
-        '.banner-controls', '#bannerToolbar', '.banner-toolbar', '.toolbar-overlay',
-        '.mini-btn', '.mini-toolbar', '.overlay-button', '.small-button', '.banner-small'
+        '.tb-play', '.tb-back', '.tb-title', '.banner-local-play', '.local-back', '.banner-controls',
+        '#bannerToolbar', '.banner-toolbar', '.toolbar-overlay', '.mini-btn', '.mini-toolbar', '.overlay-button', '.small-button', '.banner-small'
       ];
-
-      // remove by selector when node is small or matches toolbar-like classes
       overlaySelectors.forEach(function (sel) {
         try {
           var list = banner.querySelectorAll(sel);
           list.forEach(function (n) {
-            try {
-              var rect = n.getBoundingClientRect ? n.getBoundingClientRect() : { width: 0, height: 0 };
-              var small = (rect.width < 180 && rect.height < 90);
-              var cls = (n.className && String(n.className).toLowerCase()) || '';
-              var likely = cls.indexOf('tb-') !== -1 || cls.indexOf('toolbar') !== -1 || cls.indexOf('mini') !== -1 || cls.indexOf('overlay') !== -1;
-              if (small || likely) {
-                n.parentNode && n.parentNode.removeChild(n);
-              }
-            } catch (e) { }
+            try { n.parentNode && n.parentNode.removeChild(n); } catch (e) {}
           });
-        } catch (e) { }
+        } catch (e) {}
       });
 
       // remove small nodes whose text equals Album or localized back
@@ -186,16 +176,16 @@ document.addEventListener('DOMContentLoaded', function () {
           if (small && textCandidates.indexOf(txt) !== -1) {
             el.parentNode && el.parentNode.removeChild(el);
           }
-        } catch (e) { }
+        } catch (e) {}
       });
 
-      // lastly remove role=button small elements inside banner
+      // remove small role=button nodes
       var roleBtns = banner.querySelectorAll('[role="button"]');
       roleBtns.forEach(function (n) {
         try {
           var rect = n.getBoundingClientRect ? n.getBoundingClientRect() : { width: 0, height: 0 };
           if (rect.width < 180 && rect.height < 80) n.parentNode && n.parentNode.removeChild(n);
-        } catch (e) { }
+        } catch (e) {}
       });
     }
 
@@ -220,27 +210,32 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     }
 
-    /* ---------- floating album toolbar (top of album page) ---------- */
+    /* ---------- TOOLBAR: improved creation + robust positioning ---------- */
     function ensureAlbumToolbar() {
       var tb = $id('albumToolbar');
       if (tb) return tb;
+
       tb = document.createElement('div');
       tb.id = 'albumToolbar';
       tb.style.position = 'fixed';
       tb.style.left = '12px';
-      tb.style.right = '12px';
+      tb.style.right = 'auto';
       tb.style.top = '98px';
       tb.style.zIndex = '2200';
       tb.style.display = 'flex';
       tb.style.alignItems = 'center';
       tb.style.gap = '18px';
       tb.style.padding = '12px 18px';
+      tb.style.boxSizing = 'border-box';
       tb.style.borderRadius = '12px';
       tb.style.backdropFilter = 'blur(18px) saturate(1.2)';
       tb.style.background = 'linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01))';
       tb.style.boxShadow = '0 8px 30px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.02)';
-      tb.style.transition = 'opacity .18s ease, transform .18s ease';
+      tb.style.transition = 'opacity .18s ease, transform .18s ease, left .12s ease, width .12s ease';
       tb.style.pointerEvents = 'auto';
+      tb.style.opacity = '0';
+      tb.style.transform = 'translateY(-6px)';
+
       tb.innerHTML = [
         '<div class="tb-play" id="tbPlay" title="Play/Pause" style="width:64px;height:64px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#19d267,#06b56b);box-shadow:0 8px 24px rgba(6,10,14,0.6)"><svg viewBox="0 0 24 24" id="tbPlayIcon" width="28" height="28" fill="#052517"><path d="M8 5v14l11-7z"/></svg></div>',
         '<div class="tb-title" id="tbTitle" style="font-weight:900;font-size:28px;color:#fff;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-left:6px"></div>',
@@ -261,7 +256,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
       tb.querySelector('#tbBack').addEventListener('click', function (ev) {
         ev.stopPropagation();
-        // go back to music selection (not main home)
         var panelMusic = $id('panel-music');
         if (panelMusic) {
           var ms = $id('music-selection');
@@ -278,21 +272,32 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function positionAlbumToolbar() {
       var tb = $id('albumToolbar'); if (!tb) return;
-      var panel = $id('panel-music'); if (!panel || !panel.classList.contains('visible')) { hideAlbumToolbar(); return; }
+      var panel = $id('panel-music'); if (!panel || !panel.classList.contains('visible')) { tb.style.opacity='0'; tb.style.pointerEvents='none'; return; }
       var leftCol = panel.querySelector('.music-left');
-      if (!leftCol) { hideAlbumToolbar(); return; }
+      if (!leftCol) { tb.style.opacity='0'; tb.style.pointerEvents='none'; return; }
+      tb.style.pointerEvents='auto';
       var rect = leftCol.getBoundingClientRect();
-      var left = Math.max(12, rect.left);
-      var width = Math.max(320, rect.width);
-      tb.style.left = left + 'px';
-      tb.style.width = width + 'px';
-      var topBase = document.querySelector('header') ? (document.querySelector('header').getBoundingClientRect().bottom + 12) : 12;
+      var cs = getComputedStyle(leftCol);
+      var padLeft = parseFloat(cs.paddingLeft||'0')||0;
+      var padRight = parseFloat(cs.paddingRight||'0')||0;
+      var desiredLeft = Math.round(rect.left + padLeft);
+      var desiredWidth = Math.max(320, Math.round((leftCol.clientWidth || rect.width) - padLeft - padRight));
+      var margin = 12;
+      var maxWidthAllowed = Math.max(280, Math.round(window.innerWidth - desiredLeft - margin));
+      if (desiredWidth > maxWidthAllowed) {
+        desiredWidth = maxWidthAllowed;
+        if (desiredLeft + desiredWidth > window.innerWidth - margin) {
+          desiredLeft = Math.max(margin, window.innerWidth - margin - desiredWidth);
+        }
+      }
+      var headerRect = document.querySelector('header') ? document.querySelector('header').getBoundingClientRect() : { bottom: 12 };
+      var topBase = Math.round(headerRect.bottom + 12);
+      tb.style.left = desiredLeft + 'px';
+      tb.style.width = desiredWidth + 'px';
       tb.style.top = topBase + 'px';
+      tb.style.opacity = '1';
+      tb.style.transform = 'translateY(0px)';
     }
-
-    var toolbarRaf = null;
-    window.addEventListener('resize', function () { if (toolbarRaf) cancelAnimationFrame(toolbarRaf); toolbarRaf = requestAnimationFrame(positionAlbumToolbar); });
-    window.addEventListener('scroll', function () { if (toolbarRaf) cancelAnimationFrame(toolbarRaf); toolbarRaf = requestAnimationFrame(positionAlbumToolbar); });
 
     function showAlbumToolbar(titleText) {
       var tb = ensureAlbumToolbar();
@@ -300,21 +305,41 @@ document.addEventListener('DOMContentLoaded', function () {
       var back = tb.querySelector('#tbBack');
       if (tbTitle) tbTitle.textContent = titleText || '';
       if (back) back.textContent = (I18N[lang] || I18N.en).ui.back;
-      tb.style.opacity = '1'; tb.style.transform = 'translateY(0px)';
       positionAlbumToolbar();
-      // push down the left columns content slightly so toolbar doesn't overlap banner content
       var panel = $id('panel-music');
       if (panel) {
         var left = panel.querySelector('.music-left');
-        if (left) left.style.paddingTop = '88px'; // ensure content pushed below toolbar
+        if (left) {
+          if (!left.dataset.toolbarPushed) {
+            var tbH = parseFloat(getComputedStyle(tb).height || '78') || 78;
+            left.style.paddingTop = (tbH + 10) + 'px';
+            left.dataset.toolbarPushed = '1';
+          }
+        }
+      }
+      if (!positionAlbumToolbar._bound) {
+        positionAlbumToolbar._bound = true;
+        var rafId = null;
+        function schedule() { if (rafId) cancelAnimationFrame(rafId); rafId = requestAnimationFrame(function(){ positionAlbumToolbar(); rafId=null; }); }
+        window.addEventListener('resize', schedule, { passive: true });
+        var panelMusic = $id('panel-music');
+        if (panelMusic) {
+          var leftCol = panelMusic.querySelector('.music-left');
+          if (leftCol) {
+            leftCol.addEventListener('scroll', schedule, { passive: true });
+            var mo = new MutationObserver(schedule);
+            mo.observe(leftCol, { childList: true, subtree: true, attributes: true, characterData: true });
+          }
+        }
       }
     }
+
     function hideAlbumToolbar() {
       var tb = $id('albumToolbar'); if (tb) { tb.style.opacity = '0'; tb.style.transform = 'translateY(-6px)'; }
       var panel = $id('panel-music');
       if (panel) {
         var left = panel.querySelector('.music-left');
-        if (left) left.style.paddingTop = ''; // reset
+        if (left && left.dataset.toolbarPushed) { left.style.paddingTop = ''; delete left.dataset.toolbarPushed; }
       }
     }
 
@@ -322,14 +347,10 @@ document.addEventListener('DOMContentLoaded', function () {
     function openMusicAlbum(albumId) {
       if (!albumId) return;
       curAlbum = albumId;
-
-      // Pre-clean banner
       cleanBannerControls();
-
       var panel = $id('panel-music');
       if (panel) {
-        var panels = document.querySelectorAll('.panel');
-        for (var i = 0; i < panels.length; i++) panels[i].classList.remove('visible');
+        var panels = document.querySelectorAll('.panel'); for (var i = 0; i < panels.length; i++) panels[i].classList.remove('visible');
         panel.classList.add('visible');
       }
       var home = $id('home'); if (home) home.style.display = 'none';
@@ -345,7 +366,6 @@ document.addEventListener('DOMContentLoaded', function () {
         var cands = [a.cover, IMAGE_BASE + a.id + '_cover.jpg', IMAGE_BASE + a.id + '.jpg', IMAGE_BASE + 'paradigmes_cover.jpg', IMAGE_BASE + 'art_angles_cover.jpg', IMAGE_BASE + 'grimes_cover.jpg', IMAGE_BASE + 'lafemme_cover.jpg'];
         tryImageSources(banner, cands);
       } else {
-        // if banner is not an <img> but a container with background, set css background
         var bannerCont = $id('banner') || document.querySelector('.album-banner');
         if (bannerCont) {
           bannerCont.style.backgroundImage = 'url("' + (a.cover || '') + '")';
@@ -363,12 +383,9 @@ document.addEventListener('DOMContentLoaded', function () {
       var artistBioEl = $id('artistBio'); if (artistBioEl) artistBioEl.textContent = (a.artistBio && (a.artistBio[lang] || a.artistBio['zh-CN'] || a.artistBio.en)) || a.artistBio || '';
       var albumNotes = $id('albumNotes'); if (albumNotes) albumNotes.textContent = notes;
 
-      // Hide small overlay nodes in banner if any remain
       cleanBannerControls();
-
       var ms = $id('music-selection'); if (ms) ms.style.display = 'none';
       var mg = panel ? panel.querySelector('.music-grid') : null; if (mg) mg.style.display = '';
-
       renderTracks();
 
       // show floating toolbar (top)
@@ -406,18 +423,20 @@ document.addEventListener('DOMContentLoaded', function () {
         var r = document.createElement('div'); r.className = 'row'; r.dataset.idx = i;
         var titleText = trk.t || '';
         var albumTitle = (a.title && (a.title[lang] || a.title['zh-CN'] || a.title.en)) || '';
-        var lenText = trk.len || '—';
+        var lenText = fmtSecondsFromString(trk.len || '—');
         var leftSvg = '<div class="row-btn" data-idx="' + i + '" title="Play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>';
         var mid = '<div style="flex:1"><div class="title">' + titleText + '</div><div class="meta">' + a.artist + ' • ' + albumTitle + '</div></div>';
         var right = '<div style="width:80px;text-align:right">' + lenText + '</div>';
         r.innerHTML = leftSvg + mid + right;
+
         // click row to play
         r.addEventListener('click', function (ev) {
-          if (ev.target && ev.target.closest('.row-btn')) return; // click on small button will be handled separately
+          if (ev.target && ev.target.closest('.row-btn')) return;
           document.querySelectorAll('.row').forEach(function (el) { el.classList.remove('active'); });
           r.classList.add('active');
           playIdx(i); updateLyricsForIndex(i);
         }, false);
+
         // row-btn click (play single track)
         var rowBtn = r.querySelector('.row-btn');
         if (rowBtn) {
@@ -428,8 +447,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     /* ---------- audio playback handling ---------- */
-    var audio = new Audio(); audio.preload = 'metadata';
-    audio.crossOrigin = 'anonymous';
+    var audio = new Audio(); audio.preload = 'metadata'; audio.crossOrigin = 'anonymous';
 
     function firstPlayableIndex(albumId) { var a = LIB[albumId]; if (!a) return -1; for (var i = 0; i < a.tracks.length; i++) if (a.tracks[i].src) return i; return -1; }
     function nextPlayableIndex(albumId, from) { var a = LIB[albumId]; if (!a) return from; var n = a.tracks.length; for (var k = 1; k <= n; k++) { var idx = (from + k) % n; if (a.tracks[idx].src) return idx; } return from; }
@@ -451,6 +469,11 @@ document.addEventListener('DOMContentLoaded', function () {
       if (npMetaEl) npMetaEl.textContent = album.artist + ' • ' + ((album.title && (album.title[lang] || album.title['zh-CN'] || album.title.en)) || '');
       if (npArtEl) npArtEl.style.backgroundImage = 'url("' + (album.cover || '') + '")';
       curIdx = i;
+
+      // UI: mark playing row
+      document.querySelectorAll('.row').forEach(function (el) { el.classList.remove('playing'); el.classList.remove('active'); });
+      var row = document.querySelector('.row[data-idx="'+i+'"]');
+      if (row) { row.classList.add('playing'); row.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
     }
 
     audio.addEventListener('loadedmetadata', function () {
@@ -477,11 +500,6 @@ document.addEventListener('DOMContentLoaded', function () {
       var p = (total > 0) ? (current / total) : 0;
       var px = Math.max(0, Math.min(innerW, Math.round(p * innerW)));
       bar.style.width = px + 'px';
-      // ensure thumb aligns: if there is a thumb element make its center at 12 + px
-      var seekThumb = rail.querySelector('.thumb');
-      if (seekThumb) {
-        seekThumb.style.left = (12 + px) + 'px';
-      }
     }
 
     function pointerToRatio(e, el) {
@@ -569,8 +587,8 @@ document.addEventListener('DOMContentLoaded', function () {
     window.addEventListener('keydown', function (e) {
       if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
       if (e.code === 'Space') { e.preventDefault(); var btn = $id('playPause'); if (btn) btn.click(); }
-      if (e.code === 'ArrowRight') { e.preventDefault(); var n = $id('btnNext'); if (n) n.click(); }
-      if (e.code === 'ArrowLeft') { e.preventDefault(); var p = $id('btnPrev'); if (p) p.click(); }
+      if (e.code === 'ArrowRight') { e.preventDefault(); var n = $id('btnNext'); if (n) n.click(); if (curIdx >= 0) { var next = nextPlayableIndex(curAlbum, curIdx); playIdx(next); updateLyricsForIndex(next); } }
+      if (e.code === 'ArrowLeft') { e.preventDefault(); var p = $id('btnPrev'); if (p) p.click(); if (curIdx >= 0) { var prev = prevPlayableIndex(curAlbum, curIdx); playIdx(prev); updateLyricsForIndex(prev); } }
     });
 
     /* ---------- language modal ---------- */
@@ -608,7 +626,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     var btnBeltEl = document.getElementById('btnBelt');
     if (btnBeltEl) {
-      btnBeltEl.addEventListener('click', function (ev) { ev.stopPropagation(); alert((I18N && I18N[lang] ? I18N[lang].ui.seatbeltOn : 'Seatbelt On')); });
+      btnBeltEl.addEventListener('click', function (ev) { ev.stopPropagation(); alert((I18N[lang] || I18N.en).ui.seatbeltOn); });
     }
     var userBtnEl = document.getElementById('userBtn');
     if (userBtnEl) {

@@ -2,12 +2,12 @@
   --bg:#0a0d12;
   --panel:#0b121c;
   --card:#0e1726;
-  --muted:#a7b7cc;
+  --muted:#9fb0c8;
   --text:#f6f8fb;
   --border:#223149;
   --accent:#16d26b;
   --icon-color:#e8f0ff;
-  --banner-glow: rgba(60,160,220,0.18); /* 增强 glow 强度 */
+  --banner-glow: rgba(40,140,200,0.20);
   --control-h: 58px;
   --text-scale: 1.28;
   --player-h: calc(var(--control-h) + 12px);
@@ -83,7 +83,7 @@ main{position:relative;height:calc(100vh - var(--header-h) - var(--player-h) - v
 .tile p{margin:0;font-size:calc(14px * var(--text-scale));color:var(--muted)}
 
 /* panels */
-.panel{position:relative;height:100%;display:none;overflow:auto}
+.panel{position:relative;height:100%;display:none;overflow:hidden}
 .panel.visible{display:block}
 
 /* album selection */
@@ -95,18 +95,25 @@ main{position:relative;height:calc(100vh - var(--header-h) - var(--player-h) - v
 .album-info .meta{color:var(--muted);font-size:calc(14px * var(--text-scale));margin-top:6px}
 .album-info .blurb{margin-top:8px;color:#d9e5ff}
 
-/* music-grid */
-.music-grid{height:100%;display:grid;grid-template-columns:7fr 3fr;gap:16px;overflow:hidden}
-.music-left,.music-right{height:100%;overflow:auto;padding:10px 14px;box-sizing:border-box}
+/* music-grid: left 70% / right 30% */
+.music-grid{height:100%;display:grid;grid-template-columns:70% 30%;gap:16px;overflow:hidden}
+.music-left,.music-right{
+  height:100%;
+  overflow:auto;
+  padding:10px 14px;
+  box-sizing:border-box;
+}
+/* remove extra bottom padding so scroll ends at last item */
 .music-left{padding-left:8px;padding-right:18px}
-.music-left,.music-right{padding-bottom:calc(var(--player-h) + var(--player-bottom-offset) + 28px)}
+.music-left,.music-right{padding-bottom:0}
 
-/* ---------------- album toolbar (floating) ---------------- */
+/* narrow scrollbar for both columns */
+.music-left::-webkit-scrollbar, .music-right::-webkit-scrollbar { width:8px; }
+.music-left::-webkit-scrollbar-thumb, .music-right::-webkit-scrollbar-thumb { background: rgba(120,160,190,0.14); border-radius:999px; }
+.music-left::-webkit-scrollbar-track, .music-right::-webkit-scrollbar-track { background: rgba(255,255,255,0.01); }
+
+/* album toolbar (floating) — JS will inject styles for placement; CSS for appearance */
 #albumToolbar{
-  position:fixed;
-  top: calc(var(--header-h) + var(--gap));
-  left: var(--gap);
-  right: auto;
   height: var(--toolbar-h);
   display:flex;
   align-items:center;
@@ -121,11 +128,9 @@ main{position:relative;height:calc(100vh - var(--header-h) - var(--player-h) - v
   z-index:1600;
   transform: translateZ(0);
   transition: left .12s ease, width .12s ease, opacity .18s;
-  opacity: 0; /* hidden by default; JS will set to 1 */
+  opacity: 0;
   pointer-events: none;
 }
-
-/* toolbar strong glow: pseudo element (uses --banner-glow) */
 #albumToolbar::after {
   content: "";
   position: absolute;
@@ -139,22 +144,18 @@ main{position:relative;height:calc(100vh - var(--header-h) - var(--player-h) - v
 }
 
 /* toolbar contents */
-#albumToolbar .tb-play {
-  width:56px;height:56px;border-radius:12px;background:linear-gradient(180deg,#21d474,#0fbf56);display:grid;place-items:center;color:#052517;border:1px solid rgba(0,0,0,0.08);box-shadow:0 8px 18px rgba(14,60,40,0.35);
-  flex:0 0 auto; cursor:pointer;
-}
+#albumToolbar .tb-play { width:56px;height:56px;border-radius:12px;background:linear-gradient(180deg,#21d474,#0fbf56);display:grid;place-items:center;color:#052517;border:1px solid rgba(0,0,0,0.08);box-shadow:0 8px 18px rgba(14,60,40,0.35);flex:0 0 auto; cursor:pointer;}
 #albumToolbar .tb-play svg{width:22px;height:22px;fill:currentColor}
 #albumToolbar .tb-title{font-size:36px;font-weight:900;letter-spacing:-0.02em;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #albumToolbar .tb-back{margin-left:auto;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;padding:10px 18px;color:#fff;border:1px solid rgba(255,255,255,0.06);font-size:18px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 10px 30px rgba(3,6,10,0.45)}
 
-/* ---------------- album banner (keeps original look but moved down when toolbar active) ---------------- */
+/* album-banner */
 .album-banner{
   position:relative;border-radius:18px;overflow:hidden;margin-bottom:14px;display:flex;align-items:stretch;gap:18px;padding:18px;
   background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));backdrop-filter:blur(16px) saturate(1.15);
   transition: margin-top .16s ease, box-shadow .12s ease;
   z-index:10;
 }
-/* strong album glow effect */
 .album-banner::before{
   content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
   background: radial-gradient(800px 200px at 10% 20%, var(--banner-glow), rgba(0,0,0,0) 30%);
@@ -174,36 +175,49 @@ main{position:relative;height:calc(100vh - var(--header-h) - var(--player-h) - v
 .submeta{color:var(--muted);margin-top:8px}
 .banner-blurb{margin-top:12px;color:#d9e5ff;max-width:60%}
 
-/* ensure any toolbar elements accidentally placed inside banner are hidden (no conflict) */
+/* ensure toolbar-like elements accidentally inside banner are hidden */
 .album-banner .tb-play, .album-banner .tb-title, .album-banner .tb-back { display: none !important; }
 
-/* ---------------- playlist row: liquid glass styling ---------------- */
-.playlist{display:grid;gap:10px}
+/* playlist row: fixed uniform height, list behavior */
+.playlist{display:flex;flex-direction:column;gap:12px;padding-bottom:8px}
 .row{
   display:grid;
-  grid-template-columns:54px 1fr 72px;
+  grid-template-columns:56px 1fr 80px;
   align-items:center;
-  gap:10px;
+  gap:12px;
   border-radius:14px;
-  padding:12px 12px;
+  padding:12px 14px;
+  min-height:68px;
   font-size:calc(18px * var(--text-scale));
   background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.002));
   border:1px solid rgba(255,255,255,0.02);
   box-shadow: 0 8px 20px rgba(2,6,10,0.5), inset 0 1px 0 rgba(255,255,255,0.02);
   transition: transform .12s ease, box-shadow .14s ease, background .12s ease;
+  cursor:pointer;
 }
-.row:hover{ transform: translateY(-3px); box-shadow: 0 18px 42px rgba(6,10,14,0.6); background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.004)); }
-.row.active{ background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(180,220,255,0.02)); border-color: rgba(160,200,255,0.06); box-shadow: 0 20px 48px rgba(12,24,36,0.7); transform: translateY(-4px) scale(1.005); }
+.row:hover{ transform: translateY(-2px); box-shadow: 0 18px 42px rgba(6,10,14,0.6); background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.004)); }
+.row.active{ background: linear-gradient(90deg, rgba(36,90,120,0.06), rgba(160,200,255,0.02)); border-color: rgba(100,170,230,0.06); box-shadow: 0 20px 48px rgba(12,24,36,0.7); transform: translateY(-2px) scale(1.001); }
+.row.playing{
+  /* strong multi-directional glow */
+  box-shadow:
+    0 12px 28px rgba(8,40,60,0.5),
+    0 0 40px rgba(30,140,200,0.16),
+    0 0 70px rgba(30,140,200,0.10);
+  background: linear-gradient(180deg, rgba(22,60,90,0.12), rgba(8,12,18,0.04));
+  border-color: rgba(60,150,220,0.12);
+}
 
 /* row internals */
 .row .row-btn{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(180deg,#0f1620,#091018);border:1px solid var(--border);cursor:pointer}
 .row .title{font-size:calc(18px * var(--text-scale));font-weight:800}
 .row .meta{font-size:calc(13px * var(--text-scale));color:var(--muted)}
 
+/* duration column align right */
+.row > div:nth-child(3){ text-align:right; font-weight:700; color:var(--muted) }
+
 /* right column */
 .artist-hero{border-radius:14px;overflow:hidden;margin-bottom:12px;border:1px solid rgba(255,255,255,.04);background:linear-gradient(180deg, rgba(255,255,255,.01), rgba(255,255,255,.005))}
 .artist-hero img{display:block;width:100%;height:auto;border-radius:14px;object-fit:cover}
-.artist-bio{padding:12px;margin-bottom:12px;border-radius:12px}
 .card{border-radius:14px;padding:12px;background:linear-gradient(180deg, rgba(255,255,255,.01), rgba(255,255,255,.005));border:1px solid rgba(255,255,255,.03)}
 .card-title{margin:0 0 8px 0;font-size:calc(16px * var(--text-scale));font-weight:800}
 .card-text{margin:0;font-size:calc(14px * var(--text-scale));color:#d9e5ff;line-height:1.55}
@@ -215,24 +229,24 @@ main{position:relative;height:calc(100vh - var(--header-h) - var(--player-h) - v
 .btn{width:var(--control-h);height:var(--control-h);border-radius:50%;background:linear-gradient(180deg,#12313f,#071018);border:1px solid rgba(255,255,255,0.06);display:grid;place-items:center;cursor:pointer;color:var(--icon-color);box-shadow:0 8px 24px rgba(6,10,14,0.55)}
 .btn svg{width:calc(22px * var(--text-scale));height:calc(22px * var(--text-scale));fill:currentColor}
 
-/* timeline */
+/* timeline - fixed width so it won't be pushed by text on left */
 .center-col{display:flex;flex-direction:row;gap:12px;align-items:center;justify-content:center;flex:1;min-width:320px}
 .now{display:flex;align-items:center;gap:12px;min-width:240px;max-width:420px;overflow:hidden}
 .art{width:58px;height:58px;border-radius:12px;background:#1b2946;background-size:cover;background-position:center}
 .np .t{font-size:calc(16px * var(--text-scale));font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .np .m{font-size:calc(13px * var(--text-scale));color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-/* rail / bar / thumb: thumb hidden per request (line-only) */
-.timeline{display:flex;align-items:center;gap:12px;justify-content:center;flex:1;min-width:320px}
-.rail{position:relative;height:var(--control-h);border-radius:999px;background:transparent;width:clamp(300px,46vw,740px);cursor:pointer;display:flex;align-items:center;padding:0 12px;box-sizing:border-box}
-.rail::before{content:"";position:absolute;left:12px;right:12px;top:50%;transform:translateY(-50%);height:calc(12px * var(--text-scale));background:#0b2634;border-radius:999px;z-index:1}
-.bar{position:absolute;left:12px;top:50%;transform:translateY(-50%);height:calc(12px * var(--text-scale));border-radius:999px;background:linear-gradient(90deg,#ffd67a 0%, #9ff3cf 100%);box-shadow:0 10px 28px rgba(0,0,0,.35);width:0;z-index:2}
+/* rail fixed size and stronger Liquid glass look */
+.timeline{display:flex;align-items:center;gap:12px;justify-content:center;flex:1;min-width:320px;max-width:900px}
+.time{font-size:calc(13px * var(--text-scale));color:var(--muted);width:48px;text-align:center}
+
+/* rail / bar / thumb: thumb hidden (still interactive via pointer events on rail) */
+.rail{position:relative;height:10px;border-radius:999px;background:transparent;width:clamp(360px,50vw,820px);cursor:pointer;display:flex;align-items:center;padding:0 12px;box-sizing:border-box}
+.rail::before{content:"";position:absolute;left:12px;right:12px;top:50%;transform:translateY(-50%);height:8px;background:#0b2634;border-radius:999px;z-index:1;filter:blur(0.5px)}
+.bar{position:absolute;left:12px;top:50%;transform:translateY(-50%);height:8px;border-radius:999px;background:linear-gradient(90deg,#ffd67a 0%, #9ff3cf 100%);box-shadow:0 10px 28px rgba(0,0,0,.35), 0 0 40px rgba(150,220,255,0.06);width:0;z-index:2}
 
 /* HIDE thumbs (white dot) as requested — still interactive via pointer events on rail */
 .rail .thumb, .vol-rail .thumb, .player .rail .thumb { display: none !important; pointer-events: none !important; }
-
-/* time */
-.time{font-size:calc(13px * var(--text-scale));color:var(--muted);width:48px;text-align:center}
 
 /* volume */
 .volume{display:flex;align-items:center;gap:8px;justify-content:flex-end;margin-right:8px;min-width:170px}

@@ -67,7 +67,7 @@
         <div class="album-grid" id="albumGrid" aria-live="polite"></div>
       </div>
 
-      <!-- Album page: banner (with floating toolbar) + tracks + right column -->
+      <!-- Album page: banner (with floating toolbar injected by JS) + tracks + right column -->
       <div class="music-grid" style="display:none;">
         <div class="music-left">
           <div class="album-banner" id="albumBannerRoot">
@@ -84,19 +84,6 @@
               </div>
             </div>
 
-            <!-- Floating toolbar that sits on top of banner (play, album title, back) -->
-            <div class="banner-toolbar" id="bannerToolbar" aria-hidden="false">
-              <div class="toolbar-left">
-                <button id="bannerPlay" class="play-pill" title="Play">
-                  <!-- svg triangle inside -->
-                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg>
-                </button>
-                <div class="toolbar-title" id="toolbarTitleFloating">Album</div>
-              </div>
-              <div class="toolbar-right">
-                <button id="musicBack" class="icon-btn" title="返回">返回</button>
-              </div>
-            </div>
           </div>
 
           <!-- track list -->
@@ -118,6 +105,14 @@
             <pre id="lyricsBody" class="card-lyrics">—</pre>
           </div>
         </aside>
+      </div>
+    </section>
+
+    <!-- dining panel placeholder (added but minimal; does not change music behavior) -->
+    <section id="panel-dining" class="panel" aria-hidden="true">
+      <div class="dining-grid">
+        <!-- dining content will be injected by app.js when requested -->
+        <div id="diningContainer" class="dining-container"></div>
       </div>
     </section>
 
