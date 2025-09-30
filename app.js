@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function () {
         notes: { "zh-CN": "La Femme 的《Paradigmes》（2021）以霓虹冲浪浪得林荫大道的暗影；对照《Art Angels》的甜刀锋，它像午夜磁带般翻涌。", "en": "Paradigmes (2021) by La Femme brings neon surf and coldwave shadows." },
         year: 2021,
         tracks: [
-          { t: "Paradigmes Introduction", len: "—", src: MUSIC_BASE + "Paradigmes Introduction.mp3" },
+          /* REMOVED: "Paradigmes Introduction" per user request */
           { t: "Paradigme", len: "—", src: MUSIC_BASE + "La Femme - Paradigme.mp3" },
           { t: "Le sang de mon prochain", len: "—", src: MUSIC_BASE + "La Femme - Le Sang De Mon Prochain.mp3" },
           { t: "Cool Colorado", len: "—", src: MUSIC_BASE + "La Femme - Cool Colorado.mp3" },
