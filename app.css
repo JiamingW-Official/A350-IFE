@@ -237,6 +237,7 @@ main{
 .map{ height:100%; width:100%; border-radius:12px; border:1px solid rgba(255,255,255,0.06); overflow:hidden }
 .info-col{ overflow:hidden }
 .leaflet-container{ background:#081018 }
+.leaflet-control-zoom{ display:none !important; }
 .ac-icon{ filter: drop-shadow(0 2px 4px rgba(0,0,0,.6)); font-size:22px }
 .tick-label{ background:rgba(16,22,34,.8); color:#e8f0ff; padding:2px 6px; border-radius:6px; font-size:12px; border:1px solid rgba(255,255,255,.08) }
 .board-list{ display:grid; gap:6px; }
@@ -253,8 +254,11 @@ main{
 .compass{ position:absolute; left:14px; top:14px; width:48px; height:48px; border-radius:999px; background:rgba(16,22,34,.6); border:1px solid rgba(255,255,255,.12); display:grid; place-items:center; color:#fff; font-weight:900; z-index:500 }
 .attitude{ position:absolute; left:14px; bottom:56px; width:120px; height:80px; border-radius:12px; background:rgba(16,22,34,.6); border:1px solid rgba(255,255,255,.12); overflow:hidden; z-index:500 }
 .attitude .horizon{ position:absolute; left:0; right:0; top:50%; height:2px; background:#ffd67a }
-.ticker{ position:absolute; left:12px; right:12px; bottom:10px; height:32px; border-radius:10px; background:rgba(0,0,0,.45); border:1px solid rgba(255,255,255,.08); color:#e8f0ff; display:flex; align-items:center; overflow:hidden; z-index:500 }
-.ticker .inner{ white-space:nowrap; animation: tickerMove 18s linear infinite; padding-left:16px }
+.ticker{ position:absolute; left:12px; right:12px; bottom:10px; height:44px; border-radius:12px; 
+  background: var(--glass-bg); border: var(--glass-border); color:#e8f0ff; 
+  display:flex; align-items:center; overflow:hidden; z-index:500; backdrop-filter: blur(10px) saturate(1.1);
+}
+.ticker .inner{ white-space:nowrap; animation: tickerMove 18s linear infinite; padding-left:16px; font-size:16px; font-weight:800 }
 @keyframes tickerMove { 0%{ transform: translateX(0) } 100%{ transform: translateX(-50%) } }
 @media (max-width:900px){
   .album-grid{ grid-template-columns:1fr; }

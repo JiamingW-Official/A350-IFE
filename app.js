@@ -422,11 +422,13 @@ document.addEventListener('DOMContentLoaded', function () {
       const conn = $id('sfoConn'); if (conn) {
         conn.innerHTML = '';
         const dests = ['HNL','LAX','SEA','YVR','ORD','DFW','PHX','IAD','BOS','MIA','ATL','DEN','MSP','DTW','YYZ','YUL','SJD','AUS','SAN','PDX','SNA','RSW','TPA','BNA','PHL','EWR','JFK','DAL','STL','CLE'];
+        function randFlight(){ return 'JW' + (600 + Math.floor(Math.random()*400)); }
+        function randGate(){ const letters='BCDEFG'; return letters[Math.floor(Math.random()*letters.length)]+((Math.floor(Math.random()*9))+1); }
         for (let i=0;i<30;i++){
-          const hr = 20 + Math.floor(i/2); const min = (i%2)*30; const t = `${(hr%24).toString().padStart(2,'0')}:${min.toString().padStart(2,'0')}`;
+          const hr = 20 + Math.floor(Math.random()*6); const min = (Math.random()<0.5?0:30); const t = `${(hr%24).toString().padStart(2,'0')}:${min.toString().padStart(2,'0')}`;
           const status = ['On Time','Delayed','Cancelled'][Math.floor(Math.random()*3)];
           const row = document.createElement('div'); row.className = 'board-row';
-          row.innerHTML = `<div>JW${700+i}</div><div>${dests[i]}</div><div>${t}</div><div>B${(i%9)+1}</div><div class="status">${status}</div>`;
+          row.innerHTML = `<div>${randFlight()}</div><div>${dests[i]}</div><div>${t}</div><div>${randGate()}</div><div class="status">${status}</div>`;
           conn.appendChild(row);
         }
       }
