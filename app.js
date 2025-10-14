@@ -287,8 +287,10 @@ document.addEventListener('DOMContentLoaded', function () {
         // auto-fit: expand font-size until ~90% width is used, within reasonable bounds
         try {
           const parent = heroCity.parentElement; if (parent) {
-            const maxWidth = parent.getBoundingClientRect().width * 0.9; // 90%
+            const widthFactor = (lang === 'ru') ? 0.88 : 0.90; // slightly smaller target for Russian
+            const maxWidth = parent.getBoundingClientRect().width * widthFactor;
             let size = 64 * (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--text-scale'))||1);
+            if (lang === 'ru') size *= 0.96; // nudge down a touch for Russian glyph widths
             const min = 28, max = 140; // px bounds
             heroCity.style.whiteSpace = 'nowrap'; // keep one line if possible
             heroCity.style.display = 'block';
