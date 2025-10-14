@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>IFE — JW Airlines Music</title>
   <link rel="stylesheet" href="app.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
 </head>
 <body>
   <header>
@@ -109,6 +110,28 @@
       </div>
     </section>
 
+    <section id="panel-flight" class="panel" aria-hidden="true" style="display:none;">
+      <div class="flight-grid">
+        <div class="map-col">
+          <div id="flightMap" class="map"></div>
+        </div>
+        <aside class="info-col">
+          <div class="card">
+            <h3 class="card-title" id="fltTitle">A350‑1000 • JFK → SFO</h3>
+            <p class="card-text" id="fltMeta">Cruise • FL380 • Mach 0.85</p>
+          </div>
+          <div class="card">
+            <h4 class="card-title">Flight info</h4>
+            <div id="fltInfo" class="card-text"></div>
+          </div>
+          <div class="card">
+            <h4 class="card-title">SFO connections</h4>
+            <div id="sfoConn" class="card-text"></div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
     <section id="panel-dining" class="panel" aria-hidden="true">
       <div class="dining-grid">
         <div class="menu-column">
@@ -188,5 +211,6 @@
   </div>
 
   <script src="app.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 </body>
 </html>

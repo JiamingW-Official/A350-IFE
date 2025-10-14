@@ -320,11 +320,77 @@ document.addEventListener('DOMContentLoaded', function () {
       const albumNotesTitle = $id("albumNotesTitle"); if (albumNotesTitle) albumNotesTitle.textContent = t.ui.about;
       const lyricsH = $id("lyricsH"); if (lyricsH) lyricsH.textContent = t.ui.lyrics;
       const tbBack = $id('tbBack'); if (tbBack) tbBack.textContent = (I18N[lang] || I18N.en).ui.back;
+      // update hero city localized...
       // refresh dining in-place if open
       const diningPanel = $id('panel-dining');
       if (diningPanel && diningPanel.classList.contains('visible')) {
         renderDining();
       }
+    }
+    /* ---------- Flight map (Leaflet) ---------- */
+    function renderFlight() {
+      const panel = $id('panel-flight'); if (!panel) return;
+      const mapEl = $id('flightMap'); if (!mapEl) return;
+      // init or reuse map
+      if (!window._leafletMap) {
+        const m = L.map(mapEl, { zoomControl: true, attributionControl: false });
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 8 }).addTo(m);
+        window._leafletMap = m;
+      } else {
+        mapEl.innerHTML = '';
+        window._leafletMap = L.map(mapEl, { zoomControl: true, attributionControl: false });
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 8 }).addTo(window._leafletMap);
+      }
+      const map = window._leafletMap;
+
+      const jfk = [40.6413, -73.7781]; // JFK
+      const sfo = [37.6213, -122.3790]; // SFO
+
+      // compute great-circle polyline points
+      function toRad(d){return d*Math.PI/180}
+      function toDeg(r){return r*180/Math.PI}
+      function interpolateGreatCircle(a,b,steps){
+        const [lat1,lon1]=a.map(toRad), [lat2,lon2]=b.map(toRad);
+        const d = 2*Math.asin(Math.sqrt(Math.sin((lat2-lat1)/2)**2 + Math.cos(lat1)*Math.cos(lat2)*Math.sin((lon2-lon1)/2)**2));
+        const points=[]; if (d===0) return [a,b];
+        for(let i=0;i<=steps;i++){
+          const f=i/steps; const A=Math.sin((1-f)*d)/Math.sin(d); const B=Math.sin(f*d)/Math.sin(d);
+          const x=A*Math.cos(lat1)*Math.cos(lon1)+B*Math.cos(lat2)*Math.cos(lon2);
+          const y=A*Math.cos(lat1)*Math.sin(lon1)+B*Math.cos(lat2)*Math.sin(lon2);
+          const z=A*Math.sin(lat1)+B*Math.sin(lat2);
+          const lat=Math.atan2(z,Math.sqrt(x*x+y*y)); const lon=Math.atan2(y,x);
+          points.push([toDeg(lat),toDeg(lon)]);
+        }
+        return points;
+      }
+
+      const route = interpolateGreatCircle(jfk, sfo, 128);
+      const line = L.polyline(route, { color: '#66e2ff', weight: 4, opacity: 0.9 }).addTo(map);
+      map.fitBounds(line.getBounds(), { padding: [20,20] });
+
+      // progress marker at 1/3
+      const idx = Math.round(route.length/3);
+      const pos = route[idx];
+      const aircraftIcon = L.divIcon({ className: 'ac-icon', html: '✈️', iconSize:[24,24], iconAnchor:[12,12] });
+      L.marker(pos, { icon: aircraftIcon }).addTo(map);
+
+      // info panel
+      const distNm = haversineNm(jfk, sfo);
+      const covered = Math.round(distNm/3);
+      const remain = distNm - covered;
+      const info = $id('fltInfo'); if (info) info.innerHTML = `Distance: ${distNm} nm<br>Covered: ${covered} nm<br>Remaining: ${remain} nm`;
+      const conn = $id('sfoConn'); if (conn) conn.innerHTML = 'SFO connections: HNL, LAX, LAS, SEA, YVR…';
+    }
+
+    function haversineNm(a,b){
+      const R=6371e3; // meters
+      function toRad(d){return d*Math.PI/180}
+      const [lat1,lon1]=[toRad(a[0]),toRad(a[1])];
+      const [lat2,lon2]=[toRad(b[0]),toRad(b[1])];
+      const dlat=lat2-lat1, dlon=lon2-lon1;
+      const h= Math.sin(dlat/2)**2 + Math.cos(lat1)*Math.cos(lat2)*Math.sin(dlon/2)**2;
+      const d=2*Math.asin(Math.sqrt(h));
+      return Math.round((R*d)/1852); // meters to nautical miles
     }
 
     // Library (kept from your last version, durations present where available)
@@ -1000,6 +1066,7 @@ document.addEventListener('DOMContentLoaded', function () {
           const panels2 = document.querySelectorAll('.panel'); panels2.forEach(p => { p.classList.remove('visible'); p.style.display = 'none'; });
           panel.classList.add('visible'); panel.style.display = 'block';
           const h = $id('home'); if (h) h.style.display = 'none';
+          if (key === 'flight') { renderFlight(); }
         } else {
           alert('模块“' + key + '”尚未实现（placeholder）。');
         }
