@@ -384,7 +384,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return (toDeg(Math.atan2(y,x))+360)%360;
       }
       const brg = bearing(route[idx-1], route[idx+1]);
-      const svg = `<svg width="28" height="28" viewBox="0 0 24 24" fill="#ffd67a" xmlns="http://www.w3.org/2000/svg"><path d="M10.18 9"/><path d="M10.18 9l-6.18-6v3l4 3v3l-4 3v3l6.18-6 6.82 9h3l-5.82-12 5.82-12h-3l-6.82 9z"/></svg>`;
+      const svg = `<svg width="28" height="28" viewBox="0 0 64 64" fill="#ffd67a" xmlns="http://www.w3.org/2000/svg"><path d="M6 36l20-6 0-14 4-4 4 4 0 14 20 6 0 4-20-2 0 10 6 6 0 4-10-4-10 4 0-4 6-6 0-10-20 2z"/></svg>`;
       const aircraftIcon = L.divIcon({ className: 'ac-icon', html: `<div style="transform:rotate(${brg}deg)">${svg}</div>`, iconSize:[28,28], iconAnchor:[14,14] });
       L.marker(pos, { icon: aircraftIcon, rotationAngle:brg }).addTo(map);
 
@@ -398,27 +398,11 @@ document.addEventListener('DOMContentLoaded', function () {
       const elapsedH = covered/gs; // rough flight time elapsed
       const etaDate = new Date(depLocal.getTime() + etaH*3600*1000);
       const locTime = new Date();
-      const info = $id('fltInfo');
-      if (info) {
-        info.innerHTML = '';
-        const rows = [
-          ['Attitude (roll/pitch)','2°/1°'],
-          ['Ground speed',''+gs+' kt'],
-          ['OAT','−56 °C'],
-          ['Altitude','FL380'],
-          ['Mach','0.85'],
-          ['Departure (local)',''+depLocal.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})],
-          ['Time aloft',''+elapsedH.toFixed(1)+' h'],
-          ['Local time',''+locTime.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})],
-          ['Distance',''+distNm+' nm'],
-          ['Covered',''+covered+' nm'],
-          ['Remaining',''+remain+' nm'],
-          ['ETA (hrs)',''+etaH.toFixed(1)],
-          ['ETA clock',''+etaDate.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})],
-          ['Terminal/Baggage','T2 / Carousel B3']
-        ];
-        rows.forEach(([k,v])=>{ const l=document.createElement('div'); l.className='label'; l.textContent=k; const val=document.createElement('div'); val.className='value'; val.textContent=v; info.appendChild(l); info.appendChild(val); });
-      }
+      const page1=$id('fiPage1'), page2=$id('fiPage2'), page3=$id('fiPage3');
+      function fillGrid(el, rows){ if (!el) return; el.innerHTML=''; rows.forEach(([k,v])=>{ const l=document.createElement('div'); l.className='label'; l.textContent=k; const val=document.createElement('div'); val.className='value'; val.textContent=v; el.appendChild(l); el.appendChild(val); }); }
+      fillGrid(page1,[ ['Attitude (roll/pitch)','2°/1°'], ['Altitude','FL380'], ['Mach','0.85'], ['Ground speed',gs+' kt'], ['OAT','−56 °C'] ]);
+      fillGrid(page2,[ ['Departure (local)',depLocal.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})], ['Time aloft',elapsedH.toFixed(1)+' h'], ['Local time',locTime.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})], ['ETA (hrs)',etaH.toFixed(1)], ['ETA clock',etaDate.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})] ]);
+      fillGrid(page3,[ ['Distance',distNm+' nm'], ['Covered',covered+' nm'], ['Remaining',remain+' nm'], ['Terminal/Baggage','T2 / Carousel B3'] ]);
       const conn = $id('sfoConn'); if (conn) {
         conn.innerHTML = '';
         const dests = ['HNL','LAX','SEA','YVR','ORD','DFW','PHX','IAD','BOS','MIA','ATL','DEN','MSP','DTW','YYZ','YUL','SJD','AUS','SAN','PDX','SNA','RSW','TPA','BNA','PHL','EWR','JFK','DAL','STL','CLE'];
@@ -442,6 +426,12 @@ document.addEventListener('DOMContentLoaded', function () {
       const zi=$id('zoomIn'), zo=$id('zoomOut');
       if (zi) zi.onclick=()=> map.zoomIn();
       if (zo) zo.onclick=()=> map.zoomOut();
+      // flight info carousel controls
+      const track=$id('fiTrack'); let page=0;
+      function setPage(p){ page=(p+3)%3; if (track) track.style.transform=`translateX(-${page*100}%)`; }
+      const fiPrev=$id('fiPrev'), fiNext=$id('fiNext');
+      if (fiPrev) fiPrev.onclick=()=> setPage(page-1);
+      if (fiNext) fiNext.onclick=()=> setPage(page+1);
       const compass=$id('compass'); if (compass) compass.textContent='N';
       const attH=$id('attH'); if (attH) attH.style.transform='translateY(0)';
       // ticker text

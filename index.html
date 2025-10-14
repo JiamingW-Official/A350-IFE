@@ -124,13 +124,22 @@
             <h3 class="card-title" id="fltTitle">FL380 • JFK → SFO</h3>
             <p class="card-text" id="fltMeta">SFO Weather: —</p>
           </div>
-          <div class="card">
-            <h4 class="card-title">Flight info</h4>
-            <div id="fltInfo" class="flight-info"></div>
+          <div class="card" id="fiCard">
+            <div class="fi-header">
+              <h4 class="card-title" style="margin:0">Flight info</h4>
+              <div class="fi-nav"><button id="fiPrev" class="zoombtn" aria-label="prev">‹</button><button id="fiNext" class="zoombtn" aria-label="next">›</button></div>
+            </div>
+            <div class="fi-carousel">
+              <div class="fi-track" id="fiTrack">
+                <section class="fi-page"><div id="fiPage1" class="flight-info"></div></section>
+                <section class="fi-page"><div id="fiPage2" class="flight-info"></div></section>
+                <section class="fi-page"><div id="fiPage3" class="flight-info"></div></section>
+              </div>
+            </div>
           </div>
           <div class="card">
             <h4 class="card-title">Connections / 中转</h4>
-            <div id="sfoConn" class="board-list" style="max-height: 48vh; overflow:auto;"></div>
+            <div id="sfoConn" class="board-list" style="max-height: 60vh; overflow:auto;"></div>
           </div>
         </aside>
       </div>
