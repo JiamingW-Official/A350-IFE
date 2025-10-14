@@ -367,10 +367,11 @@ document.addEventListener('DOMContentLoaded', function () {
       }
 
       const route = interpolateGreatCircle(jfk, sfo, 128);
-      const flown = route.slice(0, Math.round(route.length/3));
-      const unflown = route.slice(Math.round(route.length/3));
+      const split = Math.round(route.length/3);
+      const flown = route.slice(0, split+1);
+      const unflown = route.slice(split);
       L.polyline(flown, { color: '#9ff3cf', weight: 5, opacity: 0.95 }).addTo(map);
-      L.polyline(unflown, { color: '#3da0ff', weight: 4, opacity: 0.75, dashArray:'6 6' }).addTo(map);
+      L.polyline(unflown, { color: 'rgba(61,160,255,0.6)', weight: 4, opacity: 0.9 }).addTo(map);
       const line = L.polyline(route, { opacity:0 });
       map.fitBounds(line.getBounds(), { padding: [20,20] });
 
@@ -385,7 +386,7 @@ document.addEventListener('DOMContentLoaded', function () {
       }
       const brg = bearing(route[idx-1], route[idx+1]);
       const svg = `<svg width="28" height="28" viewBox="0 0 64 64" fill="#ffd67a" xmlns="http://www.w3.org/2000/svg"><path d="M6 36l20-6 0-14 4-4 4 4 0 14 20 6 0 4-20-2 0 10 6 6 0 4-10-4-10 4 0-4 6-6 0-10-20 2z"/></svg>`;
-      const aircraftIcon = L.divIcon({ className: 'ac-icon', html: `<div style="transform:rotate(${brg}deg)">${svg}</div>`, iconSize:[28,28], iconAnchor:[14,14] });
+      const aircraftIcon = L.divIcon({ className: 'ac-icon', html: `<div style="transform:rotate(${brg}deg)">${svg}</div>`, iconSize:[36,36], iconAnchor:[18,18] });
       L.marker(pos, { icon: aircraftIcon, rotationAngle:brg }).addTo(map);
 
       // info panel
@@ -426,12 +427,12 @@ document.addEventListener('DOMContentLoaded', function () {
       const zi=$id('zoomIn'), zo=$id('zoomOut');
       if (zi) zi.onclick=()=> map.zoomIn();
       if (zo) zo.onclick=()=> map.zoomOut();
-      // flight info carousel controls
+      // flight info carousel controls (left/right small round arrows mid-height)
       const track=$id('fiTrack'); let page=0;
       function setPage(p){ page=(p+3)%3; if (track) track.style.transform=`translateX(-${page*100}%)`; }
-      const fiPrev=$id('fiPrev'), fiNext=$id('fiNext');
-      if (fiPrev) fiPrev.onclick=()=> setPage(page-1);
-      if (fiNext) fiNext.onclick=()=> setPage(page+1);
+      const fiLeft=$id('fiLeft'), fiRight=$id('fiRight');
+      if (fiLeft) fiLeft.onclick=()=> setPage(page-1);
+      if (fiRight) fiRight.onclick=()=> setPage(page+1);
       const compass=$id('compass'); if (compass) compass.textContent='N';
       const attH=$id('attH'); if (attH) attH.style.transform='translateY(0)';
       // ticker text
