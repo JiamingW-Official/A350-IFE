@@ -243,8 +243,10 @@ main{
 .tag.halal{ background:rgba(240,200,80,0.18); border-color:rgba(240,200,80,0.45) }
 .tag.spicy{ background:rgba(240,90,90,0.2); border-color:rgba(240,90,90,0.5) }
 .kcal{ color:#ffd67a; font-weight:800 }
-.wine-list{ display:grid; gap:10px }
-.bev-list{ display:grid; gap:10px }
+.wine-list{ display:grid; gap:12px }
+.bev-list{ display:grid; gap:12px }
+.wine-list > div, .bev-list > div{ display:grid; gap:10px; margin-bottom:12px }
+.wine-item{ margin:0 } /* keep item spacing controlled by container gap */
 .wine-item{ padding:10px 12px; border-radius:12px; border:1px solid rgba(255,255,255,0.05); background: linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.004)) }
 .wine-item .name{ font-weight:800; font-size:calc(15px * var(--text-scale)) }
 .wine-item .meta{ color:var(--muted); font-size:calc(12px * var(--text-scale)); margin-top:4px }

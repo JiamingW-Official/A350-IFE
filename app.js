@@ -141,33 +141,33 @@ document.addEventListener('DOMContentLoaded', function () {
       },
       beverages: {
         juice: [
-          { name: "Fresh orange juice", meta: "100% squeezed" },
-          { name: "Apple juice", meta: "Cloudy" },
-          { name: "Watermelon juice", meta: "Chilled" }
+          { t: { 'zh-CN': '鲜橙汁', 'zh-TW': '鮮橙汁', en: 'Fresh orange juice', fr: 'Jus d’orange frais', es: 'Zumo de naranja fresco', ru: 'Свежевыжатый апельсиновый сок' }, meta: { en:'100% squeezed', 'zh-CN':'100% 鲜榨' } },
+          { t: { 'zh-CN': '苹果汁', 'zh-TW': '蘋果汁', en: 'Apple juice', fr: 'Jus de pomme', es: 'Zumo de manzana', ru: 'Яблочный сок' }, meta: { en:'Cloudy' } },
+          { t: { 'zh-CN': '西瓜汁', 'zh-TW': '西瓜汁', en: 'Watermelon juice', fr: 'Jus de pastèque', es: 'Zumo de sandía', ru: 'Арбузный сок' }, meta: { en:'Chilled' } }
         ],
         mocktail: [
-          { name: "Nojito", meta: "Mint, lime, soda" },
-          { name: "Yuzu Spritz", meta: "Yuzu, tonic" },
-          { name: "Ginger Mule", meta: "Ginger beer, lime" }
+          { t: { 'zh-CN':'无酒精莫吉托', 'zh-TW':'無酒精莫希托', en:'Nojito', fr:'Nojito', es:'Nojito', ru:'Ноджито' }, meta: { en:'Mint, lime, soda', 'zh-CN':'薄荷 青柠 苏打' } },
+          { t: { 'zh-CN':'柚子思普利兹', 'zh-TW':'柚子氣泡飲', en:'Yuzu Spritz', fr:'Spritz au yuzu', es:'Spritz de yuzu', ru:'Юдзу Спритц' }, meta: { en:'Yuzu, tonic' } },
+          { t: { 'zh-CN':'姜味骡子', 'zh-TW':'薑味騾子', en:'Ginger Mule', fr:'Mule au gingembre', es:'Mule de jengibre', ru:'Имбирный Мул' }, meta: { en:'Ginger beer, lime' } }
         ],
         soft: [
-          { name: "Coca‑Cola", meta: "Classic" },
-          { name: "Coca‑Cola Zero", meta: "Zero sugar" },
-          { name: "Fanta Orange", meta: "" },
-          { name: "Sprite", meta: "" },
-          { name: "Acqua Panna / San Pellegrino", meta: "Still / Sparkling Mineral Water" }
+          { t: { 'zh-CN':'可口可乐', 'zh-TW':'可口可樂', en:'Coca‑Cola', fr:'Coca‑Cola', es:'Coca‑Cola', ru:'Coca‑Cola' }, meta: { en:'Classic' } },
+          { t: { 'zh-CN':'零度可乐', 'zh-TW':'零度可樂', en:'Coca‑Cola Zero', fr:'Coca‑Cola Zéro', es:'Coca‑Cola Zero', ru:'Coca‑Cola Zero' }, meta: { en:'Zero sugar' } },
+          { t: { 'zh-CN':'芬达（橙味）', 'zh-TW':'芬達（柳橙）', en:'Fanta Orange', fr:'Fanta Orange', es:'Fanta Naranja', ru:'Fanta Апельсин' } },
+          { t: { 'zh-CN':'雪碧', 'zh-TW':'雪碧', en:'Sprite', fr:'Sprite', es:'Sprite', ru:'Sprite' } },
+          { t: { 'zh-CN':'矿泉水 / 气泡水', 'zh-TW':'礦泉水 / 氣泡水', en:'Still / Sparkling Water', fr:'Eau plate / gazeuse', es:'Agua sin gas / con gas', ru:'Вода негаз/газ' }, meta: { en:'Acqua Panna / San Pellegrino' } }
         ],
         tea: [
-          { name: "Da Hong Pao (大红袍)", meta: "Rock oolong — Wuyi, China" },
-          { name: "Gyokuro", meta: "Shade‑grown green — Uji, Japan" },
-          { name: "Darjeeling First Flush", meta: "Single‑estate — India" },
-          { name: "Jasmine Silver Needle", meta: "Fuding, China" }
+          { t: { 'zh-CN':'大红袍', 'zh-TW':'大紅袍', en:'Da Hong Pao', fr:'Da Hong Pao', es:'Da Hong Pao', ru:'Да Хун Пао' }, meta: { en:'Rock oolong — Wuyi, China' } },
+          { t: { 'zh-CN':'玉露', 'zh-TW':'玉露', en:'Gyokuro', fr:'Gyokuro', es:'Gyokuro', ru:'Гёкуро' }, meta: { en:'Shade‑grown green — Uji, Japan' } },
+          { t: { 'zh-CN':'大吉岭头采', 'zh-TW':'大吉嶺頭採', en:'Darjeeling First Flush', fr:'Darjeeling First Flush', es:'Darjeeling First Flush', ru:'Дарджилинг Первый сбор' }, meta:{ en:'Single‑estate — India' } },
+          { t: { 'zh-CN':'茉莉银针', 'zh-TW':'茉莉銀針', en:'Jasmine Silver Needle', fr:'Aiguilles d’argent au jasmin', es:'Agujas de plata al jazmín', ru:'Жасмин Серебряная игла' }, meta:{ en:'Fuding, China' } }
         ],
         coffee: [
-          { name: "Single‑origin espresso", meta: "Ethiopia / Colombia rotation" },
-          { name: "V60 hand‑brew", meta: "Seasonal roaster selection" },
-          { name: "Affogato", meta: "Vanilla gelato, espresso" },
-          { name: "Flat White / Cappuccino", meta: "Oat milk available" }
+          { t: { 'zh-CN':'单品意式浓缩', 'zh-TW':'單品濃縮', en:'Single‑origin espresso', fr:'Espresso mono‑origine', es:'Espresso monoorigen', ru:'Эспрессо моносорт' }, meta:{ en:'Ethiopia / Colombia rotation' } },
+          { t: { 'zh-CN':'V60 手冲', 'zh-TW':'V60 手沖', en:'V60 hand‑brew', fr:'V60 filtre', es:'V60 de filtro', ru:'V60 пуровер' }, meta:{ en:'Seasonal roaster selection' } },
+          { t: { 'zh-CN':'阿芙佳朵', 'zh-TW':'阿芙佳朵', en:'Affogato', fr:'Affogato', es:'Affogato', ru:'Аффогато' }, meta:{ en:'Vanilla gelato, espresso' } },
+          { t: { 'zh-CN':'馥芮白 / 卡布奇诺', 'zh-TW':'馥芮白 / 卡布奇諾', en:'Flat White / Cappuccino', fr:'Flat White / Cappuccino', es:'Flat White / Cappuccino', ru:'Флэт уайт / Капучино' }, meta:{ en:'Oat milk available' } }
         ]
       }
     };
@@ -218,7 +218,10 @@ document.addEventListener('DOMContentLoaded', function () {
       // quick chips (recreate to ensure language reflects immediately)
       const chips = $id('diningChips'); if (chips) {
         chips.innerHTML = '';
-        const chipMap = [ ['starter', L.course.starter], ['soup', L.course.soup], ['main', L.course.main], ['dessert', L.course.dessert], ['cheese', L.course.cheese], ['icecream', L.course.icecream], ['wine', L.wine], ['tea', L.drinks.tea], ['coffee', L.drinks.coffee] ];
+        const chipMap = [
+          ['starter', L.course.starter], ['soup', L.course.soup], ['main', L.course.main], ['dessert', L.course.dessert], ['cheese', L.course.cheese], ['icecream', L.course.icecream],
+          ['wine', L.wine], ['juice', L.drinks.juice], ['mocktail', L.drinks.mocktail], ['soft', L.drinks.soft], ['tea', L.drinks.tea], ['coffee', L.drinks.coffee]
+        ];
         chipMap.forEach(([key, label]) => {
           const c = document.createElement('button'); c.className = 'chip'; c.textContent = label;
           c.addEventListener('click', () => {
@@ -235,7 +238,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const g = document.createElement('div');
         if (anchorKey) g.dataset.anchor = anchorKey;
         const h = document.createElement('h4'); h.textContent = title; g.appendChild(h);
-        (items||[]).forEach(w => { const it = document.createElement('div'); it.className='wine-item'; it.innerHTML = '<div class="name">'+w.name+'</div><div class="meta">'+w.meta+'</div>'; g.appendChild(it); });
+        (items||[]).forEach(w => { const name = w.t ? tPick(w.t) : (w.name||''); const meta = w.meta ? (typeof w.meta==='string'? w.meta : tPick(w.meta)) : ''; const it = document.createElement('div'); it.className='wine-item'; it.innerHTML = '<div class="name">'+name+'</div><div class="meta">'+meta+'</div>'; g.appendChild(it); });
         wineBox && wineBox.appendChild(g);
       }
       const W = DINING.wine; const B = DINING.beverages;
@@ -250,11 +253,11 @@ document.addEventListener('DOMContentLoaded', function () {
         const g = document.createElement('div');
         if (anchorKey) g.dataset.anchor = anchorKey;
         const h = document.createElement('h4'); h.textContent = title; g.appendChild(h);
-        (items||[]).forEach(w => { const it = document.createElement('div'); it.className='wine-item'; it.innerHTML = '<div class="name">'+w.name+'</div><div class="meta">'+(w.meta||'')+'</div>'; g.appendChild(it); });
+        (items||[]).forEach(w => { const name = w.t ? tPick(w.t) : (w.name||''); const meta = w.meta ? (typeof w.meta==='string'? w.meta : tPick(w.meta)) : ''; const it = document.createElement('div'); it.className='wine-item'; it.innerHTML = '<div class="name">'+name+'</div><div class="meta">'+meta+'</div>'; g.appendChild(it); });
         nonBox && nonBox.appendChild(g);
       }
       addNon(L.drinks.juice || 'Juice', B.juice, 'juice');
-      addNon('Mocktail', B.mocktail, 'mocktail');
+      addNon(L.drinks.mocktail || 'Mocktail', B.mocktail, 'mocktail');
       addNon(L.drinks.soft, B.soft, 'soft');
       addNon(L.drinks.tea, B.tea, 'tea');
       addNon(L.drinks.coffee, B.coffee, 'coffee');
