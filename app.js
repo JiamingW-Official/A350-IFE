@@ -334,12 +334,19 @@ document.addEventListener('DOMContentLoaded', function () {
       // init or reuse map
       if (!window._leafletMap) {
         const m = L.map(mapEl, { zoomControl: true, attributionControl: false });
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 8 }).addTo(m);
+        // basemaps
+        const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 8 });
+        const esri = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 12 });
+        osm.addTo(m);
+        L.control.layers({ OSM: osm, Satellite: esri }, {}, { position: 'topright', collapsed: true }).addTo(m);
         window._leafletMap = m;
       } else {
         mapEl.innerHTML = '';
         window._leafletMap = L.map(mapEl, { zoomControl: true, attributionControl: false });
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 8 }).addTo(window._leafletMap);
+        const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 8 });
+        const esri = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 12 });
+        osm.addTo(window._leafletMap);
+        L.control.layers({ OSM: osm, Satellite: esri }, {}, { position: 'topright', collapsed: true }).addTo(window._leafletMap);
       }
       const map = window._leafletMap;
 
@@ -371,15 +378,46 @@ document.addEventListener('DOMContentLoaded', function () {
       // progress marker at 1/3
       const idx = Math.round(route.length/3);
       const pos = route[idx];
-      const aircraftIcon = L.divIcon({ className: 'ac-icon', html: '✈️', iconSize:[24,24], iconAnchor:[12,12] });
+      function bearing(a,b){
+        const toRad=x=>x*Math.PI/180, toDeg=x=>x*180/Math.PI;
+        const lat1=toRad(a[0]), lat2=toRad(b[0]), dLon=toRad(b[1]-a[1]);
+        const y=Math.sin(dLon)*Math.cos(lat2), x=Math.cos(lat1)*Math.sin(lat2)-Math.sin(lat1)*Math.cos(lat2)*Math.cos(dLon);
+        return (toDeg(Math.atan2(y,x))+360)%360;
+      }
+      const brg = bearing(route[idx-1], route[idx+1]);
+      const aircraftIcon = L.divIcon({ className: 'ac-icon', html: `<div style="transform:rotate(${brg}deg)">✈️</div>`, iconSize:[24,24], iconAnchor:[12,12] });
       L.marker(pos, { icon: aircraftIcon }).addTo(map);
 
       // info panel
       const distNm = haversineNm(jfk, sfo);
       const covered = Math.round(distNm/3);
       const remain = distNm - covered;
-      const info = $id('fltInfo'); if (info) info.innerHTML = `Distance: ${distNm} nm<br>Covered: ${covered} nm<br>Remaining: ${remain} nm`;
-      const conn = $id('sfoConn'); if (conn) conn.innerHTML = 'SFO connections: HNL, LAX, LAS, SEA, YVR…';
+      // assume TAS ~ 470 kt at cruise, OAT ~ -56°C @ FL380
+      const gs = 470; const etaH = (remain/gs).toFixed(1);
+      const info = $id('fltInfo'); if (info) info.innerHTML = `Distance: ${distNm} nm<br>Covered: ${covered} nm<br>Remaining: ${remain} nm<br>Ground speed: ${gs} kt<br>ETA: ${etaH} h<br>OAT: −56 °C`;
+      const conn = $id('sfoConn'); if (conn) {
+        conn.innerHTML = '';
+        const list = [
+          { flight:'JW210', dest:'HNL', time:'12:10', boarding:'11:35', gate:'F3', status:'Boarding' },
+          { flight:'JW348', dest:'LAX', time:'12:25', boarding:'11:50', gate:'E7', status:'On Time' },
+          { flight:'JW512', dest:'SEA', time:'12:40', boarding:'12:05', gate:'D2', status:'Gate Change' },
+          { flight:'JW908', dest:'YVR', time:'13:15', boarding:'12:40', gate:'C4', status:'Delayed' }
+        ];
+        list.forEach(r=>{ const row=document.createElement('div'); row.className='board-row'; row.innerHTML=`<div>${r.flight}</div><div>${r.dest}</div><div>${r.time}</div><div>${r.boarding}</div><div class="status">${r.status}</div>`; conn.appendChild(row); });
+      }
+      const board = $id('jwBoard'); if (board) {
+        board.innerHTML='';
+        const my = document.createElement('div'); my.className='board-row'; my.innerHTML = `<div>JW620</div><div>JFK → SFO</div><div>—</div><div>—</div><div class="status">En‑route</div>`; board.appendChild(my);
+        ['JW622 SFO→LAS 15:20','JW701 SFO→NRT 16:45','JW330 SFO→ORD 17:10'].forEach(s=>{ const d=document.createElement('div'); d.textContent=s; board.appendChild(d); });
+      }
+
+      // 200nm ticks
+      const nmPerTick = 200; const ticks = Math.floor(distNm/nmPerTick);
+      for(let t=1;t<ticks;t++){
+        const frac=t/ticks; const i=Math.round(frac*route.length); const p=route[i];
+        L.circleMarker(p,{radius:3,color:'#ffd67a',weight:2,opacity:0.9,fillOpacity:0.6}).addTo(map);
+        L.marker(p,{ icon: L.divIcon({className:'tick-label',html:`${t*nmPerTick} nm`,iconAnchor:[0,0]}) }).addTo(map);
+      }
     }
 
     function haversineNm(a,b){
