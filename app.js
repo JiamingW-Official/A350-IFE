@@ -430,16 +430,13 @@ document.addEventListener('DOMContentLoaded', function () {
       // flight info carousel controls (left/right small round arrows mid-height)
       const track=$id('fiTrack'); let page=0;
       function setPage(p){ page=(p+3)%3; if (track) track.style.transform=`translateX(-${page*100}%)`; }
-      const fiLeft=$id('fiLeft'), fiRight=$id('fiRight');
-      if (fiLeft) fiLeft.onclick=()=> setPage(page-1);
-      if (fiRight) fiRight.onclick=()=> setPage(page+1);
-      // auto-rotate every 6s (reset on render)
+      // auto-rotate every 5s (reset on render); no manual arrows
       if (window._fiTimer) { clearInterval(window._fiTimer); }
-      window._fiTimer = setInterval(()=> setPage(page+1), 6000);
+      window._fiTimer = setInterval(()=> setPage(page+1), 5000);
       const compass=$id('compass'); if (compass) compass.textContent='N';
       const attH=$id('attH'); if (attH) attH.style.transform='translateY(0)';
       // ticker text
-      const ticker=$id('tickerInner'); if (ticker) ticker.textContent = `JW620 JFK→SFO • GS ${gs}kt • ETA ${etaDate.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} • FL380 • Mach 0.85 • OAT −56°C     `;
+      const ticker=$id('tickerInner'); if (ticker) ticker.innerHTML = `<span>JW620 JFK→SFO</span><span>GS ${gs} kt</span><span>ETA ${etaDate.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span><span>FL380</span><span>Mach 0.85</span><span>OAT −56°C</span>`;
 
       // 200nm ticks
       // no nm tick marks per user request
