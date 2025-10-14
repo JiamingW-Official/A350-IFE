@@ -17,32 +17,32 @@ document.addEventListener('DOMContentLoaded', function () {
     // i18n map (保持之前版本)
     const I18N = {
       "zh-CN": {
-        brand: "JW Airlines", dest: "目的地： Paris CDG",
+        brand: "JW Airlines", dest: "目的地： 旧金山 SFO",
         tiles: { music: ["音乐", "专辑与歌单"], movies: ["电影", "播放器与片库"], shopping: ["购物", "免税店"], dining: ["用餐", "餐食与倒计时"], flight: ["我的飞行", "地图与信息"] },
         ui: { remain: "剩余", seatbeltOn: "系好安全带", crew: "呼叫乘务", about: "专辑简介", lyrics: "歌词", playAll: "播放全部", home: "主页", back: "返回" }
       },
       "zh-TW": {
-        brand: "JW Airlines", dest: "目的地： Paris CDG",
+        brand: "JW Airlines", dest: "目的地： 舊金山 SFO",
         tiles: { music: ["音樂", "專輯與歌單"], movies: ["電影", "播放器與片庫"], shopping: ["購物", "免稅店"], dining: ["用餐", "餐食與倒計時"], flight: ["我的飛行", "地圖與資訊"] },
         ui: { remain: "剩餘", seatbeltOn: "繫好安全帶", crew: "呼叫乘務", about: "專輯簡介", lyrics: "歌詞", playAll: "播放全部", home: "主頁", back: "返回" }
       },
       "es": {
-        brand: "JW Airlines", dest: "Destino: Paris CDG",
+        brand: "JW Airlines", dest: "Destino: San Francisco SFO",
         tiles: { music: ["Música", "Álbumes y listas"], movies: ["Películas", "Reproductor y biblioteca"], shopping: ["Compras", "Duty-Free"], dining: ["Comida", "Menú y cuenta atrás"], flight: ["Mi vuelo", "Mapa e info"] },
         ui: { remain: "Restante", seatbeltOn: "Abróchese el cinturón", crew: "Llamar tripulación", about: "Acerca del álbum", lyrics: "Letras", playAll: "Reproducir todo", home: "Inicio", back: "Volver" }
       },
       "ru": {
-        brand: "JW Airlines", dest: "Пункт назначения: Paris CDG",
+        brand: "JW Airlines", dest: "Пункт назначения: Сан‑Франциско SFO",
         tiles: { music: ["Музыка", "Альбомы и плейлисты"], movies: ["Фильмы", "Плеер и библиотека"], shopping: ["Покупки", "Duty-Free"], dining: ["Питание", "Меню и таймер"], flight: ["Мой рейс", "Карта и информация"] },
         ui: { remain: "Осталось", seatbeltOn: "Пристегните ремень", crew: "Вызвать экипаж", about: "О альбоме", lyrics: "Текст", playAll: "Воспроизвести всё", home: "Главная", back: "Назад" }
       },
       "fr": {
-        brand: "JW Airlines", dest: "Destination : Paris CDG",
+        brand: "JW Airlines", dest: "Destination : San Francisco SFO",
         tiles: { music: ["Musique", "Albums et playlists"], movies: ["Films", "Lecteur et bibliothèque"], shopping: ["Shopping", "Duty-Free"], dining: ["Restauration", "Repas & compte à rebours"], flight: ["Mon vol", "Carte et infos"] },
         ui: { remain: "Restant", seatbeltOn: "Bouclez votre ceinture", crew: "Appeler l'équipage", about: "À propos de l'album", lyrics: "Paroles", playAll: "Tout jouer", home: "Accueil", back: "Retour" }
       },
       "en": {
-        brand: "JW Airlines", dest: "Destination: Paris CDG",
+        brand: "JW Airlines", dest: "Destination: San Francisco SFO",
         tiles: { music: ["Music", "Albums & Playlists"], movies: ["Movies", "Player & Library"], shopping: ["Shopping", "Duty-Free"], dining: ["Dining", "Meal & Countdown"], flight: ["My Flight", "Map & Info"] },
         ui: { remain: "Remaining", seatbeltOn: "Seatbelt On", crew: "Call Crew", about: "About this album", lyrics: "Lyrics", playAll: "Play All", home: "Home", back: "Back" }
       }
