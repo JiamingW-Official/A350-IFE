@@ -119,22 +119,15 @@ main{
 }
 .hub > .hero img{width:100%;height:100%;object-fit:cover;display:block}
 .hub > .hero .label{
-  position:absolute;left:10%;bottom:16px;right:10%;
+  position:absolute;left:5%;bottom:16px;right:5%;
   display:flex;align-items:flex-end;justify-content:space-between;gap:10px;
   color:#fff;text-shadow:0 4px 18px rgba(0,0,0,0.6);
 }
 .hub > .hero{transition: transform .18s ease, box-shadow .18s ease}
 .hub > .hero:hover{ transform: translateY(-2px); box-shadow:0 26px 64px rgba(0,0,0,0.6) }
 .hub > .hero .label .city{font-size:calc(64px * var(--text-scale));font-weight:900;letter-spacing:2px;line-height:1.02; text-align:left; word-break:break-word; hyphens:auto}
-@media (max-width:1200px){
-  .hub > .hero .label .city{ font-size:calc(52px * var(--text-scale)); }
-}
-@media (max-width:900px){
-  .hub > .hero .label .city{ font-size:calc(44px * var(--text-scale)); }
-}
-@media (max-width:720px){
-  .hub > .hero .label .city{ font-size:calc(36px * var(--text-scale)); }
-}
+/* JS will auto-fit font-size; media queries kept minimal */
+@media (max-width:900px){ .hub > .hero .label .city{ line-height:1.03 } }
 .hub > .hero .label .code{font-size:calc(28px * var(--text-scale));font-weight:800;opacity:0.95}
 
 /* Right tiles */

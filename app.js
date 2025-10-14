@@ -284,6 +284,23 @@ document.addEventListener('DOMContentLoaded', function () {
       if (heroCity) {
         const cityMap = { 'zh-CN':'旧金山', 'zh-TW':'舊金山', en:'SAN FRANCISCO', fr:'SAN FRANCISCO', es:'SAN FRANCISCO', ru:'САН-ФРАНЦИСКО' };
         heroCity.textContent = cityMap[lang] || cityMap.en;
+        // auto-fit: expand font-size until ~90% width is used, within reasonable bounds
+        try {
+          const parent = heroCity.parentElement; if (parent) {
+            const maxWidth = parent.getBoundingClientRect().width * 0.9; // 90%
+            let size = 64 * (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--text-scale'))||1);
+            const min = 28, max = 140; // px bounds
+            heroCity.style.whiteSpace = 'normal';
+            heroCity.style.display = 'block';
+            for (let step = 0; step < 20; step++) {
+              heroCity.style.fontSize = size + 'px';
+              const used = heroCity.getBoundingClientRect().width;
+              if (used >= maxWidth || size >= max) break;
+              size = Math.min(max, Math.min(size + Math.max(2, (maxWidth - used) / 10), size * 1.12));
+            }
+            if (size < min) heroCity.style.fontSize = min + 'px';
+          }
+        } catch(_) {}
       }
       setText("tileMusic", t.tiles.music[0]); setText("tileMusicSub", t.tiles.music[1]);
       setText("tileMovies", t.tiles.movies[0]); setText("tileMoviesSub", t.tiles.movies[1]);
