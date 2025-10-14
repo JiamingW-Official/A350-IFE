@@ -334,19 +334,14 @@ document.addEventListener('DOMContentLoaded', function () {
       // init or reuse map
       if (!window._leafletMap) {
         const m = L.map(mapEl, { zoomControl: true, attributionControl: false });
-        // basemaps
-        const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 8 });
         const esri = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 12 });
-        osm.addTo(m);
-        L.control.layers({ OSM: osm, Satellite: esri }, {}, { position: 'topright', collapsed: true }).addTo(m);
+        esri.addTo(m);
         window._leafletMap = m;
       } else {
         mapEl.innerHTML = '';
         window._leafletMap = L.map(mapEl, { zoomControl: true, attributionControl: false });
-        const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 8 });
         const esri = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 12 });
-        osm.addTo(window._leafletMap);
-        L.control.layers({ OSM: osm, Satellite: esri }, {}, { position: 'topright', collapsed: true }).addTo(window._leafletMap);
+        esri.addTo(window._leafletMap);
       }
       const map = window._leafletMap;
 
@@ -393,31 +388,46 @@ document.addEventListener('DOMContentLoaded', function () {
       const covered = Math.round(distNm/3);
       const remain = distNm - covered;
       // assume TAS ~ 470 kt at cruise, OAT ~ -56°C @ FL380
-      const gs = 470; const etaH = (remain/gs).toFixed(1);
-      const info = $id('fltInfo'); if (info) info.innerHTML = `Distance: ${distNm} nm<br>Covered: ${covered} nm<br>Remaining: ${remain} nm<br>Ground speed: ${gs} kt<br>ETA: ${etaH} h<br>OAT: −56 °C`;
+      const gs = 470; const etaH = remain/gs; // hours
+      const depLocal = new Date();
+      const elapsedH = covered/gs; // rough flight time elapsed
+      const etaDate = new Date(depLocal.getTime() + etaH*3600*1000);
+      const locTime = new Date();
+      const info = $id('fltInfo');
+      if (info) {
+        info.innerHTML = '';
+        const rows = [
+          ['Flight','JW620'],
+          ['Aircraft','A350‑1000'],
+          ['Route','JFK → SFO'],
+          ['Departure (local)',''+depLocal.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})],
+          ['Time aloft',''+elapsedH.toFixed(1)+' h'],
+          ['Local time',''+locTime.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})],
+          ['Distance',''+distNm+' nm'],
+          ['Covered',''+covered+' nm'],
+          ['Remaining',''+remain+' nm'],
+          ['Ground speed',''+gs+' kt'],
+          ['ETA (hrs)',''+etaH.toFixed(1)],
+          ['ETA clock',''+etaDate.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})],
+          ['OAT','−56 °C'],
+          ['Baggage claim','SFO Carousel B3']
+        ];
+        rows.forEach(([k,v])=>{ const l=document.createElement('div'); l.className='label'; l.textContent=k; const val=document.createElement('div'); val.className='value'; val.textContent=v; info.appendChild(l); info.appendChild(val); });
+      }
       const conn = $id('sfoConn'); if (conn) {
         conn.innerHTML = '';
-        const list = [
-          { flight:'JW210', dest:'HNL', time:'12:10', boarding:'11:35', gate:'F3', status:'Boarding' },
-          { flight:'JW348', dest:'LAX', time:'12:25', boarding:'11:50', gate:'E7', status:'On Time' },
-          { flight:'JW512', dest:'SEA', time:'12:40', boarding:'12:05', gate:'D2', status:'Gate Change' },
-          { flight:'JW908', dest:'YVR', time:'13:15', boarding:'12:40', gate:'C4', status:'Delayed' }
-        ];
-        list.forEach(r=>{ const row=document.createElement('div'); row.className='board-row'; row.innerHTML=`<div>${r.flight}</div><div>${r.dest}</div><div>${r.time}</div><div>${r.boarding}</div><div class="status">${r.status}</div>`; conn.appendChild(row); });
-      }
-      const board = $id('jwBoard'); if (board) {
-        board.innerHTML='';
-        const my = document.createElement('div'); my.className='board-row'; my.innerHTML = `<div>JW620</div><div>JFK → SFO</div><div>—</div><div>—</div><div class="status">En‑route</div>`; board.appendChild(my);
-        ['JW622 SFO→LAS 15:20','JW701 SFO→NRT 16:45','JW330 SFO→ORD 17:10'].forEach(s=>{ const d=document.createElement('div'); d.textContent=s; board.appendChild(d); });
+        const dests = ['HNL','LAX','SEA','YVR','ORD','DFW','PHX','IAD','BOS','MIA','ATL','DEN','MSP','DTW','YYZ','YUL','SJD','AUS','SAN','PDX','SNA','RSW','TPA','BNA','PHL','EWR','JFK','DAL','STL','CLE'];
+        for (let i=0;i<30;i++){
+          const hr = 20 + Math.floor(i/2); const min = (i%2)*30; const t = `${(hr%24).toString().padStart(2,'0')}:${min.toString().padStart(2,'0')}`;
+          const status = ['On Time','Delayed','Cancelled'][Math.floor(Math.random()*3)];
+          const row = document.createElement('div'); row.className = 'board-row';
+          row.innerHTML = `<div>JW${700+i}</div><div>${dests[i]}</div><div>${t}</div><div>B${(i%9)+1}</div><div class="status">${status}</div>`;
+          conn.appendChild(row);
+        }
       }
 
       // 200nm ticks
-      const nmPerTick = 200; const ticks = Math.floor(distNm/nmPerTick);
-      for(let t=1;t<ticks;t++){
-        const frac=t/ticks; const i=Math.round(frac*route.length); const p=route[i];
-        L.circleMarker(p,{radius:3,color:'#ffd67a',weight:2,opacity:0.9,fillOpacity:0.6}).addTo(map);
-        L.marker(p,{ icon: L.divIcon({className:'tick-label',html:`${t*nmPerTick} nm`,iconAnchor:[0,0]}) }).addTo(map);
-      }
+      // no nm tick marks per user request
     }
 
     function haversineNm(a,b){
