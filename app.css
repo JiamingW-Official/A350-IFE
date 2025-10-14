@@ -5,9 +5,11 @@
 .fi-carousel{ overflow:hidden }
 .fi-track{ display:flex; transition: transform .28s ease; width:300% }
 .fi-page{ width:100%; flex:0 0 100% }
-.flight-info{ display:grid; grid-template-columns: 1.1fr 1fr; gap:20px 24px; font-variant-numeric: tabular-nums; font-size:20px }
+.flight-info{ display:grid; grid-template-columns: auto 1fr; gap:20px 24px; font-variant-numeric: tabular-nums; font-size:22px; color:var(--text) }
 .flight-info .label{ color: var(--muted) }
-.flight-info .value{ font-weight:900; font-size:24px; text-align:right }
+.flight-info .value{ font-weight:900; font-size:26px; text-align:right; color:var(--text) !important; justify-self:end }
+.fi-page{ padding: 6px 8px }
+.fi-arrow{ display:none !important }
 .flight-info > .label{ grid-column:1 }
 .flight-info > .value{ grid-column:2 }
 :root{
