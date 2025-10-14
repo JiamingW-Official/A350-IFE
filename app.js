@@ -290,7 +290,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const maxWidth = parent.getBoundingClientRect().width * 0.9; // 90%
             let size = 64 * (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--text-scale'))||1);
             const min = 28, max = 140; // px bounds
-            heroCity.style.whiteSpace = 'normal';
+            heroCity.style.whiteSpace = 'nowrap'; // keep one line if possible
             heroCity.style.display = 'block';
             for (let step = 0; step < 20; step++) {
               heroCity.style.fontSize = size + 'px';
@@ -299,6 +299,13 @@ document.addEventListener('DOMContentLoaded', function () {
               size = Math.min(max, Math.min(size + Math.max(2, (maxWidth - used) / 10), size * 1.12));
             }
             if (size < min) heroCity.style.fontSize = min + 'px';
+            // if still overflowed (some languages too long), allow two-line fallback with slightly smaller size
+            if (heroCity.getBoundingClientRect().width > maxWidth) {
+              heroCity.style.whiteSpace = 'normal';
+              heroCity.style.wordBreak = 'break-word';
+              heroCity.style.hyphens = 'auto';
+              heroCity.style.fontSize = Math.max(min, size * 0.92) + 'px';
+            }
           }
         } catch(_) {}
       }

@@ -125,7 +125,11 @@ main{
 }
 .hub > .hero{transition: transform .18s ease, box-shadow .18s ease}
 .hub > .hero:hover{ transform: translateY(-2px); box-shadow:0 26px 64px rgba(0,0,0,0.6) }
-.hub > .hero .label .city{font-size:calc(64px * var(--text-scale));font-weight:900;letter-spacing:2px;line-height:1.02; text-align:left; word-break:break-word; hyphens:auto}
+.hub > .hero .label .city{
+  font-size:calc(64px * var(--text-scale));
+  font-weight:900;letter-spacing:2px;line-height:1.02;
+  text-align:left;word-break:keep-all;overflow-wrap:normal;hyphens:manual
+}
 /* JS will auto-fit font-size; media queries kept minimal */
 @media (max-width:900px){ .hub > .hero .label .city{ line-height:1.03 } }
 .hub > .hero .label .code{font-size:calc(28px * var(--text-scale));font-weight:800;opacity:0.95}
