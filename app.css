@@ -224,7 +224,7 @@ main{
 /* =============== Dining (liquid glass first-class menu) =============== */
 .dining-grid{ height:100%; display:grid; grid-template-columns: 2fr 1fr; gap:20px; overflow:hidden }
 .menu-column{ height:100%; overflow-y:auto; padding-right:8px }
-.dining-bar{ position:sticky; top: calc(var(--header-h) + 8px); z-index: 5; margin-bottom:12px }
+.dining-bar{ position:sticky; top: var(--header-h); z-index: 5; margin-bottom:8px }
 .dining-bar-card{ margin:0; }
 .dining-bar-content{ display:flex; align-items:center; justify-content:space-between; gap:16px }
 .dining-titles{ display:block }

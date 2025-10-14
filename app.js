@@ -167,7 +167,14 @@ document.addEventListener('DOMContentLoaded', function () {
       return map[code] || '';
     }
 
-    function tPick(map) { return (map && (map[lang] || map['zh-CN'] || map.en)) || ''; }
+    function tPick(map) {
+      if (!map) return '';
+      if (map[lang]) return map[lang];
+      // Prefer English as universal fallback; for zh-TW prefer zh-CN first
+      if (lang === 'zh-TW' && map['zh-CN']) return map['zh-CN'];
+      if (map.en) return map.en;
+      return map['zh-CN'] || map['fr'] || map['es'] || map['ru'] || '';
+    }
 
     function renderDining() {
       const root = $id('panel-dining'); if (!root) return;
@@ -196,7 +203,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (box) box.appendChild(sec);
       });
 
-      // quick chips
+      // quick chips (recreate to ensure language reflects immediately)
       const chips = $id('diningChips'); if (chips) {
         chips.innerHTML = '';
         const chipMap = [ ['starter', L.course.starter], ['soup', L.course.soup], ['main', L.course.main], ['dessert', L.course.dessert], ['cheese', L.course.cheese], ['icecream', L.course.icecream], ['wine', L.wine], ['tea', L.drinks.tea], ['coffee', L.drinks.coffee] ];
