@@ -57,16 +57,16 @@ document.addEventListener('DOMContentLoaded', function () {
       "zh-TW": { title: "用餐", sub: "頭等艙品嚐菜單", wine: "酒單",
         course: { starter: "前菜", main: "主菜", soup: "熱湯", bread: "麵包籃", dessert: "甜點", cheese: "起司", icecream: "冰淇淋" },
         tags: { vegan: "Vegan", gf: "無麩質", halal: "清真", spicy: "辣" }, kcal: "千卡" },
-      en: { title: "Dining", sub: "First Class Tasting Menu", wine: "Wine List",
+      en: { title: "Dining", sub: "First Class Tasting Menu", wine: "Alcohol",
         course: { starter: "Starters", main: "Mains", soup: "Soup", bread: "Bread Basket", dessert: "Dessert", cheese: "Cheese", icecream: "Ice Cream" },
         tags: { vegan: "Vegan", gf: "Gluten‑free", halal: "Halal", spicy: "Spicy" }, kcal: "kcal" },
-      fr: { title: "Restauration", sub: "Menu Dégustation Première Classe", wine: "Carte des vins",
+      fr: { title: "Restauration", sub: "Menu Dégustation Première Classe", wine: "Alcools",
         course: { starter: "Entrées", main: "Plats", soup: "Soupe", bread: "Panier de pain", dessert: "Dessert", cheese: "Fromages", icecream: "Glace" },
         tags: { vegan: "Vegan", gf: "Sans gluten", halal: "Halal", spicy: "Épicé" }, kcal: "kcal" },
-      es: { title: "Gastronomía", sub: "Menú Degustación Primera Clase", wine: "Carta de vinos",
+      es: { title: "Gastronomía", sub: "Menú Degustación Primera Clase", wine: "Alcohol",
         course: { starter: "Entrantes", main: "Principales", soup: "Sopa", bread: "Panera", dessert: "Postre", cheese: "Quesos", icecream: "Helado" },
         tags: { vegan: "Vegano", gf: "Sin gluten", halal: "Halal", spicy: "Picante" }, kcal: "kcal" },
-      ru: { title: "Питание", sub: "Дегустационное меню Первого класса", wine: "Винная карта",
+      ru: { title: "Питание", sub: "Дегустационное меню Первого класса", wine: "Алкоголь",
         course: { starter: "Закуски", main: "Горячие блюда", soup: "Суп", bread: "Хлебная корзина", dessert: "Десерт", cheese: "Сыры", icecream: "Мороженое" },
         tags: { vegan: "Веган", gf: "Без глютена", halal: "Халяль", spicy: "Острое" }, kcal: "ккал" }
     };
@@ -131,17 +131,21 @@ document.addEventListener('DOMContentLoaded', function () {
         soft: [
           { name: "Acqua Panna / San Pellegrino", meta: "Still / Sparkling Mineral Water" },
           { name: "Cold‑pressed juices", meta: "Orange, Apple, Watermelon, Celery" },
-          { name: "Artisanal sodas", meta: "Yuzu, Ginger, Sicilian Lemon" }
+          { name: "Artisanal sodas", meta: "Yuzu, Ginger, Sicilian Lemon" },
+          { name: "Kombucha", meta: "Yunnan black tea ferment" },
+          { name: "Virgin cocktails", meta: "Nojito, Yuzu Spritz, Ginger Mule" }
         ],
         tea: [
           { name: "Da Hong Pao (大红袍)", meta: "Rock oolong — Wuyi, China" },
           { name: "Gyokuro", meta: "Shade‑grown green — Uji, Japan" },
-          { name: "Darjeeling First Flush", meta: "Single‑estate — India" }
+          { name: "Darjeeling First Flush", meta: "Single‑estate — India" },
+          { name: "Jasmine Silver Needle", meta: "Fuding, China" }
         ],
         coffee: [
           { name: "Single‑origin espresso", meta: "Ethiopia / Colombia rotation" },
           { name: "V60 hand‑brew", meta: "Seasonal roaster selection" },
-          { name: "Affogato", meta: "Vanilla gelato, espresso" }
+          { name: "Affogato", meta: "Vanilla gelato, espresso" },
+          { name: "Flat White / Cappuccino", meta: "Oat milk available" }
         ]
       }
     };
@@ -163,7 +167,7 @@ document.addEventListener('DOMContentLoaded', function () {
         ['starter', DINING.starters], ['soup', DINING.soup], ['main', DINING.mains], ['bread', DINING.bread], ['dessert', DINING.dessert], ['cheese', DINING.cheese], ['icecream', DINING.icecream]
       ];
       sections.forEach(([key, arr]) => {
-        const sec = document.createElement('div'); sec.className = 'menu-section';
+        const sec = document.createElement('div'); sec.className = 'menu-section'; sec.dataset.anchor = key;
         const h = document.createElement('h4'); h.textContent = L.course[key] || key; sec.appendChild(h);
         arr.forEach(d => {
           const row = document.createElement('div'); row.className = 'dish';

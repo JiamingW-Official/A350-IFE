@@ -226,7 +226,7 @@ main{
 .menu-column{ height:100%; overflow-y:auto; padding-right:8px }
 .wine-column{ height:100%; overflow-y:auto }
 .menu-sections{ display:grid; gap:16px }
-.menu-section{ background:var(--glass-bg); border:var(--glass-border); border-radius:14px; padding:14px; backdrop-filter: blur(14px) saturate(1.12) }
+.menu-section{ background:var(--glass-bg); border:var(--glass-border); border-radius:14px; padding:14px; backdrop-filter: blur(14px) saturate(1.12); scroll-margin-top: 18px }
 .menu-section h4{ margin:0 0 10px 0; font-size:calc(18px * var(--text-scale)); font-weight:900 }
 .dish{ display:grid; grid-template-columns: 1fr auto; gap:8px; align-items:start; padding:10px 12px; border-radius:12px; background: linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.005)); border:1px solid rgba(255,255,255,0.05) }
 .dish + .dish{ margin-top:8px }
@@ -246,8 +246,11 @@ main{
 
 /* quick chips for fast jump */
 .chips{ display:flex; flex-wrap:wrap; gap:8px; margin: 0 0 12px 0 }
-.chip{ padding:8px 12px; border-radius:999px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.06); cursor:pointer; font-weight:800; font-size:calc(12px * var(--text-scale)) }
+.chip{ padding:8px 12px; border-radius:999px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.08); cursor:pointer; font-weight:800; font-size:calc(12px * var(--text-scale)); color: rgba(235,242,255,0.92) }
 .chip.active{ background:rgba(255,255,255,0.16) }
+
+/* make wine groups align with chips scroll targeting */
+.wine-list > div{ scroll-margin-top: 18px }
 
 /* =============== Playlist rows =============== */
 /* playlist container */
