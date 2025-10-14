@@ -400,7 +400,14 @@ document.addEventListener('DOMContentLoaded', function () {
       const etaDate = new Date(depLocal.getTime() + etaH*3600*1000);
       const locTime = new Date();
       const page1=$id('fiPage1'), page2=$id('fiPage2'), page3=$id('fiPage3');
-      function fillGrid(el, rows){ if (!el) return; el.innerHTML=''; rows.forEach(([k,v])=>{ const l=document.createElement('div'); l.className='label'; l.textContent=k; const val=document.createElement('div'); val.className='value'; val.textContent=v; el.appendChild(l); el.appendChild(val); }); }
+      function fillGrid(el, rows){
+        if (!el) return; el.innerHTML='';
+        rows.forEach(([k,v])=>{
+          const l=document.createElement('div'); l.className='label'; l.textContent=k;
+          const val=document.createElement('div'); val.className='value'; val.textContent=v;
+          el.appendChild(l); el.appendChild(val);
+        });
+      }
       fillGrid(page1,[ ['Attitude (roll/pitch)','2°/1°'], ['Altitude','FL380'], ['Mach','0.85'], ['Ground speed',gs+' kt'], ['OAT','−56 °C'] ]);
       fillGrid(page2,[ ['Departure time (local)',depLocal.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})], ['Time aloft',elapsedH.toFixed(1)+' hours'], ['Local time',locTime.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})], ['Estimated time remaining',etaH.toFixed(1)+' hours'], ['Estimated arrival (local)',etaDate.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})] ]);
       fillGrid(page3,[ ['Distance',distNm+' nm'], ['Covered',covered+' nm'], ['Remaining',remain+' nm'], ['Terminal/Baggage','T2 / Carousel B3'] ]);
@@ -436,7 +443,7 @@ document.addEventListener('DOMContentLoaded', function () {
       const compass=$id('compass'); if (compass) compass.textContent='N';
       const attH=$id('attH'); if (attH) attH.style.transform='translateY(0)';
       // ticker text
-      const ticker=$id('tickerInner'); if (ticker) ticker.innerHTML = `<span>Flight JW620 JFK → SFO</span><span>Ground speed ${gs} kt</span><span>Estimated arrival ${etaDate.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span><span>Altitude FL380</span><span>Mach 0.85</span><span>Outside air temp −56°C</span>`;
+      const ticker=$id('tickerInner'); if (ticker) ticker.innerHTML = `<span>Flight: JW620 JFK → SFO</span><span>Ground speed: ${gs} kt</span><span>Estimated arrival: ${etaDate.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span><span>Altitude: FL380</span><span>Mach: 0.85</span><span>Outside air temp: −56°C</span>`;
 
       // 200nm ticks
       // no nm tick marks per user request
