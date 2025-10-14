@@ -51,23 +51,29 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Dining i18n labels
     const DINING_I18N = {
-      "zh-CN": { title: "用餐", sub: "头等舱品鉴菜单", wine: "酒单",
+      "zh-CN": { title: "用餐", sub: "头等舱品鉴菜单", wine: "酒精饮品",
         course: { starter: "前菜", main: "主菜", soup: "热汤", bread: "面包篮", dessert: "甜点", cheese: "奶酪", icecream: "冰淇淋" },
+        drinks: { soft: "软饮", tea: "茶", coffee: "咖啡" },
         tags: { vegan: "Vegan", gf: "无麸质", halal: "清真", spicy: "辣度" }, kcal: "千卡" },
-      "zh-TW": { title: "用餐", sub: "頭等艙品嚐菜單", wine: "酒單",
+      "zh-TW": { title: "用餐", sub: "頭等艙品嚐菜單", wine: "酒精飲品",
         course: { starter: "前菜", main: "主菜", soup: "熱湯", bread: "麵包籃", dessert: "甜點", cheese: "起司", icecream: "冰淇淋" },
+        drinks: { soft: "軟飲", tea: "茶", coffee: "咖啡" },
         tags: { vegan: "Vegan", gf: "無麩質", halal: "清真", spicy: "辣" }, kcal: "千卡" },
       en: { title: "Dining", sub: "First Class Tasting Menu", wine: "Alcohol",
         course: { starter: "Starters", main: "Mains", soup: "Soup", bread: "Bread Basket", dessert: "Dessert", cheese: "Cheese", icecream: "Ice Cream" },
+        drinks: { soft: "Soft Drinks", tea: "Tea", coffee: "Coffee" },
         tags: { vegan: "Vegan", gf: "Gluten‑free", halal: "Halal", spicy: "Spicy" }, kcal: "kcal" },
       fr: { title: "Restauration", sub: "Menu Dégustation Première Classe", wine: "Alcools",
         course: { starter: "Entrées", main: "Plats", soup: "Soupe", bread: "Panier de pain", dessert: "Dessert", cheese: "Fromages", icecream: "Glace" },
+        drinks: { soft: "Boissons fraîches", tea: "Thé", coffee: "Café" },
         tags: { vegan: "Vegan", gf: "Sans gluten", halal: "Halal", spicy: "Épicé" }, kcal: "kcal" },
       es: { title: "Gastronomía", sub: "Menú Degustación Primera Clase", wine: "Alcohol",
         course: { starter: "Entrantes", main: "Principales", soup: "Sopa", bread: "Panera", dessert: "Postre", cheese: "Quesos", icecream: "Helado" },
+        drinks: { soft: "Refrescos", tea: "Té", coffee: "Café" },
         tags: { vegan: "Vegano", gf: "Sin gluten", halal: "Halal", spicy: "Picante" }, kcal: "kcal" },
       ru: { title: "Питание", sub: "Дегустационное меню Первого класса", wine: "Алкоголь",
         course: { starter: "Закуски", main: "Горячие блюда", soup: "Суп", bread: "Хлебная корзина", dessert: "Десерт", cheese: "Сыры", icecream: "Мороженое" },
+        drinks: { soft: "Безалкогольные", tea: "Чай", coffee: "Кофе" },
         tags: { vegan: "Веган", gf: "Без глютена", halal: "Халяль", spicy: "Острое" }, kcal: "ккал" }
     };
 
@@ -187,7 +193,7 @@ document.addEventListener('DOMContentLoaded', function () {
       // quick chips
       const chips = $id('diningChips'); if (chips) {
         chips.innerHTML = '';
-        const chipMap = [ ['starter', L.course.starter], ['soup', L.course.soup], ['main', L.course.main], ['dessert', L.course.dessert], ['cheese', L.course.cheese], ['icecream', L.course.icecream], ['wine', L.wine], ['tea', 'Tea'], ['coffee', 'Coffee'] ];
+        const chipMap = [ ['starter', L.course.starter], ['soup', L.course.soup], ['main', L.course.main], ['dessert', L.course.dessert], ['cheese', L.course.cheese], ['icecream', L.course.icecream], ['wine', L.wine], ['tea', L.drinks.tea], ['coffee', L.drinks.coffee] ];
         chipMap.forEach(([key, label]) => {
           const c = document.createElement('button'); c.className = 'chip'; c.textContent = label;
           c.addEventListener('click', () => {
@@ -213,9 +219,9 @@ document.addEventListener('DOMContentLoaded', function () {
       addGroup('Red', W.red);
       addGroup('Dessert', W.dessert);
       addGroup('Fortified', W.fortified);
-      addGroup('Soft Drinks', B.soft, 'soft');
-      addGroup('Tea', B.tea, 'tea');
-      addGroup('Coffee', B.coffee, 'coffee');
+      addGroup(L.drinks.soft, B.soft, 'soft');
+      addGroup(L.drinks.tea, B.tea, 'tea');
+      addGroup(L.drinks.coffee, B.coffee, 'coffee');
     }
 
     const LANG_ORDER = ["zh-CN", "zh-TW", "es", "ru", "fr", "en"];

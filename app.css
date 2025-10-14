@@ -224,6 +224,10 @@ main{
 /* =============== Dining (liquid glass first-class menu) =============== */
 .dining-grid{ height:100%; display:grid; grid-template-columns: 2fr 1fr; gap:20px; overflow:hidden }
 .menu-column{ height:100%; overflow-y:auto; padding-right:8px }
+.dining-bar{ position:sticky; top: calc(var(--header-h) + 8px); z-index: 5; margin-bottom:12px }
+.dining-bar-card{ margin:0; }
+.dining-bar-content{ display:flex; align-items:center; justify-content:space-between; gap:16px }
+.dining-titles{ display:block }
 .wine-column{ height:100%; overflow-y:auto }
 .menu-sections{ display:grid; gap:16px }
 .menu-section{ background:var(--glass-bg); border:var(--glass-border); border-radius:14px; padding:14px; backdrop-filter: blur(14px) saturate(1.12); scroll-margin-top: 18px }
@@ -245,7 +249,7 @@ main{
 .wine-item .meta{ color:var(--muted); font-size:calc(12px * var(--text-scale)); margin-top:4px }
 
 /* quick chips for fast jump */
-.chips{ display:flex; flex-wrap:wrap; gap:8px; margin: 0 0 12px 0 }
+.chips{ display:flex; flex-wrap:wrap; gap:8px; margin: 0 }
 .chip{ padding:8px 12px; border-radius:999px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.08); cursor:pointer; font-weight:800; font-size:calc(12px * var(--text-scale)); color: rgba(235,242,255,0.92) }
 .chip.active{ background:rgba(255,255,255,0.16) }
 
