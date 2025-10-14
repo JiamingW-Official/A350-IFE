@@ -235,13 +235,27 @@ main{
 .flight-grid{ height:100%; display:grid; grid-template-columns: 2fr 1fr; gap:20px; overflow:hidden }
 .map-col, .info-col{ height:100%; overflow:hidden }
 .map{ height:100%; width:100%; border-radius:12px; border:1px solid rgba(255,255,255,0.06); overflow:hidden }
-.info-col{ overflow-y:auto }
+.info-col{ overflow:hidden }
 .leaflet-container{ background:#081018 }
 .ac-icon{ filter: drop-shadow(0 2px 4px rgba(0,0,0,.6)); font-size:22px }
 .tick-label{ background:rgba(16,22,34,.8); color:#e8f0ff; padding:2px 6px; border-radius:6px; font-size:12px; border:1px solid rgba(255,255,255,.08) }
 .board-list{ display:grid; gap:6px; }
 .board-row{ display:grid; grid-template-columns: 110px 1fr 120px 90px 100px; gap:10px; font-variant-numeric: tabular-nums; padding:8px 2px; border-bottom:1px solid rgba(255,255,255,0.06) }
 .board-row .status{ font-weight:800 }
+.flight-info{ display:grid; grid-template-columns: 1fr 1fr; gap:8px 14px; font-variant-numeric: tabular-nums }
+.flight-info .label{ color: var(--muted) }
+.flight-info .value{ font-weight:800 }
+
+/* Map overlays */
+.map-col{ position:relative }
+.zoomctl{ position:absolute; right:14px; top:14px; display:flex; flex-direction:column; gap:8px; z-index:500 }
+.zoombtn{ width:44px; height:44px; border-radius:12px; display:grid; place-items:center; background:linear-gradient(180deg,#12313f,#071018); border:1px solid rgba(255,255,255,0.08); color:#fff; cursor:pointer }
+.compass{ position:absolute; left:14px; top:14px; width:48px; height:48px; border-radius:999px; background:rgba(16,22,34,.6); border:1px solid rgba(255,255,255,.12); display:grid; place-items:center; color:#fff; font-weight:900; z-index:500 }
+.attitude{ position:absolute; left:14px; bottom:56px; width:120px; height:80px; border-radius:12px; background:rgba(16,22,34,.6); border:1px solid rgba(255,255,255,.12); overflow:hidden; z-index:500 }
+.attitude .horizon{ position:absolute; left:0; right:0; top:50%; height:2px; background:#ffd67a }
+.ticker{ position:absolute; left:12px; right:12px; bottom:10px; height:32px; border-radius:10px; background:rgba(0,0,0,.45); border:1px solid rgba(255,255,255,.08); color:#e8f0ff; display:flex; align-items:center; overflow:hidden; z-index:500 }
+.ticker .inner{ white-space:nowrap; animation: tickerMove 18s linear infinite; padding-left:16px }
+@keyframes tickerMove { 0%{ transform: translateX(0) } 100%{ transform: translateX(-50%) } }
 @media (max-width:900px){
   .album-grid{ grid-template-columns:1fr; }
 }

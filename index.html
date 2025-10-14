@@ -113,12 +113,16 @@
     <section id="panel-flight" class="panel" aria-hidden="true" style="display:none;">
       <div class="flight-grid">
         <div class="map-col">
+          <div class="compass" id="compass">N</div>
+          <div class="zoomctl"><button class="zoombtn" id="zoomIn">＋</button><button class="zoombtn" id="zoomOut">－</button></div>
+          <div class="attitude" id="attPanel"><div class="horizon" id="attH"></div></div>
           <div id="flightMap" class="map"></div>
+          <div class="ticker"><div class="inner" id="tickerInner">—</div></div>
         </div>
         <aside class="info-col">
           <div class="card">
-            <h3 class="card-title" id="fltTitle">A350‑1000 • JFK → SFO</h3>
-            <p class="card-text" id="fltMeta">Cruise • FL380 • Mach 0.85</p>
+            <h3 class="card-title" id="fltTitle">FL380 • JFK → SFO</h3>
+            <p class="card-text" id="fltMeta">SFO Weather: —</p>
           </div>
           <div class="card">
             <h4 class="card-title">Flight info</h4>

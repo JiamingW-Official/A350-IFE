@@ -367,7 +367,11 @@ document.addEventListener('DOMContentLoaded', function () {
       }
 
       const route = interpolateGreatCircle(jfk, sfo, 128);
-      const line = L.polyline(route, { color: '#66e2ff', weight: 4, opacity: 0.9 }).addTo(map);
+      const flown = route.slice(0, Math.round(route.length/3));
+      const unflown = route.slice(Math.round(route.length/3));
+      L.polyline(flown, { color: '#9ff3cf', weight: 5, opacity: 0.95 }).addTo(map);
+      L.polyline(unflown, { color: '#3da0ff', weight: 4, opacity: 0.75, dashArray:'6 6' }).addTo(map);
+      const line = L.polyline(route, { opacity:0 });
       map.fitBounds(line.getBounds(), { padding: [20,20] });
 
       // progress marker at 1/3
@@ -380,8 +384,9 @@ document.addEventListener('DOMContentLoaded', function () {
         return (toDeg(Math.atan2(y,x))+360)%360;
       }
       const brg = bearing(route[idx-1], route[idx+1]);
-      const aircraftIcon = L.divIcon({ className: 'ac-icon', html: `<div style="transform:rotate(${brg}deg)">✈️</div>`, iconSize:[24,24], iconAnchor:[12,12] });
-      L.marker(pos, { icon: aircraftIcon }).addTo(map);
+      const svg = `<svg width="28" height="28" viewBox="0 0 24 24" fill="#ffd67a" xmlns="http://www.w3.org/2000/svg"><path d="M10.18 9"/><path d="M10.18 9l-6.18-6v3l4 3v3l-4 3v3l6.18-6 6.82 9h3l-5.82-12 5.82-12h-3l-6.82 9z"/></svg>`;
+      const aircraftIcon = L.divIcon({ className: 'ac-icon', html: `<div style="transform:rotate(${brg}deg)">${svg}</div>`, iconSize:[28,28], iconAnchor:[14,14] });
+      L.marker(pos, { icon: aircraftIcon, rotationAngle:brg }).addTo(map);
 
       // info panel
       const distNm = haversineNm(jfk, sfo);
@@ -397,20 +402,20 @@ document.addEventListener('DOMContentLoaded', function () {
       if (info) {
         info.innerHTML = '';
         const rows = [
-          ['Flight','JW620'],
-          ['Aircraft','A350‑1000'],
-          ['Route','JFK → SFO'],
+          ['Attitude (roll/pitch)','2°/1°'],
+          ['Ground speed',''+gs+' kt'],
+          ['OAT','−56 °C'],
+          ['Altitude','FL380'],
+          ['Mach','0.85'],
           ['Departure (local)',''+depLocal.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})],
           ['Time aloft',''+elapsedH.toFixed(1)+' h'],
           ['Local time',''+locTime.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})],
           ['Distance',''+distNm+' nm'],
           ['Covered',''+covered+' nm'],
           ['Remaining',''+remain+' nm'],
-          ['Ground speed',''+gs+' kt'],
           ['ETA (hrs)',''+etaH.toFixed(1)],
           ['ETA clock',''+etaDate.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})],
-          ['OAT','−56 °C'],
-          ['Baggage claim','SFO Carousel B3']
+          ['Terminal/Baggage','T2 / Carousel B3']
         ];
         rows.forEach(([k,v])=>{ const l=document.createElement('div'); l.className='label'; l.textContent=k; const val=document.createElement('div'); val.className='value'; val.textContent=v; info.appendChild(l); info.appendChild(val); });
       }
@@ -425,6 +430,20 @@ document.addEventListener('DOMContentLoaded', function () {
           conn.appendChild(row);
         }
       }
+
+      // title/meta with weather placeholder
+      setText('fltTitle', 'FL380 • JFK → SFO');
+      // fetch simple SFO weather (placeholder static for now)
+      setText('fltMeta', 'SFO Weather: 18°C / 64°F • Wind 12 kt');
+
+      // controls (iOS‑style zoom)
+      const zi=$id('zoomIn'), zo=$id('zoomOut');
+      if (zi) zi.onclick=()=> map.zoomIn();
+      if (zo) zo.onclick=()=> map.zoomOut();
+      const compass=$id('compass'); if (compass) compass.textContent='N';
+      const attH=$id('attH'); if (attH) attH.style.transform='translateY(0)';
+      // ticker text
+      const ticker=$id('tickerInner'); if (ticker) ticker.textContent = `JW620 JFK→SFO • GS ${gs}kt • ETA ${etaDate.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} • FL380 • Mach 0.85 • OAT −56°C     `;
 
       // 200nm ticks
       // no nm tick marks per user request
