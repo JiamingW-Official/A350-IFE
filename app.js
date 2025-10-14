@@ -279,6 +279,12 @@ document.addEventListener('DOMContentLoaded', function () {
       const t = I18N[lang];
       setText("brandTitle", t.brand);
       setText("destText", t.dest);
+      // update hero city label localized
+      const heroCity = $id('heroCity');
+      if (heroCity) {
+        const cityMap = { 'zh-CN':'旧金山', 'zh-TW':'舊金山', en:'SAN FRANCISCO', fr:'SAN FRANCISCO', es:'SAN FRANCISCO', ru:'САН-ФРАНЦИСКО' };
+        heroCity.textContent = cityMap[lang] || cityMap.en;
+      }
       setText("tileMusic", t.tiles.music[0]); setText("tileMusicSub", t.tiles.music[1]);
       setText("tileMovies", t.tiles.movies[0]); setText("tileMoviesSub", t.tiles.movies[1]);
       setText("tileShopping", t.tiles.shopping[0]); setText("tileShoppingSub", t.tiles.shopping[1]);
