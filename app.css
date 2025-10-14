@@ -44,7 +44,7 @@ header{
   border-bottom:1px solid rgba(255,255,255,.04);
   background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.01));
   backdrop-filter:blur(10px) saturate(1.05);
-  position:relative;
+  position:sticky; top:0; /* keep header fixed at top during column scrolls */
   z-index:1400;
 }
 
@@ -151,12 +151,12 @@ main{
   height:100%;
   box-sizing:border-box;
   padding:10px 14px;
-  overflow-y:auto;
   overflow-x:hidden; /* 禁止横向滚动 */
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
 }
-.music-left{ padding-right: 24px; } /* 给 tracklist 留滚动条空间 */
+.music-left{ padding-right: 24px; overflow: hidden; } /* 左列内部自定义滚动容器 */
+.left-scroll{ height:100%; overflow-y:auto; }
 
 /* Ensure banner scrolls together with list (banner not fixed) */
 .album-banner{

@@ -382,8 +382,8 @@ document.addEventListener('DOMContentLoaded', function () {
     /* ---------- TRACK LIST RENDER & BEHAVIOR ---------- */
     function renderTracks() {
       const box = $id('trackList'); if (!box) return;
-      // ensure scrollable region is correct
-      box.style.overflowY = 'auto';
+      // left column controls scroll via .left-scroll; avoid nested scrollbars here
+      box.style.overflowY = '';
       box.style.paddingBottom = '0';
       box.innerHTML = '';
       const a = LIB[curAlbum]; if (!a) return;
