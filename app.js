@@ -48,6 +48,7 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     };
 
+
     // Dining i18n labels
     const DINING_I18N = {
       "zh-CN": { title: "用餐", sub: "头等舱品鉴菜单", wine: "酒单",
@@ -856,7 +857,7 @@ document.addEventListener('DOMContentLoaded', function () {
           const panel = $id('panel-dining');
           if (panel) {
             const allPanels = document.querySelectorAll('.panel'); allPanels.forEach(p => p.classList.remove('visible'));
-            panel.classList.add('visible');
+            panel.classList.add('visible'); panel.style.display = 'block';
             const homeEl = $id('home'); if (homeEl) homeEl.style.display = 'none';
             renderDining();
           }
