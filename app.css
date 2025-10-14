@@ -89,10 +89,48 @@ main{
   height:100%;
   display:grid;
   gap:18px;
-  grid-template-columns:25% 1fr 1fr; /* left column fixed at 25% */
+  grid-template-columns:1fr 1fr 1fr; /* left column is 1/3; right two columns sum to 2/3 */
   grid-template-rows:1fr 1fr 1fr;
   grid-template-areas:"hero music movies" "hero shop dining" "hero flight flight";
 }
+
+/* Left vertical hero panel (destination) */
+.hub > .hero{
+  grid-row:1 / span 3;
+  grid-column:1;
+  position:relative;
+  border-radius:16px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,0.04);
+  background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.005));
+  box-shadow:0 20px 60px rgba(0,0,0,0.55);
+}
+.hub > .hero img{width:100%;height:100%;object-fit:cover;display:block}
+.hub > .hero .label{
+  position:absolute;left:16px;bottom:16px;right:16px;
+  display:flex;align-items:flex-end;justify-content:space-between;gap:10px;
+  color:#fff;text-shadow:0 4px 18px rgba(0,0,0,0.6);
+}
+.hub > .hero .label .city{font-size:calc(44px * var(--text-scale));font-weight:900;letter-spacing:2px}
+.hub > .hero .label .code{font-size:calc(28px * var(--text-scale));font-weight:800;opacity:0.95}
+
+/* Right tiles */
+.hub > .tile{
+  border-radius:16px;
+  padding:16px 18px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.004));
+  border:1px solid rgba(255,255,255,0.04);
+  box-shadow:0 16px 44px rgba(0,0,0,0.5);
+  cursor:pointer;
+  transition:transform .12s ease, box-shadow .14s ease, background .12s ease;
+  display:flex;flex-direction:column;justify-content:flex-end;gap:8px;
+}
+.hub > .tile:hover{ transform: translateY(-2px); box-shadow:0 26px 64px rgba(0,0,0,0.6); }
+.hub > .tile h3{ margin:0; font-size:calc(24px * var(--text-scale)); font-weight:900; }
+.hub > .tile p{ margin:0; color:var(--muted); font-size:calc(14px * var(--text-scale)); }
+
+/* Make the last tile (flight) span two columns on bottom row */
+.hub > .tile:last-child{ grid-column:2 / span 2; }
 
 /* =============== Music panel layout =============== */
 /* music-grid: left wide column ~70%, right column ~30% */
