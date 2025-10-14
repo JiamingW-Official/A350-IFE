@@ -405,12 +405,17 @@ document.addEventListener('DOMContentLoaded', function () {
         rows.forEach(([k,v])=>{
           const l=document.createElement('div'); l.className='label'; l.textContent=k;
           const val=document.createElement('div'); val.className='value'; val.textContent=v;
+          // 确保标签在第一列，值在第二列
+          l.style.gridColumn = '1';
+          val.style.gridColumn = '2';
           el.appendChild(l); el.appendChild(val);
         });
       }
       fillGrid(page1,[ ['Attitude (roll/pitch)','2°/1°'], ['Altitude','FL380'], ['Mach','0.85'], ['Ground speed',gs+' kt'], ['OAT','−56 °C'] ]);
       fillGrid(page2,[ ['Departure time (local)',depLocal.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})], ['Time aloft',elapsedH.toFixed(1)+' hours'], ['Local time',locTime.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})], ['Estimated time remaining',etaH.toFixed(1)+' hours'], ['Estimated arrival (local)',etaDate.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})] ]);
       fillGrid(page3,[ ['Distance',distNm+' nm'], ['Covered',covered+' nm'], ['Remaining',remain+' nm'], ['Terminal/Baggage','T2 / Carousel B3'] ]);
+      
+      // Flight info pages populated successfully
       const conn = $id('sfoConn'); if (conn) {
         conn.innerHTML = '';
         const dests = ['HNL','LAX','SEA','YVR','ORD','DFW','PHX','IAD','BOS','MIA','ATL','DEN','MSP','DTW','YYZ','YUL','SJD','AUS','SAN','PDX','SNA','RSW','TPA','BNA','PHL','EWR','JFK','DAL','STL','CLE'];
@@ -434,12 +439,38 @@ document.addEventListener('DOMContentLoaded', function () {
       const zi=$id('zoomIn'), zo=$id('zoomOut');
       if (zi) zi.onclick=()=> map.zoomIn();
       if (zo) zo.onclick=()=> map.zoomOut();
-      // flight info carousel controls (left/right small round arrows mid-height)
-      const track=$id('fiTrack'); let page=0;
-      function setPage(p){ page=(p+3)%3; if (track) track.style.transform=`translateX(-${page*100}%)`; }
-      // auto-rotate every 5s (reset on render); no manual arrows
-      if (window._fiTimer) { clearInterval(window._fiTimer); }
-      window._fiTimer = setInterval(()=> setPage(page+1), 5000);
+      // flight info vertical carousel (three pages: 0, 1, 2)
+      const track = $id('fiTrack');
+      let currentPage = 0;
+      const totalPages = 3;
+      
+      function setPage(pageIndex) {
+        // 确保页面索引在有效范围内
+        if (pageIndex < 0) pageIndex = totalPages - 1;
+        if (pageIndex >= totalPages) pageIndex = 0;
+        
+        currentPage = pageIndex;
+        if (track) {
+          // 使用像素值而不是百分比，每个页面280px
+          const translateY = -currentPage * 280;
+          track.style.transform = `translateY(${translateY}px)`;
+          // Flight info page switching: currentPage, translateY
+        }
+      }
+      
+      // 确保数据已填充后再初始化
+      setTimeout(function() {
+        setPage(0);
+      }, 100);
+      
+      // auto-rotate every 6 seconds (reset on render)
+      if (window._fiTimer) { 
+        clearInterval(window._fiTimer); 
+      }
+      window._fiTimer = setInterval(function() {
+        const nextPage = (currentPage + 1) % totalPages;
+        setPage(nextPage);
+      }, 6000);
       const compass=$id('compass'); if (compass) compass.textContent='N';
       const attH=$id('attH'); if (attH) attH.style.transform='translateY(0)';
       // ticker text
@@ -1070,7 +1101,7 @@ document.addEventListener('DOMContentLoaded', function () {
     /* ---------- header / control handlers ---------- */
     function closeAllPanels() {
       const panels = document.querySelectorAll('.panel');
-      panels.forEach(p => { p.classList.remove('visible'); p.style.display = 'none'; });
+      panels.forEach(p => { p.classList.remove('visible'); p.style.display = 'none'; p.setAttribute('aria-hidden', 'true'); });
       const home = $id('home');
       if (home) home.style.display = 'grid';
       const ms = $id('music-selection'); if (ms) ms.style.display = 'none';
@@ -1108,8 +1139,8 @@ document.addEventListener('DOMContentLoaded', function () {
           renderMusicSelection();
           const panelMusic = $id('panel-music');
           if (panelMusic) {
-            const allPanels = document.querySelectorAll('.panel'); allPanels.forEach(p => { p.classList.remove('visible'); p.style.display = 'none'; });
-            panelMusic.classList.add('visible'); panelMusic.style.display = 'block';
+            const allPanels = document.querySelectorAll('.panel'); allPanels.forEach(p => { p.classList.remove('visible'); p.style.display = 'none'; p.setAttribute('aria-hidden', 'true'); });
+            panelMusic.classList.add('visible'); panelMusic.style.display = 'block'; panelMusic.setAttribute('aria-hidden', 'false');
             const homeEl = $id('home'); if (homeEl) homeEl.style.display = 'none';
             const ms = $id('music-selection'); if (ms) { ms.style.display = 'block'; ms.classList.add('visible'); }
             const mg = panelMusic.querySelector('.music-grid'); if (mg) mg.style.display = 'none';
@@ -1120,8 +1151,8 @@ document.addEventListener('DOMContentLoaded', function () {
         if (key === 'dining') {
           const panel = $id('panel-dining');
           if (panel) {
-            const allPanels = document.querySelectorAll('.panel'); allPanels.forEach(p => { p.classList.remove('visible'); p.style.display = 'none'; });
-            panel.classList.add('visible'); panel.style.display = 'block';
+            const allPanels = document.querySelectorAll('.panel'); allPanels.forEach(p => { p.classList.remove('visible'); p.style.display = 'none'; p.setAttribute('aria-hidden', 'true'); });
+            panel.classList.add('visible'); panel.style.display = 'block'; panel.setAttribute('aria-hidden', 'false');
             const homeEl = $id('home'); if (homeEl) homeEl.style.display = 'none';
             renderDining();
           }
@@ -1130,8 +1161,8 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         const panel = $id('panel-' + key);
         if (panel) {
-          const panels2 = document.querySelectorAll('.panel'); panels2.forEach(p => { p.classList.remove('visible'); p.style.display = 'none'; });
-          panel.classList.add('visible'); panel.style.display = 'block';
+          const panels2 = document.querySelectorAll('.panel'); panels2.forEach(p => { p.classList.remove('visible'); p.style.display = 'none'; p.setAttribute('aria-hidden', 'true'); });
+          panel.classList.add('visible'); panel.style.display = 'block'; panel.setAttribute('aria-hidden', 'false');
           const h = $id('home'); if (h) h.style.display = 'none';
           if (key === 'flight') { renderFlight(); }
         } else {
