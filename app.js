@@ -433,6 +433,9 @@ document.addEventListener('DOMContentLoaded', function () {
       const fiLeft=$id('fiLeft'), fiRight=$id('fiRight');
       if (fiLeft) fiLeft.onclick=()=> setPage(page-1);
       if (fiRight) fiRight.onclick=()=> setPage(page+1);
+      // auto-rotate every 6s (reset on render)
+      if (window._fiTimer) { clearInterval(window._fiTimer); }
+      window._fiTimer = setInterval(()=> setPage(page+1), 6000);
       const compass=$id('compass'); if (compass) compass.textContent='N';
       const attH=$id('attH'); if (attH) attH.style.transform='translateY(0)';
       // ticker text
