@@ -320,9 +320,9 @@ main{
 .btn svg{width:calc(22px * var(--text-scale));height:calc(22px * var(--text-scale));fill:currentColor}
 
 /* now playing compact */
-.center-col{display:flex;flex-direction:row;gap:12px;align-items:center;justify-content:center;flex:1;min-width:320px}
-.now{display:flex;align-items:center;gap:12px;min-width:260px;max-width:420px;overflow:hidden;flex:0 0 auto}
-.art{width:58px;height:58px;border-radius:12px;background:#1b2946;background-size:cover;background-position:center}
+.center-col{display:flex;flex-direction:row;gap:8px;align-items:center;justify-content:flex-start;flex:1;min-width:320px}
+.now{display:flex;align-items:center;gap:10px;min-width:200px;max-width:320px;overflow:hidden;flex:0 0 auto}
+.art{width:52px;height:52px;border-radius:12px;background:#1b2946;background-size:cover;background-position:center}
 .np .t{font-size:calc(16px * var(--text-scale));font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .np .m{font-size:calc(13px * var(--text-scale));color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
