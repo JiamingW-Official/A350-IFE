@@ -9,7 +9,7 @@
   --icon-color:#e8f0ff;
   --banner-glow: rgba(60,160,220,0.18);
   --control-h: 58px;
-  --text-scale: 1.35; /* 全局文字放大约 35%（基于原始设计） */
+  --text-scale: 1.5; /* 提升全局字号，但不破坏布局 */
   --player-h: calc(var(--control-h) + 12px);
   --player-bottom-offset: 16px;
   --gap:18px;
@@ -18,6 +18,10 @@
   --toolbar-h:78px;
   --track-thickness: 10px; /* 统一：进度条与音量条的粗细 */
   --timeline-w: clamp(400px, 46vw, 820px); /* 稍微缩短时间轴宽度，避免被挤压 */
+  --font-sans: "SF Pro", "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --glass-bg: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015));
+  --glass-border: 1px solid rgba(255,255,255,0.08);
+  --glass-shadow: 0 18px 50px rgba(0,0,0,0.6);
 }
 
 /* =============== 基础布局 =============== */
@@ -26,12 +30,13 @@ body{
   margin:0;color:var(--text);
   background:
     radial-gradient(1200px 800px at 15% 10%, #0e1420 0%, #0a0d12 55%, #080b10 100%);
-  font-family: ui-sans-serif, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  font-family: var(--font-sans);
   font-size:15px;
   overflow:hidden; /* 页面主体不可滚动，内部列滚动 */
   -webkit-font-smoothing:antialiased;
   -moz-osx-font-smoothing:grayscale;
   -webkit-tap-highlight-color: transparent;
+  line-height:1.5;
 }
 
 /* =============== Header =============== */
@@ -43,9 +48,9 @@ header{
   align-items:center;
   justify-content:space-between;
   gap:12px;
-  border-bottom:1px solid rgba(255,255,255,.04);
-  background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.01));
-  backdrop-filter:blur(10px) saturate(1.05);
+  border-bottom:1px solid rgba(255,255,255,.06);
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px) saturate(1.15);
   position:sticky; top:0; /* keep header fixed at top during column scrolls */
   z-index:1400;
 }
@@ -125,9 +130,9 @@ main{
 .hub > .tile{
   border-radius:16px;
   padding:16px 18px;
-  background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.004));
-  border:1px solid rgba(255,255,255,0.04);
-  box-shadow:0 16px 44px rgba(0,0,0,0.5);
+  background:var(--glass-bg);
+  border: var(--glass-border);
+  box-shadow: var(--glass-shadow);
   cursor:pointer;
   transition:transform .12s ease, box-shadow .14s ease, background .12s ease;
   display:flex;flex-direction:column;justify-content:flex-end;gap:8px;
@@ -166,8 +171,9 @@ main{
 /* Ensure banner scrolls together with list (banner not fixed) */
 .album-banner{
   position:relative;border-radius:18px;overflow:hidden;margin-bottom:14px;display:flex;align-items:stretch;gap:18px;padding:18px;
-  background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));backdrop-filter:blur(16px) saturate(1.15);
-  transition: box-shadow .12s ease, transform .12s ease;
+  background:var(--glass-bg);backdrop-filter:blur(18px) saturate(1.18);
+  border: var(--glass-border);
+  transition: box-shadow .12s ease, transform .12s ease, border-color .12s ease;
   z-index:2;
 }
 .album-banner::before{
@@ -290,12 +296,12 @@ main{
 }
 
 /* =============== Right column / artist cards =============== */
-.artist-hero{border-radius:12px;overflow:hidden;margin-bottom:12px;border:1px solid rgba(255,255,255,.04);background:linear-gradient(180deg, rgba(255,255,255,.01), rgba(255,255,255,.005))}
+.artist-hero{border-radius:12px;overflow:hidden;margin-bottom:12px;border: var(--glass-border);background:var(--glass-bg);backdrop-filter: blur(14px) saturate(1.12)}
 .artist-hero img{display:block;width:100%;height:auto;border-radius:12px;object-fit:cover}
-.card{border-radius:12px;padding:12px;background:linear-gradient(180deg, rgba(255,255,255,.01), rgba(255,255,255,.005));border:1px solid rgba(255,255,255,.03);margin-bottom:12px}
+.card{border-radius:12px;padding:12px;background:var(--glass-bg);border: var(--glass-border);margin-bottom:12px;backdrop-filter: blur(14px) saturate(1.12)}
 .card-title{margin:0 0 8px 0;font-size:calc(16px * var(--text-scale));font-weight:800}
 .card-text{margin:0;font-size:calc(14px * var(--text-scale));color:#d9e5ff;line-height:1.55}
-.card-lyrics{white-space:pre-wrap;color:#fff;font-size:calc(13px * var(--text-scale));line-height:1.6}
+.card-lyrics{white-space:pre-wrap;color:#fff;font-size:calc(15px * var(--text-scale));line-height:1.7}
 
 /* =============== Language modal =============== */
 .lang-screen{position:fixed;inset:0;background:rgba(10,14,22,.55);display:none;place-items:center;z-index:2000}
@@ -307,6 +313,7 @@ main{
 /* =============== Player (fixed bottom) =============== */
 .player{
   position:fixed;left:12px;right:12px;bottom:var(--player-bottom-offset);height:var(--player-h);
+
   display:grid;align-items:center;gap:12px;padding:12px 18px;box-sizing:border-box;
   /* 1:controls 2:art 3:title/meta 4:gap 5:cur 6:rail 7:dur 8:volume */
   grid-template-columns: auto 52px minmax(180px,1fr) 12px 48px var(--timeline-w) 48px 220px;
