@@ -1,319 +1,306 @@
-/* ===========================================================
-   app.css  —  主样式（已包含：更亮的 Liquid glass active 行 & inward 'bubble' glow）
-   关键改动：
-     1) .row.active 使用 inset box-shadow 产生“内部”均匀发光（泡泡感）
-     2) 保证每一行高度一致（min-height）
-     3) 将列表底部必要空白放在 .playlist（内容）而非容器 .music-left，以减少空白感
-     4) 窄滚动条，左右两栏独立滚动
-   =========================================================== */
+:root{
+  --bg:#0a0d12;
+  --panel:#0b121c;
+  --card:#0e1726;
+  --muted:#a7b7cc;
+  --text:#f6f8fb;
+  --border:#223149;
+  --accent:#16d26b;
+  --icon-color:#e8f0ff;
+  --banner-glow: rgba(60,160,220,0.18);
+  --control-h: 58px;
+  --text-scale: 1.35; /* 全局文字放大约 35%（基于原始设计） */
+  --player-h: calc(var(--control-h) + 12px);
+  --player-bottom-offset: 16px;
+  --gap:18px;
+  --header-h:86px;
+  --header-btn-h:58px; /* header 按钮略大 */
+  --toolbar-h:78px;
+}
 
-   :root{
-    --bg:#0a0d12;
-    --panel:#0b121c;
-    --card:#0e1726;
-    --muted:#a7b7cc;
-    --text:#f6f8fb;
-    --border:#223149;
-    --accent:#16d26b;
-    --icon-color:#e8f0ff;
-    --banner-glow: rgba(60,160,220,0.18);
-    --control-h: 58px;
-    --text-scale: 1.28;
-    --player-h: calc(var(--control-h) + 12px);
-    --player-bottom-offset: 16px;
-    --gap:18px;
-    --header-h:86px;
-    --toolbar-h:78px;
-  }
-  
-  /* ---------------- base ---------------- */
-  html,body{height:100%}
-  body{
-    margin:0;color:var(--text);
-    background:radial-gradient(1200px 800px at 15% 10%, #0e1420 0%, #0a0d12 55%, #080b10 100%);
-    font-family:ui-sans-serif,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
-    overflow:hidden;
-    font-size:15px;
-  }
-  
-  /* header */
-  header{
-    height:var(--header-h);
-    padding:14px 22px;
-    box-sizing:border-box;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:12px;
-    border-bottom:1px solid rgba(255,255,255,.04);
-    background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.01));
-    backdrop-filter:blur(10px) saturate(1.05);
-    position:relative;
-    z-index:1400;
-  }
-  .left{display:flex;align-items:center;gap:12px;min-width:0}
-  .left strong#brandTitle{font-size:calc(20px * var(--text-scale));font-weight:900;color:#fff;white-space:nowrap}
-  .muted{color:var(--muted);font-size:calc(14px * var(--text-scale));opacity:0.95;white-space:nowrap}
-  #remain{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;font-size:calc(18px * var(--text-scale));color:#ffd67a;font-weight:900;z-index:1450;pointer-events:none}
-  .actions{display:flex;align-items:center;gap:10px;justify-content:flex-end}
-  .icon-btn, .badge, .pill, .btn {display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box}
-  .icon-btn{width:var(--header-btn-h);height:var(--header-btn-h);border-radius:10px;border:1px solid rgba(255,255,255,0.06);cursor:pointer;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.006));color:var(--icon-color);box-shadow:0 6px 18px rgba(6,10,14,0.6), inset 0 1px 0 rgba(255,255,255,0.02);transition:transform .12s,box-shadow .12s}
-  .icon-btn:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(6,10,14,0.7)}
-  .badge{height:var(--header-btn-h);padding:0 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:linear-gradient(180deg,#12202a,#0b1418);color:#fff;display:inline-flex;align-items:center;gap:8px;font-size:calc(14px * var(--text-scale));box-shadow:0 6px 18px rgba(0,0,0,0.45)}
-  .actions > * { flex: 0 0 auto; }
-  header * { white-space: nowrap; }
-  
-  /* main layout: leave space for header + player */
-  main{position:relative;height:calc(100vh - var(--header-h) - var(--player-h) - var(--player-bottom-offset));margin:0;padding:var(--gap);box-sizing:border-box}
-  
-  /* home / tiles (保持以前的风格) */
-  .hub{height:100%;display:grid;gap:18px;grid-template-columns:1.4fr 1fr 1fr;grid-template-rows:1fr 1fr 1fr;grid-template-areas:"hero music movies" "hero shop dining" "hero flight flight"}
-  .tile{border:1px solid rgba(255,255,255,.04);border-radius:22px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;background:linear-gradient(180deg, rgba(255,255,255,.01), rgba(255,255,255,.005));transition:transform .12s,box-shadow .12s}
-  
-  /* panels */
-  .panel{position:relative;height:100%;display:none;overflow:hidden}
-  .panel.visible{display:block}
-  
-  /* album grid/card */
-  .album-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:18px;padding:8px}
-  .album-card{border-radius:14px;overflow:hidden;display:flex;gap:12px;align-items:center;background:linear-gradient(180deg, rgba(255,255,255,.01), rgba(255,255,255,.005));border:1px solid rgba(255,255,255,.03);padding:12px;cursor:pointer}
-  .album-card img{width:120px;height:120px;object-fit:cover;border-radius:10px}
-  .album-info{display:flex;flex-direction:column;justify-content:flex-end;min-height:120px;padding:6px}
-  .album-info .title{font-size:calc(22px * var(--text-scale));font-weight:900}
-  .album-info .meta{color:var(--muted);font-size:calc(14px * var(--text-scale));margin-top:6px}
-  .album-info .blurb{margin-top:8px;color:#d9e5ff}
-  
-  /* ---------------- music grid (LEFT ~70%  RIGHT ~30%) ---------------- */
-  .music-grid{height:100%;display:grid;grid-template-columns: 1fr 420px; gap:22px;overflow:hidden}
-  @media (min-width:1600px){
-    .music-grid{grid-template-columns: 1fr 420px;}
-  }
-  
-  /* 左右列分别可独立滚动（窄滚动条） */
-  .music-left, .music-right{
-    height:100%;
-    padding:10px 14px;
-    box-sizing:border-box;
-    overflow:auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  .music-left{
-    padding-left:8px;padding-right:6px;
-    /* 不把底部额外空白放到容器上，放到内容上（.playlist）以降低 "多余空白" 的可感知性 */
-    padding-bottom:0;
-  }
-  .music-right{ padding-bottom:0; }
-  
-  /* 狭长美观滚动条 */
-  .music-left::-webkit-scrollbar, .music-right::-webkit-scrollbar{ width:8px; height:8px; }
-  .music-left::-webkit-scrollbar-thumb, .music-right::-webkit-scrollbar-thumb{ background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.01)); border-radius:999px; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02); }
-  
-  /* ---------------- album toolbar (floating) ---------------- */
-  #albumToolbar{
-    position:fixed;
-    top: calc(var(--header-h) + var(--gap));
-    left: var(--gap);
-    right: auto;
-    height: var(--toolbar-h);
-    display:flex;
-    align-items:center;
-    gap:18px;
-    padding:12px 18px;
-    box-sizing:border-box;
-    border-radius:14px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
-    backdrop-filter: blur(18px) saturate(1.5);
-    border: 1px solid rgba(255,255,255,0.06);
-    box-shadow: 0 22px 60px rgba(12,24,40,0.6), inset 0 1px 0 rgba(255,255,255,0.03);
-    z-index:1600;
-    transform: translateZ(0);
-    transition: left .12s ease, width .12s ease, opacity .18s;
-    opacity: 0;
-    pointer-events: none;
-  }
-  #albumToolbar::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    box-shadow: 0 18px 60px rgba(0,0,0,0.6), 0 0 160px var(--banner-glow);
-    mix-blend-mode: screen;
-    opacity: 0.9;
-    filter: blur(20px) saturate(1.2);
-  }
-  
-  /* album banner */
-  .album-banner{
-    position:relative;border-radius:18px;overflow:hidden;margin-bottom:14px;display:flex;align-items:stretch;gap:18px;padding:18px;
-    background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));backdrop-filter:blur(16px) saturate(1.15);
-    transition: margin-top .16s ease, box-shadow .12s ease;
-    z-index:10;
-  }
-  .album-banner::before{
-    content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
-    background: radial-gradient(800px 200px at 10% 20%, var(--banner-glow), rgba(0,0,0,0) 30%);
-    mix-blend-mode: screen; opacity:1;
-  }
-  .album-banner::after{
-    content:"";position:absolute;left:0;right:0;top:50%;height:160px;transform:translateY(-50%);z-index:0;pointer-events:none;border-radius:18px;
-    background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.00));
-    mix-blend-mode: overlay; opacity:0.6; filter: blur(36px);
-  }
-  .banner-left{flex:0 0 220px;z-index:1}
-  .banner-left img{width:220px;height:220px;object-fit:cover;border-radius:14px;display:block;box-shadow:0 14px 40px rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.03)}
-  .banner-right{flex:1;display:flex;align-items:flex-end;z-index:1;padding-bottom:8px}
-  .banner-meta{padding:8px}
-  .banner-meta .small{font-size:calc(13px * var(--text-scale));color:var(--muted);margin-bottom:6px}
-  .banner-meta h1{margin:0;font-size:calc(44px * var(--text-scale));line-height:1;font-weight:900}
-  .submeta{color:var(--muted);margin-top:8px}
-  .banner-blurb{margin-top:12px;color:#d9e5ff;max-width:60%}
-  .album-banner .tb-play, .album-banner .tb-title, .album-banner .tb-back { display: none !important; }
-  
-  /* ---------------- playlist rows（统一高度、list 行为） ---------------- */
-  /* 把内容高度统一，避免每行尺寸不同导致跳动/可滚动异常 */
-  .playlist{display:flex;flex-direction:column;gap:12px;margin-top:6px; padding-bottom: calc(var(--player-h) + var(--player-bottom-offset)); /* 将底部空白放在内容上，避免容器出现大面积留白 */ }
-  .row{
-    display:grid;
-    grid-template-columns:54px 1fr 80px;
-    align-items:center;
-    gap:12px;
-    border-radius:14px;
-    padding:14px 14px;
-    font-size:calc(18px * var(--text-scale));
-    background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.002));
-    border:1px solid rgba(255,255,255,0.02);
-    transition: transform .12s ease, box-shadow .14s ease, background .12s ease;
-    cursor: pointer;
-    min-height:72px;               /* 保证每一行高度一致，避免大小不一 */
-    box-sizing:border-box;
-    overflow:visible;
-  }
-  .row:hover{ transform: translateY(-3px); box-shadow: 0 18px 42px rgba(6,10,14,0.6); background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.004)); }
-  
-  /* ---------------- 关键：active 行 -> 强烈 Liquid glass inward glow（bubble） ----------------
-     使用多个 inset 阴影制造“内部”高亮，同时保留微弱的外侧阴影作为分离感。
-     这样光晕是向内的、上下左右均匀分布，视觉更像“泡泡”而不是单纯向下的光。
-  */
-  .row.active{
-    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(140,200,255,0.02));
-    border-color: rgba(180,220,255,0.18);
-    /* inward bubble: 多层 inset shadow */
-    box-shadow:
-      inset 0 0 48px rgba(120,210,255,0.18),
-      inset 0 10px 28px rgba(255,255,255,0.06),
-      inset 0 -10px 22px rgba(0,0,0,0.08),
-      0 8px 30px rgba(6,14,22,0.45); /* 轻微外部阴影用于分离效果 */
-    transform: translateY(-2px) scale(1.003);
-    position:relative;
-    z-index:5;
-    border-radius:14px;
-    backdrop-filter: blur(8px) saturate(1.15); /* 更明显的 glass 效果 */
-    -webkit-backdrop-filter: blur(8px) saturate(1.15);
-  }
-  
-  /* 去掉主动行的外放 ::before（之前用于向外 glow），改用 inset shadows 实现向内发光 */
-  .row.active::before, .row.active::after { display:none !important; content:none !important; }
-  
-  /* row internals */
-  .row .row-btn{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(180deg,#0f1620,#091018);border:1px solid var(--border);cursor:pointer}
-  .row .title{font-size:calc(18px * var(--text-scale));font-weight:800}
-  .row .meta{font-size:calc(13px * var(--text-scale));color:var(--muted)}
-  
-  /* right column */
-  .artist-hero{border-radius:14px;overflow:hidden;margin-bottom:12px;border:1px solid rgba(255,255,255,.04);background:linear-gradient(180deg, rgba(255,255,255,.01), rgba(255,255,255,.005))}
-  .artist-hero img{display:block;width:100%;height:auto;border-radius:14px;object-fit:cover}
-  .card{border-radius:14px;padding:12px;background:linear-gradient(180deg, rgba(255,255,255,.01), rgba(255,255,255,.005));border:1px solid rgba(255,255,255,.03)}
-  .card-title{margin:0 0 8px 0;font-size:calc(16px * var(--text-scale));font-weight:800}
-  .card-text{margin:0;font-size:calc(14px * var(--text-scale));color:#d9e5ff;line-height:1.55}
-  .card-lyrics{margin:0;font:calc(14px * var(--text-scale))/1.6 ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial;white-space:pre-wrap;color:#fff}
-  
-  /* ---------------- player bottom（更亮、更 glass） ---------------- */
-  .player{
-    position:fixed;
-    left:12px; right:12px;
-    bottom:var(--player-bottom-offset);
-    height:var(--player-h);
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:18px;
-    padding:10px 18px;
-    box-sizing:border-box;
-    background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03)); /* 更亮 */
-    backdrop-filter: blur(24px) saturate(1.5);
-    border-top:1px solid rgba(255,255,255,.08);
-    z-index:2000;
-    border-radius:12px;
-    box-shadow: 0 36px 110px rgba(6,18,30,0.72);
-  }
-  .player::after{
-    content:"";
-    position:absolute; inset:0; border-radius:12px; pointer-events:none;
-    box-shadow: 0 40px 120px rgba(30,130,120,0.06), 0 0 120px rgba(120,200,255,0.05);
-    mix-blend-mode: screen;
-    filter: blur(14px);
-    opacity:1;
-  }
-  
-  /* controls */
-  .controls{display:flex;gap:12px;align-items:center;height:100%}
-  .btn{width:var(--control-h);height:var(--control-h);border-radius:50%;background:linear-gradient(180deg,#12313f,#071018);border:1px solid rgba(255,255,255,0.06);display:grid;place-items:center;cursor:pointer;color:var(--icon-color);box-shadow:0 8px 24px rgba(6,10,14,0.55)}
-  .btn svg{width:calc(22px * var(--text-scale));height:calc(22px * var(--text-scale));fill:currentColor}
-  
-  /* center / now / timeline: 固定进度条位置，不受左侧文字宽度影响 */
-  .center-col{display:flex;flex-direction:row;gap:12px;align-items:center;justify-content:center;flex:1;min-width:320px}
-  .now{display:flex;align-items:center;gap:12px;min-width:260px;max-width:320px;overflow:hidden;flex:0 0 320px}
-  .art{width:58px;height:58px;border-radius:12px;background:#1b2946;background-size:cover;background-position:center;flex:0 0 58px}
-  .np .t{font-size:calc(16px * var(--text-scale));font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .np .m{font-size:calc(13px * var(--text-scale));color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  
-  /* timeline（progress）——固定长度，不会被左侧元素挤压 */
-  .timeline{display:flex;align-items:center;gap:12px;justify-content:center;flex:1;min-width:320px}
-  .rail{position:relative;height:10px;border-radius:999px;background:transparent;width:min(860px,60vw);max-width:860px;cursor:pointer;display:flex;align-items:center;padding:0 12px;box-sizing:border-box}
-  .rail::before{content:"";position:absolute;left:12px;right:12px;top:50%;transform:translateY(-50%);height:8px;background:#0b2634;border-radius:999px;z-index:1}
-  .bar{position:absolute;left:12px;top:50%;transform:translateY(-50%);height:8px;border-radius:999px;background:linear-gradient(90deg,#ffd67a 0%, #9ff3cf 100%);box-shadow:0 10px 28px rgba(0,0,0,.35);width:0;z-index:2}
-  
-  /* time */
-  .time{font-size:calc(13px * var(--text-scale));color:var(--muted);width:48px;text-align:center}
-  
-  /* volume */
-  .volume{display:flex;align-items:center;gap:8px;justify-content:flex-end;margin-right:6px;min-width:170px}
-  .volume svg{width:20px;height:20px;fill:currentColor}
-  .vol-rail{position:relative;height:var(--control-h);border-radius:999px;background:transparent;width:120px;display:flex;align-items:center;padding:0 8px;box-sizing:border-box}
-  .vol-bar{position:absolute;left:8px;top:50%;transform:translateY(-50%);height:calc(10px * var(--text-scale));border-radius:999px;background:linear-gradient(90deg,#58c284,#a7ffd8);width:60%}
-  
-  /* modal / other UI */
-  .lang-screen{position:fixed;inset:0;background:rgba(10,14,22,.55);display:none;place-items:center;z-index:2000}
-  .lang-card.glass{width:min(640px,86vw);background:rgba(16,22,34,.72);border:1px solid rgba(255,255,255,.12);padding:24px;border-radius:20px;backdrop-filter:blur(18px) saturate(1.2)}
-  .center-title{text-align:center;margin:0 0 16px 0}
-  .lang-list{display:grid;grid-template-columns:1fr;gap:12px}
-  .lang-btn{height:64px;border-radius:14px;border:1px solid var(--border);background:rgba(12,18,32,.8);color:var(--icon-color);font-size:calc(22px * var(--text-scale));cursor:pointer}
-  
-  /* global narrow scrollbars */
-  *::-webkit-scrollbar{width:8px;height:8px}
-  *::-webkit-scrollbar-track{background:rgba(255,255,255,.02)}
-  *::-webkit-scrollbar-thumb{background:rgba(90,120,160,.22);border-radius:999px}
-  
-  /* final adjustments */
-  .player, .controls, .center-col, .now { align-items: center !important; }
-  .player .btn, .controls .btn { box-sizing: border-box !important; display: flex !important; align-items: center !important; justify-content: center !important; margin: 0 !important; transform: none !important; }
-  .rail { padding: 0 12px !important; box-sizing: border-box !important; }
-  .rail::before { left: 12px !important; right: 12px !important; }
-  .volume, .timeline { align-items: center !important; }
-  .player * { margin: 0 !important; }
-  
-  /* icons颜色保证 */
-  .icon-btn { color: #ffffff !important; }
-  .icon-btn svg, .icon-btn svg path, .icon-btn svg g { fill: currentColor !important; }
-  .btn { color: #ffffff !important; }
-  .btn svg, .btn svg path, .btn svg g { fill: currentColor !important; }
-  svg[fill="#000"], svg[fill="#000000"] { fill: currentColor !important; }
-  
-  /* responsive */
-  @media (max-width:1100px){
-    .music-grid{grid-template-columns:1fr;grid-auto-rows:auto}
-    .banner-left img{width:160px;height:160px}
-    .banner-meta h1{font-size:calc(34px * var(--text-scale))}
-    #albumToolbar{left:12px;right:12px}
-  }
+/* =============== 基础布局 =============== */
+html,body{height:100%}
+body{
+  margin:0;color:var(--text);
+  background:
+    radial-gradient(1200px 800px at 15% 10%, #0e1420 0%, #0a0d12 55%, #080b10 100%);
+  font-family: ui-sans-serif, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  font-size:15px;
+  overflow:hidden; /* 页面主体不可滚动，内部列滚动 */
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* =============== Header =============== */
+header{
+  height:var(--header-h);
+  padding:14px 22px;
+  box-sizing:border-box;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  border-bottom:1px solid rgba(255,255,255,.04);
+  background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.01));
+  backdrop-filter:blur(10px) saturate(1.05);
+  position:relative;
+  z-index:1400;
+}
+
+/* left group */
+.left{display:flex;align-items:center;gap:12px;min-width:0}
+.left strong#brandTitle{
+  font-size:calc(20px * var(--text-scale));
+  font-weight:900;color:#fff;white-space:nowrap;
+}
+.muted{color:var(--muted);font-size:calc(14px * var(--text-scale));opacity:0.95;white-space:nowrap}
+
+/* center time */
+#remain{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;font-size:calc(18px * var(--text-scale));color:#ffd67a;font-weight:900;z-index:1450;pointer-events:none}
+
+/* right actions */
+.actions{display:flex;align-items:center;gap:16px;justify-content:flex-end}
+.icon-btn, .badge, .pill, .btn {display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box}
+.icon-btn{
+  width:var(--header-btn-h);height:var(--header-btn-h);border-radius:12px;border:1px solid rgba(255,255,255,0.06);cursor:pointer;
+  background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.006));
+  color:var(--icon-color);box-shadow:0 6px 18px rgba(6,10,14,0.6), inset 0 1px 0 rgba(255,255,255,0.02);
+  transition:transform .12s,box-shadow .12s;
+}
+.icon-btn:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(6,10,14,0.7)}
+.badge{
+  height:var(--header-btn-h);padding:0 14px;border-radius:12px;border:1px solid rgba(255,255,255,0.06);background:linear-gradient(180deg,#12202a,#0b1418);
+  color:#fff;display:inline-flex;align-items:center;gap:8px;font-size:calc(14px * var(--text-scale));box-shadow:0 6px 18px rgba(0,0,0,0.45);
+}
+.actions > * { flex: 0 0 auto; }
+header * { white-space: nowrap; }
+
+/* =============== Main (two-column layout) =============== */
+main{
+  position:relative;
+  height:calc(100vh - var(--header-h) - var(--player-h) - var(--player-bottom-offset));
+  margin:0;padding:var(--gap);
+  box-sizing:border-box;
+}
+
+/* Hub / Home grid (when on home) */
+.hub{
+  height:100%;
+  display:grid;
+  gap:18px;
+  grid-template-columns:1.4fr 1fr 1fr;
+  grid-template-rows:1fr 1fr 1fr;
+  grid-template-areas:"hero music movies" "hero shop dining" "hero flight flight";
+}
+
+/* =============== Music panel layout =============== */
+/* music-grid: left wide column ~70%, right column ~30% */
+.music-grid{
+  height:100%;
+  display:grid;
+  grid-template-columns: 1fr 380px; /* left flexible, right fixed 380px (~30% typical) */
+  gap:20px;
+  overflow:hidden;
+}
+
+/* left and right columns scroll independently */
+.music-left, .music-right{
+  height:100%;
+  box-sizing:border-box;
+  padding:10px 14px;
+  overflow-y:auto;
+  overflow-x:hidden; /* 禁止横向滚动 */
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+.music-left{ padding-right: 24px; } /* 给 tracklist 留滚动条空间 */
+
+/* Ensure banner scrolls together with list (banner not fixed) */
+.album-banner{
+  position:relative;border-radius:18px;overflow:hidden;margin-bottom:14px;display:flex;align-items:stretch;gap:18px;padding:18px;
+  background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));backdrop-filter:blur(16px) saturate(1.15);
+  transition: box-shadow .12s ease, transform .12s ease;
+  z-index:2;
+}
+.album-banner::before{
+  content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+  background: radial-gradient(800px 200px at 10% 20%, var(--banner-glow), rgba(0,0,0,0) 30%);
+  mix-blend-mode: screen; opacity:1;
+}
+.banner-left{flex:0 0 160px;z-index:1}
+.banner-left img{width:160px;height:160px;object-fit:cover;border-radius:12px;display:block;box-shadow:0 14px 40px rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.03)}
+.banner-right{flex:1;display:flex;align-items:flex-end;z-index:1;padding-bottom:8px}
+.banner-meta{padding:8px}
+.banner-meta .small{font-size:calc(13px * var(--text-scale));color:var(--muted);margin-bottom:6px}
+.banner-meta h1{margin:0;font-size:calc(36px * var(--text-scale));line-height:1;font-weight:900}
+.submeta{color:var(--muted);margin-top:8px}
+.banner-blurb{margin-top:12px;color:#d9e5ff;max-width:85%}
+
+/* hide any accidental toolbar-like nodes inside banner (protect against previous injection) */
+.album-banner .tb-play, .album-banner .tb-title, .album-banner .tb-back { display: none !important; }
+
+/* =============== Playlist rows =============== */
+/* playlist container */
+.playlist{display:grid;gap:12px;margin-top:6px}
+#trackList{ display:block; } /* ensure block container for vertical list */
+
+/* uniform row style */
+.row{
+  display:grid;
+  grid-template-columns:54px 1fr 90px; /* duration column width fixed, middle flex */
+  gap:12px;
+  align-items:center;
+  min-height:66px;
+  padding:14px 18px;
+  border-radius:12px;
+  font-size:calc(18px * var(--text-scale));
+  background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.002));
+  border:1px solid rgba(255,255,255,0.02);
+  box-shadow: 0 6px 20px rgba(2,6,10,0.5), inset 0 1px 0 rgba(255,255,255,0.02);
+  transition: transform .12s ease, box-shadow .14s ease, background .12s ease;
+  overflow: hidden; /* prevent content overflow */
+}
+.row:hover{ transform: translateY(-2px); box-shadow: 0 18px 42px rgba(6,10,14,0.6); background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.004)); }
+.row.active{
+  background: linear-gradient(180deg, rgba(255,255,255,0.045), rgba(6,18,22,0.16));
+  border-color: rgba(255,255,255,0.06);
+  box-shadow: 0 26px 60px rgba(6,20,40,0.5);
+  transform: translateY(-2px);
+  position:relative;
+}
+
+/* make sure middle column can shrink (prevents horizontal overflow) */
+.row > *:nth-child(2){ min-width:0; overflow:hidden; }
+
+/* left play button */
+.row .row-btn{
+  width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(180deg,#0f1620,#091018);border:1px solid var(--border);cursor:pointer;
+  box-shadow: inset 0 1px rgba(255,255,255,0.01);
+}
+.row .row-btn svg{ width:22px;height:22px; fill:#ffffff; } /* ensure white icon */
+.row .title{ font-size:calc(16px * var(--text-scale)); font-weight:800; white-space:nowrap; text-overflow:ellipsis; overflow:hidden; }
+.row .meta{ font-size:calc(13px * var(--text-scale)); color:var(--muted); margin-top:6px; }
+
+/* duration (right column) */
+.row > *:nth-child(3){
+  text-align:right;
+  font-weight:700;
+  color:var(--text);
+  font-size:calc(15px * var(--text-scale));
+}
+
+/* active inner glow (inward, bubble-like, iOS style) */
+.row.active::before{
+  content:'';
+  position:absolute;
+  inset:-6px;
+  border-radius:12px;
+  pointer-events:none;
+  background: radial-gradient(closest-side, rgba(140,200,255,0.12), rgba(10,16,20,0));
+  filter: blur(14px);
+  mix-blend-mode: screen;
+  opacity:1;
+}
+
+/* subtle inner sheen to selected row */
+.row.active::after{
+  content:'';
+  position:absolute;
+  left:12px; right:12px; top:6px; height:36%;
+  border-radius:8px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.01));
+  mix-blend-mode: overlay;
+  pointer-events:none;
+}
+
+/* =============== Right column / artist cards =============== */
+.artist-hero{border-radius:12px;overflow:hidden;margin-bottom:12px;border:1px solid rgba(255,255,255,.04);background:linear-gradient(180deg, rgba(255,255,255,.01), rgba(255,255,255,.005))}
+.artist-hero img{display:block;width:100%;height:auto;border-radius:12px;object-fit:cover}
+.card{border-radius:12px;padding:12px;background:linear-gradient(180deg, rgba(255,255,255,.01), rgba(255,255,255,.005));border:1px solid rgba(255,255,255,.03);margin-bottom:12px}
+.card-title{margin:0 0 8px 0;font-size:calc(16px * var(--text-scale));font-weight:800}
+.card-text{margin:0;font-size:calc(14px * var(--text-scale));color:#d9e5ff;line-height:1.55}
+.card-lyrics{white-space:pre-wrap;color:#fff;font-size:calc(13px * var(--text-scale));line-height:1.6}
+
+/* =============== Language modal =============== */
+.lang-screen{position:fixed;inset:0;background:rgba(10,14,22,.55);display:none;place-items:center;z-index:2000}
+.lang-card.glass{width:min(640px,86vw);background:rgba(16,22,34,.72);border:1px solid rgba(255,255,255,.12);padding:24px;border-radius:20px;backdrop-filter:blur(18px) saturate(1.2)}
+.center-title{text-align:center;margin:0 0 16px 0}
+.lang-list{display:grid;grid-template-columns:1fr;gap:12px}
+.lang-btn{height:64px;border-radius:14px;border:1px solid var(--border);background:rgba(12,18,32,.8);color:var(--icon-color);font-size:calc(22px * var(--text-scale));cursor:pointer}
+
+/* =============== Player (fixed bottom) =============== */
+.player{
+  position:fixed;left:12px;right:12px;bottom:var(--player-bottom-offset);height:var(--player-h);
+  display:flex;align-items:center;justify-content:space-between;gap:18px;padding:12px 18px;box-sizing:border-box;
+  background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(6,12,18,0.6));
+  backdrop-filter: blur(20px) saturate(1.2);
+  border-top:1px solid rgba(255,255,255,.03);
+  z-index:2000;border-radius:12px;box-shadow:0 18px 40px rgba(0,0,0,0.6);
+}
+
+/* player controls */
+.controls{display:flex;gap:12px;align-items:center;height:100%}
+.btn{width:var(--control-h);height:var(--control-h);border-radius:50%;background:linear-gradient(180deg,#12313f,#071018);border:1px solid rgba(255,255,255,0.06);display:grid;place-items:center;cursor:pointer;color:var(--icon-color);box-shadow:0 8px 24px rgba(6,10,14,0.55)}
+.btn svg{width:calc(22px * var(--text-scale));height:calc(22px * var(--text-scale));fill:currentColor}
+
+/* now playing compact */
+.center-col{display:flex;flex-direction:row;gap:12px;align-items:center;justify-content:center;flex:1;min-width:320px}
+.now{display:flex;align-items:center;gap:12px;min-width:260px;max-width:420px;overflow:hidden}
+.art{width:58px;height:58px;border-radius:12px;background:#1b2946;background-size:cover;background-position:center}
+.np .t{font-size:calc(16px * var(--text-scale));font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.np .m{font-size:calc(13px * var(--text-scale));color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* timeline - make rail fixed visual width and centered within center-col */
+.timeline{display:flex;align-items:center;gap:12px;justify-content:center;flex:1;min-width:420px}
+.rail{
+  position:relative;height:10px;border-radius:999px;background:transparent;
+  width:clamp(420px,52vw,900px); /* 固定视觉长度：不会因为左侧内容变长而被推移 */
+  display:flex;align-items:center;padding:0 12px;box-sizing:border-box;cursor:pointer;
+}
+.rail::before{content:"";position:absolute;left:12px;right:12px;top:50%;transform:translateY(-50%);height:10px;background:#0b2634;border-radius:999px;z-index:1}
+.bar{position:absolute;left:12px;top:50%;transform:translateY(-50%);height:10px;border-radius:999px;background:linear-gradient(90deg,#ffd67a 0%, #9ff3cf 100%);box-shadow:0 10px 28px rgba(0,0,0,.35);width:0;z-index:2}
+.rail .thumb { display:none !important; pointer-events:none; }
+
+/* time display */
+.time{font-size:calc(13px * var(--text-scale));color:var(--muted);width:48px;text-align:center}
+
+/* volume */
+.volume{display:flex;align-items:center;gap:8px;justify-content:flex-end;margin-right:8px;min-width:170px}
+.volume svg{width:20px;height:20px;fill:currentColor}
+.vol-rail{position:relative;height:var(--control-h);border-radius:999px;background:transparent;width:120px;display:flex;align-items:center;padding:0 8px;box-sizing:border-box}
+.vol-bar{position:absolute;left:8px;top:50%;transform:translateY(-50%);height:calc(10px * var(--text-scale));border-radius:999px;background:linear-gradient(90deg,#58c284,#a7ffd8);width:60%}
+
+/* =============== Scrollbar global (narrow) =============== */
+*::-webkit-scrollbar{width:10px;height:10px}
+*::-webkit-scrollbar-track{background:rgba(255,255,255,.02)}
+*::-webkit-scrollbar-thumb{background:rgba(90,120,160,.22);border-radius:999px}
+
+/* make narrow column scrollbars (override where needed) */
+.music-left::-webkit-scrollbar, .music-right::-webkit-scrollbar, #trackList::-webkit-scrollbar {
+  width:10px;
+}
+.music-left::-webkit-scrollbar-thumb, .music-right::-webkit-scrollbar-thumb, #trackList::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+  border-radius:999px;
+}
+
+/* ensure icons are white */
+.icon-btn { color: #ffffff !important; }
+.icon-btn svg, .icon-btn svg path, .icon-btn svg g { fill: currentColor !important; }
+.btn { color: #ffffff !important; }
+.btn svg, .btn svg path, .btn svg g { fill: currentColor !important; }
+
+/* =============== Accessibility / small utility =============== */
+.hidden { display:none !important; }
+.center { display:flex; align-items:center; justify-content:center; }
+
+/* =============== Responsive tweaks =============== */
+@media (max-width:1200px){
+  .music-grid{grid-template-columns: 1fr 320px;}
+  .banner-left img{width:140px;height:140px}
+  .banner-meta h1{font-size:calc(30px * var(--text-scale))}
+  .rail{width:clamp(320px,60vw,740px)}
+}
+
+/* ===================== End of file ===================== */

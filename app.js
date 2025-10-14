@@ -1,11 +1,21 @@
-// app.js — updated: fixed player layout, toolbar visibility rules, highlight-on-play
+// app.js — 完整版本（替换现有文件）
+// 功能要点：
+// - i18n 与语言记忆
+// - 专辑选择页与专辑详情页（toolbar 仅在专辑详情页显示）
+// - 流畅的播放控制（键盘左右、播放/暂停、下一首、上一首）
+// - 正确的行高亮（同步播放），并确保不会跳过索引
+// - 修复因通过按钮模拟 click 导致的“跳过一个”的问题（直接调用函数）
+// - 行内播放按钮（svg）强制为白色
+// - 列表滚动 / 高度行为微调，尽量避免底部额外空白
+// - 兼容你现有 HTML 结构（如 id: panel-music, albumGrid, music-selection, trackList 等）
+
 document.addEventListener('DOMContentLoaded', function () {
   try {
-    var MUSIC_BASE = "music/";
-    var IMAGE_BASE = "images/";
+    const MUSIC_BASE = "music/";
+    const IMAGE_BASE = "images/";
 
-    // i18n (same as before)
-    var I18N = {
+    // i18n map (保持之前版本)
+    const I18N = {
       "zh-CN": {
         brand: "JW Airlines", dest: "目的地： Paris CDG",
         tiles: { music: ["音乐", "专辑与歌单"], movies: ["电影", "播放器与片库"], shopping: ["购物", "免税店"], dining: ["用餐", "餐食与倒计时"], flight: ["我的飞行", "地图与信息"] },
@@ -38,18 +48,19 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     };
 
-    var LANG_ORDER = ["zh-CN", "zh-TW", "es", "ru", "fr", "en"];
-    var lang = localStorage.getItem("ife_lang") || "zh-CN";
+    const LANG_ORDER = ["zh-CN", "zh-TW", "es", "ru", "fr", "en"];
+    let lang = localStorage.getItem("ife_lang") || "zh-CN";
     if (!I18N[lang]) lang = "zh-CN";
 
-    function $id(id) { return document.getElementById(id); }
-    function setText(id, text) { var el = $id(id); if (el) el.textContent = text; }
+    // small DOM helpers
+    const $id = id => document.getElementById(id);
+    const setText = (id, txt) => { const el = $id(id); if (el) el.textContent = txt; };
 
     function applyLang(sel) {
       if (sel) lang = sel;
       if (!I18N[lang]) lang = "zh-CN";
       localStorage.setItem("ife_lang", lang);
-      var t = I18N[lang];
+      const t = I18N[lang];
       setText("brandTitle", t.brand);
       setText("destText", t.dest);
       setText("tileMusic", t.tiles.music[0]); setText("tileMusicSub", t.tiles.music[1]);
@@ -57,23 +68,22 @@ document.addEventListener('DOMContentLoaded', function () {
       setText("tileShopping", t.tiles.shopping[0]); setText("tileShoppingSub", t.tiles.shopping[1]);
       setText("tileDining", t.tiles.dining[0]); setText("tileDiningSub", t.tiles.dining[1]);
       setText("tileFlight", t.tiles.flight[0]); setText("tileFlightSub", t.tiles.flight[1]);
-      var playAllBtn = $id("musicPlayAll"); if (playAllBtn) playAllBtn.title = t.ui.playAll;
-      var belt = $id("btnBelt"); if (belt) belt.textContent = t.ui.seatbeltOn;
-      var albumAboutTitle = $id("albumNotesTitle"); if (albumAboutTitle) albumAboutTitle.textContent = t.ui.about;
-      var lyricsH = $id("lyricsH"); if (lyricsH) lyricsH.textContent = t.ui.lyrics;
-      var tbBack = $id('tbBack'); if (tbBack) tbBack.textContent = (I18N[lang] || I18N.en).ui.back;
+      const belt = $id("btnBelt"); if (belt) belt.textContent = t.ui.seatbeltOn;
+      const albumNotesTitle = $id("albumNotesTitle"); if (albumNotesTitle) albumNotesTitle.textContent = t.ui.about;
+      const lyricsH = $id("lyricsH"); if (lyricsH) lyricsH.textContent = t.ui.lyrics;
+      const tbBack = $id('tbBack'); if (tbBack) tbBack.textContent = (I18N[lang] || I18N.en).ui.back;
     }
 
-    // Library — keep your existing structure; durations should be populated in tracks[].len
-    var LIB = {
+    // Library (kept from your last version, durations present where available)
+    const LIB = {
       artangels: {
         id: "artangels",
         artist: "Grimes",
         artistImg: IMAGE_BASE + "grimes_cover.jpg",
-        title: { "en": "Art Angels", "zh-CN": "Art Angels" },
+        title: { "en": "Art Angels", "zh-CN": "Art Angels", "zh-TW": "Art Angels", "fr": "Art Angels" },
         cover: IMAGE_BASE + "art_angles_cover.jpg",
-        blurb: { "en": "Grimes’ hyperpop opus blending industrial punch with bubblegum hooks.", "zh-CN": "Grimes 的超流行专辑，工业能量与泡泡旋律的融合。" },
-        notes: { "zh-CN": "《Art Angels》（2015）与《Paradigmes》（2021）两张专辑呈现两种语汇：前者以工业重拍与甜美旋律拉开舞台帷幕；后者则以冷潮与黑梦色彩敞开夜行叙事。", "en": "Art Angels (2015) and Paradigmes (2021) show two vocabularies." },
+        blurb: { "en": "Grimes’ hyperpop opus blending industrial punch with bubblegum hooks.", "zh-CN": "Grimes 的超流行专辑，工业能量与泡泡旋律的融合。", "fr": "Album hyperpop de Grimes mêlant puissance industrielle et refrains sucrés." },
+        notes: { "zh-CN": "《Art Angels》（2015）与《Paradigmes》（2021）两张专辑呈现两种语汇：前者以工业重拍与甜美旋律拉开舞台帷幕；后者则以冷潮与黑梦色彩敞开夜行叙事。", "en": "Art Angels (2015) and Paradigmes (2021) show two vocabularies: industrial punch and sweet melodies vs. coldwave night drives." },
         year: 2015,
         tracks: [
           { t: "laughing and not being normal", len: "1:48", src: MUSIC_BASE + "Grimes - laughing and not being normal.mp3" },
@@ -85,568 +95,639 @@ document.addEventListener('DOMContentLoaded', function () {
           { t: "Artangels", len: "4:06", src: MUSIC_BASE + "Grimes - Artangels.mp3" },
           { t: "Easily", len: "3:03", src: MUSIC_BASE + "Grimes - Easily.mp3" },
           { t: "Pin", len: "3:31", src: MUSIC_BASE + "Grimes - Pin.mp3" },
-          { t: "REALiTi (album version)", len: "5:06", src: MUSIC_BASE + "Grimes - Realiti.mp3" },
+          { t: "Realiti", len: "5:06", src: MUSIC_BASE + "Grimes - Realiti.mp3" },
           { t: "World Princess Part II", len: "5:07", src: MUSIC_BASE + "Grimes - World Princess Part II.mp3" },
           { t: "Venus Fly (feat. Janelle Monáe)", len: "3:45", src: MUSIC_BASE + "Grimes - Venus Fly.mp3" },
           { t: "Life in the Vivid Dream", len: "1:29", src: MUSIC_BASE + "Grimes - Life in the Vivid Dream.mp3" },
           { t: "Butterfly", len: "4:13", src: MUSIC_BASE + "Grimes - Butterfly.mp3" }
         ],
-        artistBio: { "zh-CN": "Grimes — 加拿大艺术家，科幻感与 DIY 狂热混合。", "en": "Grimes — Canadian artist mixing sci-fi textures." }
+        artistBio: { "zh-CN": "Grimes — 加拿大艺术家，科幻感与 DIY 狂热混合。", "en": "Grimes — Canadian artist mixing sci-fi textures with DIY intensity." }
       },
       paradigmes: {
         id: "paradigmes",
         artist: "La Femme",
         artistImg: IMAGE_BASE + "lafemme_cover.jpg",
-        title: { "en": "Paradigmes", "zh-CN": "Paradigmes" },
+        title: { "en": "Paradigmes", "zh-CN": "Paradigmes", "zh-TW": "Paradigmes", "fr": "Paradigmes" },
         cover: IMAGE_BASE + "paradigmes_cover.jpg",
-        blurb: { "en": "French surf-coldwave shapeshifting into a cinematic night drive.", "zh-CN": "法国冷潮与冲浪气质的混融，像一段夜色里的电影公路。" },
-        notes: { "zh-CN": "La Femme 的《Paradigmes》（2021）以霓虹冲浪浪的暗影；对照《Art Angels》的甜刀锋，它像午夜磁带般翻涌。", "en": "Paradigmes (2021) by La Femme brings neon surf and coldwave shadows." },
+        blurb: { "en": "French surf-coldwave shapeshifting into a cinematic night drive.", "zh-CN": "法国冷潮与冲浪气质的混融，像一段夜色里的电影公路。", "fr": "Mélange de coldwave et surf français comme une route nocturne cinématographique." },
+        notes: { "zh-CN": "La Femme 的《Paradigmes》（2021）以霓虹冲浪浪得林荫大道的暗影；对照《Art Angels》的甜刀锋，它像午夜磁带般翻涌。", "en": "Paradigmes (2021) by La Femme brings neon surf and coldwave shadows." },
         year: 2021,
         tracks: [
-          // ensure your tracks[].len are correct in your library; remove intro if file deleted
-          /* example durations (adjust to your files if needed) */
+          // user said Paradigmes Introduction 已删除 —— 确保我们在列表中不引用它
           { t: "Paradigme", len: "3:12", src: MUSIC_BASE + "La Femme - Paradigme.mp3" },
           { t: "Le sang de mon prochain", len: "4:00", src: MUSIC_BASE + "La Femme - Le Sang De Mon Prochain.mp3" },
           { t: "Cool Colorado", len: "3:38", src: MUSIC_BASE + "La Femme - Cool Colorado.mp3" },
           { t: "Foreigner", len: "3:50", src: MUSIC_BASE + "La Femme - Foreigner.mp3" },
           { t: "Nouvelle-Orléans", len: "4:02", src: MUSIC_BASE + "La Femme - Nouvelle-Orleans.mp3" },
           { t: "Disconnexion", len: "3:46", src: MUSIC_BASE + "La Femme - Disconnexion.mp3" },
-          { t: "Pasadena", len: "4:06", src: MUSIC_BASE + "La Femme - Pasadena.mp3" }
+          { t: "Pasadena", len: "3:20", src: MUSIC_BASE + "La Femme - Pasadena.mp3" }
         ],
         artistBio: { "zh-CN": "La Femme — 法国乐队，冷潮与冲浪的混搭。", "en": "La Femme — French band mixing coldwave and surf." }
       }
     };
 
-    var albumIds = Object.keys(LIB);
-    var curAlbum = albumIds[0];
-    var curIdx = 0;
+    // state
+    const albumIds = Object.keys(LIB);
+    let curAlbum = albumIds[0];
+    let curIdx = 0;
 
     function slug(s) {
       return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
     }
     function fmtSeconds(s) {
       s = Math.floor(s || 0);
-      var m = Math.floor(s / 60), sec = s % 60;
+      const m = Math.floor(s / 60), sec = s % 60;
       return m + ':' + (sec < 10 ? '0' : '') + sec;
     }
 
-    // try image fallback list
+    // try image candidates
     function tryImageSources(imgEl, candidates) {
       if (!imgEl || !candidates || !candidates.length) return;
-      var i = 0;
+      let i = 0;
       imgEl.onerror = function () {
-        if (i < candidates.length) {
-          imgEl.src = candidates[i++];
-        }
+        if (i < candidates.length) imgEl.src = candidates[i++];
       };
       imgEl.src = candidates[i++] || '';
     }
 
     /* ---------- CLEANUP: remove stray toolbar controls INSIDE BANNER ---------- */
     function cleanBannerControls() {
-      var banner = $id('banner') || document.querySelector('.banner') || document.querySelector('.album-banner');
+      const banner = document.querySelector('.album-banner') || document.querySelector('#banner') || document.querySelector('.banner');
       if (!banner) return;
-      var overlaySelectors = [
+
+      const overlaySelectors = [
         '.tb-play', '.tb-back', '.tb-title', '.banner-local-play', '.local-back',
         '.banner-controls', '#bannerToolbar', '.banner-toolbar', '.toolbar-overlay',
         '.mini-btn', '.mini-toolbar', '.overlay-button', '.small-button', '.banner-small'
       ];
-      overlaySelectors.forEach(function (sel) {
+
+      overlaySelectors.forEach(sel => {
         try {
-          var list = banner.querySelectorAll(sel);
-          list.forEach(function (n) { try { var rect = n.getBoundingClientRect ? n.getBoundingClientRect() : { width: 0, height: 0 }; var small = (rect.width < 180 && rect.height < 90); var cls = (n.className && String(n.className).toLowerCase()) || ''; var likely = cls.indexOf('tb-') !== -1 || cls.indexOf('toolbar') !== -1 || cls.indexOf('mini') !== -1 || cls.indexOf('overlay') !== -1; if (small || likely) { n.parentNode && n.parentNode.removeChild(n); } } catch (e) {} });
-        } catch (e) {}
+          const nodes = banner.querySelectorAll(sel);
+          nodes.forEach(n => {
+            try {
+              const rect = n.getBoundingClientRect ? n.getBoundingClientRect() : { width: 0, height: 0 };
+              const small = (rect.width < 180 && rect.height < 90);
+              const cls = (n.className && String(n.className).toLowerCase()) || '';
+              const likely = cls.indexOf('tb-') !== -1 || cls.indexOf('toolbar') !== -1 || cls.indexOf('mini') !== -1 || cls.indexOf('overlay') !== -1;
+              if (small || likely) n.parentNode && n.parentNode.removeChild(n);
+            } catch (e) { /* ignore */ }
+          });
+        } catch (e) { /* ignore */ }
       });
 
-      var textCandidates = [ (I18N[lang] || I18N.en).ui.back, 'Album', 'album' ];
-      var nodes = banner.querySelectorAll('*');
-      nodes.forEach(function (el) {
+      const textCandidates = [ (I18N[lang] || I18N.en).ui.back, 'Album', 'album' ];
+      const nodes = banner.querySelectorAll('*');
+      nodes.forEach(el => {
         try {
           if (!el || !el.textContent) return;
-          var txt = el.textContent.trim();
+          const txt = el.textContent.trim();
           if (!txt) return;
-          var r = el.getBoundingClientRect ? el.getBoundingClientRect() : { width: 9999, height: 9999 };
-          var small = (r.width < 200 && r.height < 80);
-          if (small && textCandidates.indexOf(txt) !== -1) {
-            el.parentNode && el.parentNode.removeChild(el);
-          }
-        } catch (e) {}
+          const r = el.getBoundingClientRect ? el.getBoundingClientRect() : { width: 9999, height: 9999 };
+          const small = (r.width < 200 && r.height < 80);
+          if (small && textCandidates.indexOf(txt) !== -1) el.parentNode && el.parentNode.removeChild(el);
+        } catch (e) { /* ignore */ }
       });
 
-      var roleBtns = banner.querySelectorAll('[role="button"]');
-      roleBtns.forEach(function (n) {
+      const roleBtns = banner.querySelectorAll('[role="button"]');
+      roleBtns.forEach(n => {
         try {
-          var rect = n.getBoundingClientRect ? n.getBoundingClientRect() : { width: 0, height: 0 };
+          const rect = n.getBoundingClientRect ? n.getBoundingClientRect() : { width: 0, height: 0 };
           if (rect.width < 180 && rect.height < 80) n.parentNode && n.parentNode.removeChild(n);
-        } catch (e) {}
+        } catch (e) { /* ignore */ }
       });
     }
 
-    /* ---------- render music selection (grid) ---------- */
+    /* ---------- render album selection grid ---------- */
     function renderMusicSelection() {
-      hideAlbumToolbar(); // ensure toolbar gone when viewing album grid
-      var grid = $id('albumGrid'); if (!grid) return; grid.innerHTML = '';
-      albumIds.forEach(function (id) {
-        var a = LIB[id];
-        var title = (a.title && (a.title[lang] || a.title['zh-CN'] || a.title.en)) || '';
-        var blurb = (a.blurb && (a.blurb[lang] || a.blurb['zh-CN'] || a.blurb.en)) || '';
-        var card = document.createElement('div'); card.className = 'album-card'; card.dataset.album = id;
-        var img = document.createElement('img'); img.alt = title;
-        var cands = [a.cover, IMAGE_BASE + id + '_cover.jpg', IMAGE_BASE + id + '.jpg', IMAGE_BASE + 'art_angles_cover.jpg', IMAGE_BASE + 'paradigmes_cover.jpg', IMAGE_BASE + 'grimes_cover.jpg', IMAGE_BASE + 'lafemme_cover.jpg'];
+      const grid = $id('albumGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+      albumIds.forEach(id => {
+        const a = LIB[id];
+        const title = (a.title && (a.title[lang] || a.title['zh-CN'] || a.title.en)) || '';
+        const blurb = (a.blurb && (a.blurb[lang] || a.blurb['zh-CN'] || a.blurb.en)) || '';
+        const card = document.createElement('div'); card.className = 'album-card'; card.dataset.album = id;
+        const img = document.createElement('img'); img.alt = title;
+        const cands = [a.cover, IMAGE_BASE + id + '_cover.jpg', IMAGE_BASE + id + '.jpg', IMAGE_BASE + 'art_angles_cover.jpg', IMAGE_BASE + 'paradigmes_cover.jpg', IMAGE_BASE + 'grimes_cover.jpg', IMAGE_BASE + 'lafemme_cover.jpg'];
         tryImageSources(img, cands);
-        var info = document.createElement('div'); info.className = 'album-info';
-        var tdiv = document.createElement('div'); tdiv.className = 'title'; tdiv.textContent = title;
-        var meta = document.createElement('div'); meta.className = 'meta'; meta.textContent = a.artist + ' • ' + (a.year || '');
-        var bl = document.createElement('div'); bl.className = 'blurb'; bl.textContent = blurb;
+        const info = document.createElement('div'); info.className = 'album-info';
+        const tdiv = document.createElement('div'); tdiv.className = 'title'; tdiv.textContent = title;
+        const meta = document.createElement('div'); meta.className = 'meta'; meta.textContent = a.artist + ' • ' + (a.year || '');
+        const bl = document.createElement('div'); bl.className = 'blurb'; bl.textContent = blurb;
         info.appendChild(tdiv); info.appendChild(meta); info.appendChild(bl);
         card.appendChild(img); card.appendChild(info);
         grid.appendChild(card);
       });
     }
 
-    /* ---------- floating album toolbar control (created in DOM via JS) ---------- */
+    /* ---------- album toolbar (floating) ---------- */
     function ensureAlbumToolbar() {
-      var tb = $id('albumToolbar');
+      let tb = $id('albumToolbar');
       if (tb) return tb;
+
       tb = document.createElement('div');
       tb.id = 'albumToolbar';
-      tb.style.opacity = '0';
-      tb.style.pointerEvents = 'none';
+      // basic structure — styling mostly in CSS; keep inline minimal but ensure behaviors
       tb.innerHTML = [
-        '<div class="tb-play" id="tbPlay" title="Play/Pause"><svg viewBox="0 0 24 24" id="tbPlayIcon" width="28" height="28" fill="#052517"><path d="M8 5v14l11-7z"/></svg></div>',
-        '<div class="tb-title" id="tbTitle"></div>',
-        '<div class="tb-back" id="tbBack">返回</div>'
+        '<div class="tb-play" id="tbPlay" title="Play/Pause" aria-label="play-pill"><svg viewBox="0 0 24 24" id="tbPlayIcon" width="26" height="26" fill="#052517"><path d="M8 5v14l11-7z"/></svg></div>',
+        '<div class="tb-title" id="tbTitle" aria-hidden="false" style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-left:8px"></div>',
+        '<div class="tb-back" id="tbBack" aria-label="back" style="margin-left:12px;padding:10px 16px;border-radius:12px;cursor:pointer"></div>'
       ].join('');
       document.body.appendChild(tb);
 
-      // Behavior
+      // behavior
       tb.querySelector('#tbPlay').addEventListener('click', function (ev) {
         ev.stopPropagation();
         if (!audio.src) {
-          var f = firstPlayableIndex(curAlbum);
-          if (f !== -1) { playIdx(f); updateLyricsForIndex(f); }
+          const f = firstPlayableIndex(curAlbum);
+          if (f !== -1) { playIdx(f); updateLyricsForIndex(f); highlightRow(f, true); }
           return;
         }
-        if (audio.paused) { audio.play().then(function () { setPauseIcon(); }).catch(function () { setPlayIcon(); }); } else { audio.pause(); setPlayIcon(); }
+        if (audio.paused) {
+          audio.play().then(() => setPauseIcon()).catch(() => setPlayIcon());
+        } else {
+          audio.pause(); setPlayIcon();
+        }
       });
 
       tb.querySelector('#tbBack').addEventListener('click', function (ev) {
         ev.stopPropagation();
-        // go back to music selection (not main home)
-        var panelMusic = $id('panel-music');
+        // go back to album selection
+        const panelMusic = $id('panel-music');
         if (panelMusic) {
-          var ms = $id('music-selection');
+          const ms = $id('music-selection');
           if (ms) { ms.style.display = 'block'; ms.classList.add('visible'); }
-          var mg = panelMusic.querySelector('.music-grid');
+          const mg = panelMusic.querySelector('.music-grid');
           if (mg) mg.style.display = 'none';
-          panelMusic.classList.add('visible');
+          // hide toolbar
+          hideAlbumToolbar();
         }
-        hideAlbumToolbar();
       });
 
       return tb;
     }
 
     function positionAlbumToolbar() {
-      var tb = $id('albumToolbar'); if (!tb) return;
-      var panel = $id('panel-music'); if (!panel || !panel.classList.contains('visible')) { hideAlbumToolbar(); return; }
-      var leftCol = panel.querySelector('.music-left');
+      const tb = $id('albumToolbar'); if (!tb) return;
+      const panel = $id('panel-music'); if (!panel || !panel.classList.contains('visible')) { hideAlbumToolbar(); return; }
+      const leftCol = panel.querySelector('.music-left');
       if (!leftCol) { hideAlbumToolbar(); return; }
-      var rect = leftCol.getBoundingClientRect();
-      var left = Math.max(12, rect.left);
-      var width = Math.max(320, rect.width);
+      const rect = leftCol.getBoundingClientRect();
+      const left = Math.max(12, rect.left);
+      const width = Math.max(320, rect.width);
       tb.style.left = left + 'px';
       tb.style.width = width + 'px';
-      var topBase = document.querySelector('header') ? (document.querySelector('header').getBoundingClientRect().bottom + 12) : 12;
+      const topBase = document.querySelector('header') ? (document.querySelector('header').getBoundingClientRect().bottom + 12) : 12;
       tb.style.top = topBase + 'px';
     }
 
-    var toolbarRaf = null;
-    window.addEventListener('resize', function () { if (toolbarRaf) cancelAnimationFrame(toolbarRaf); toolbarRaf = requestAnimationFrame(positionAlbumToolbar); });
-    window.addEventListener('scroll', function () { if (toolbarRaf) cancelAnimationFrame(toolbarRaf); toolbarRaf = requestAnimationFrame(positionAlbumToolbar); });
+    let toolbarRaf = null;
+    window.addEventListener('resize', () => { if (toolbarRaf) cancelAnimationFrame(toolbarRaf); toolbarRaf = requestAnimationFrame(positionAlbumToolbar); });
+    window.addEventListener('scroll', () => { if (toolbarRaf) cancelAnimationFrame(toolbarRaf); toolbarRaf = requestAnimationFrame(positionAlbumToolbar); });
 
     function showAlbumToolbar(titleText) {
-      var tb = ensureAlbumToolbar();
-      var tbTitle = tb.querySelector('#tbTitle');
-      var back = tb.querySelector('#tbBack');
+      const tb = ensureAlbumToolbar();
+      const tbTitle = tb.querySelector('#tbTitle');
+      const back = tb.querySelector('#tbBack');
       if (tbTitle) tbTitle.textContent = titleText || '';
       if (back) back.textContent = (I18N[lang] || I18N.en).ui.back;
-      tb.style.pointerEvents = 'auto';
-      tb.style.opacity = '1'; tb.style.transform = 'translateY(0px)';
+      tb.style.opacity = '1'; tb.style.transform = 'translateY(0px)'; tb.style.pointerEvents = 'auto';
       positionAlbumToolbar();
-      // push down content slightly so toolbar doesn't overlap banner content
-      var panel = $id('panel-music');
+      // push down left column content to avoid overlap by toolbar
+      const panel = $id('panel-music');
       if (panel) {
-        var left = panel.querySelector('.music-left');
+        const left = panel.querySelector('.music-left');
         if (left) left.style.paddingTop = '88px';
       }
     }
     function hideAlbumToolbar() {
-      var tb = $id('albumToolbar'); if (tb) { tb.style.opacity = '0'; tb.style.transform = 'translateY(-6px)'; tb.style.pointerEvents = 'none'; }
-      var panel = $id('panel-music');
+      const tb = $id('albumToolbar'); if (tb) { tb.style.opacity = '0'; tb.style.transform = 'translateY(-6px)'; tb.style.pointerEvents = 'none'; }
+      const panel = $id('panel-music');
       if (panel) {
-        var left = panel.querySelector('.music-left');
+        const left = panel.querySelector('.music-left');
         if (left) left.style.paddingTop = '';
       }
     }
 
-    /* ---------- open music album (populate banner + tracks) ---------- */
+    /* ---------- open album ---------- */
     function openMusicAlbum(albumId) {
       if (!albumId) return;
       curAlbum = albumId;
 
       cleanBannerControls();
 
-      var panel = $id('panel-music');
+      const panel = $id('panel-music');
       if (panel) {
-        var panels = document.querySelectorAll('.panel');
-        for (var i = 0; i < panels.length; i++) panels[i].classList.remove('visible');
+        const panels = document.querySelectorAll('.panel');
+        panels.forEach(p => p.classList.remove('visible'));
         panel.classList.add('visible');
       }
-      var home = $id('home'); if (home) home.style.display = 'none';
+      const home = $id('home'); if (home) home.style.display = 'none';
 
-      var a = LIB[curAlbum]; if (!a) return;
-      var title = (a.title && (a.title[lang] || a.title['zh-CN'] || a.title.en)) || '';
-      var blurb = (a.blurb && (a.blurb[lang] || a.blurb['zh-CN'] || a.blurb.en)) || '';
-      var notes = (a.notes && (a.notes[lang] || a.notes['zh-CN'] || a.notes.en)) || a.notes || '';
+      const a = LIB[curAlbum]; if (!a) return;
+      const title = (a.title && (a.title[lang] || a.title['zh-CN'] || a.title.en)) || '';
+      const blurb = (a.blurb && (a.blurb[lang] || a.blurb['zh-CN'] || a.blurb.en)) || '';
+      const notes = (a.notes && (a.notes[lang] || a.notes['zh-CN'] || a.notes.en)) || a.notes || '';
 
-      var toolbarTitle = $id('toolbarTitle'); if (toolbarTitle) toolbarTitle.textContent = title;
-      var banner = $id('bannerCover') || document.querySelector('#bannerCover') || document.querySelector('.banner-left img') || document.querySelector('.album-banner img');
+      const toolbarTitle = $id('toolbarTitle'); if (toolbarTitle) toolbarTitle.textContent = title;
+      const banner = $id('bannerCover') || document.querySelector('.banner-left img') || document.querySelector('.album-banner img');
       if (banner && banner.tagName === 'IMG') {
-        var cands = [a.cover, IMAGE_BASE + a.id + '_cover.jpg', IMAGE_BASE + a.id + '.jpg', IMAGE_BASE + 'paradigmes_cover.jpg', IMAGE_BASE + 'art_angles_cover.jpg', IMAGE_BASE + 'grimes_cover.jpg', IMAGE_BASE + 'lafemme_cover.jpg'];
+        const cands = [a.cover, IMAGE_BASE + a.id + '_cover.jpg', IMAGE_BASE + a.id + '.jpg', IMAGE_BASE + 'paradigmes_cover.jpg', IMAGE_BASE + 'art_angles_cover.jpg', IMAGE_BASE + 'grimes_cover.jpg', IMAGE_BASE + 'lafemme_cover.jpg'];
         tryImageSources(banner, cands);
       } else {
-        var bannerCont = $id('banner') || document.querySelector('.album-banner');
+        const bannerCont = $id('banner') || document.querySelector('.album-banner');
         if (bannerCont) {
           bannerCont.style.backgroundImage = 'url("' + (a.cover || '') + '")';
           bannerCont.style.backgroundSize = 'cover';
         }
       }
 
-      var bannerSub = $id('bannerSub'); if (bannerSub) bannerSub.textContent = a.artist + ' • ' + (a.year || '');
-      var bannerBlurb = $id('bannerBlurb'); if (bannerBlurb) bannerBlurb.textContent = blurb;
-      var ai = $id('artistImg'); if (ai) {
-        var acands = [a.artistImg, IMAGE_BASE + a.id + '_artist.jpg', IMAGE_BASE + a.id + '.jpg', IMAGE_BASE + 'lafemme_cover.jpg', IMAGE_BASE + 'grimes_cover.jpg'];
+      const bannerSub = $id('bannerSub'); if (bannerSub) bannerSub.textContent = a.artist + ' • ' + (a.year || '');
+      const bannerBlurb = $id('bannerBlurb'); if (bannerBlurb) bannerBlurb.textContent = blurb;
+      const ai = $id('artistImg'); if (ai) {
+        const acands = [a.artistImg, IMAGE_BASE + a.id + '_artist.jpg', IMAGE_BASE + a.id + '.jpg', IMAGE_BASE + 'lafemme_cover.jpg', IMAGE_BASE + 'grimes_cover.jpg'];
         tryImageSources(ai, acands);
       }
-      var artistName = $id('artistName'); if (artistName) artistName.textContent = a.artist;
-      var artistBioEl = $id('artistBio'); if (artistBioEl) artistBioEl.textContent = (a.artistBio && (a.artistBio[lang] || a.artistBio['zh-CN'] || a.artistBio.en)) || a.artistBio || '';
-      var albumNotes = $id('albumNotes'); if (albumNotes) albumNotes.textContent = notes;
+      const artistName = $id('artistName'); if (artistName) artistName.textContent = a.artist;
+      const artistBioEl = $id('artistBio'); if (artistBioEl) artistBioEl.textContent = (a.artistBio && (a.artistBio[lang] || a.artistBio['zh-CN'] || a.artistBio.en)) || a.artistBio || '';
+      const albumNotes = $id('albumNotes'); if (albumNotes) albumNotes.textContent = notes;
 
       cleanBannerControls();
 
-      var ms = $id('music-selection'); if (ms) ms.style.display = 'none';
-      var mg = panel ? panel.querySelector('.music-grid') : null; if (mg) mg.style.display = '';
+      const ms = $id('music-selection'); if (ms) ms.style.display = 'none';
+      const mg = panel ? panel.querySelector('.music-grid') : null; if (mg) mg.style.display = '';
 
       renderTracks();
 
-      // show floating toolbar only on album page
+      // show floating toolbar (top)
       showAlbumToolbar(title);
 
-      // extract color glow and position toolbar
-      var tryImg = banner && banner.tagName === 'IMG' ? banner : (ai && ai.tagName === 'IMG' ? ai : null);
+      // attempt to extract color and position toolbar
+      const tryImg = banner && banner.tagName === 'IMG' ? banner : (ai && ai.tagName === 'IMG' ? ai : null);
       if (tryImg) {
-        tryImg.onload = function () {
-          extractDominantColor(tryImg, function (color) {
+        try {
+          extractDominantColor(tryImg, color => {
             if (color) {
-              try { document.documentElement.style.setProperty('--banner-glow', 'rgba(' + color.r + ',' + color.g + ',' + color.b + ',0.22)'); } catch (e) { }
+              try { document.documentElement.style.setProperty('--banner-glow', `rgba(${color.r},${color.g},${color.b},0.22)`); } catch (e) { }
             }
             positionAlbumToolbar();
           });
-        };
-        if (tryImg.complete) {
-          extractDominantColor(tryImg, function (color) {
-            if (color) {
-              try { document.documentElement.style.setProperty('--banner-glow', 'rgba(' + color.r + ',' + color.g + ',' + color.b + ',0.22)'); } catch (e) { }
-            }
-            positionAlbumToolbar();
-          });
-        }
+        } catch (e) { positionAlbumToolbar(); }
       } else {
         positionAlbumToolbar();
       }
     }
 
-    /* ---------- render tracks list (uniform list) ---------- */
+    /* ---------- TRACK LIST RENDER & BEHAVIOR ---------- */
     function renderTracks() {
-      var box = $id('trackList'); if (!box) return; box.innerHTML = '';
-      var a = LIB[curAlbum]; if (!a) return;
-      a.tracks.forEach(function (trk, i) {
-        var r = document.createElement('div'); r.className = 'row'; r.dataset.idx = i;
-        var titleText = trk.t || '';
-        var albumTitle = (a.title && (a.title[lang] || a.title['zh-CN'] || a.title.en)) || '';
-        var lenText = trk.len || '—';
-        var leftSvg = '<div class="row-btn" data-idx="' + i + '" title="Play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>';
-        var mid = '<div style="flex:1"><div class="title">' + titleText + '</div><div class="meta">' + a.artist + ' • ' + albumTitle + '</div></div>';
-        var right = '<div style="width:80px;text-align:right;font-weight:700">' + lenText + '</div>';
-        r.innerHTML = leftSvg + mid + right;
+      const box = $id('trackList'); if (!box) return;
+      // ensure scrollable region is correct
+      box.style.overflowY = 'auto';
+      box.style.paddingBottom = '0';
+      box.innerHTML = '';
+      const a = LIB[curAlbum]; if (!a) return;
 
-        // click row to play
+      // ensure consistent row heights: create rows uniformly
+      a.tracks.forEach((trk, i) => {
+        const r = document.createElement('div');
+        r.className = 'row';
+        r.dataset.idx = i;
+
+        // columns: play-circle / text / duration
+        const left = document.createElement('div'); left.className = 'row-left';
+        const rowBtn = document.createElement('div');
+        rowBtn.className = 'row-btn';
+        rowBtn.dataset.idx = i;
+        rowBtn.title = 'Play';
+        // svg play circle; force white fill for list-play buttons
+        rowBtn.innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22" fill="#ffffff" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>';
+        left.appendChild(rowBtn);
+
+        const mid = document.createElement('div'); mid.className = 'row-mid';
+        const titleDiv = document.createElement('div'); titleDiv.className = 'title'; titleDiv.textContent = trk.t || '';
+        const metaDiv = document.createElement('div'); metaDiv.className = 'meta'; metaDiv.textContent = LIB[curAlbum].artist + ' • ' + ((LIB[curAlbum].title && (LIB[curAlbum].title[lang] || LIB[curAlbum].title['zh-CN'] || LIB[curAlbum].title.en)) || '');
+        mid.appendChild(titleDiv); mid.appendChild(metaDiv);
+
+        const right = document.createElement('div'); right.className = 'row-right'; right.textContent = trk.len || '—';
+
+        // assemble row
+        // Use CSS grid on .row to place these three columns; we keep markup simple
+        r.appendChild(left); r.appendChild(mid); r.appendChild(right);
+
+        // click handlers
         r.addEventListener('click', function (ev) {
+          // if clicking the row-btn, that event is handled separately (prevent double)
           if (ev.target && ev.target.closest('.row-btn')) return;
-          clearActiveRows();
-          r.classList.add('active');
-          playIdx(i); updateLyricsForIndex(i);
-        }, false);
+          // play and highlight
+          playIdx(i);
+          updateLyricsForIndex(i);
+          highlightRow(i, true);
+        });
 
-        // row-btn click (play single track)
-        var rowBtn = r.querySelector('.row-btn');
-        if (rowBtn) {
-          rowBtn.addEventListener('click', function (ev) { ev.stopPropagation(); clearActiveRows(); r.classList.add('active'); playIdx(i); updateLyricsForIndex(i); });
-        }
+        // play button
+        rowBtn.addEventListener('click', function (ev) {
+          ev.stopPropagation();
+          playIdx(i);
+          updateLyricsForIndex(i);
+          highlightRow(i, true);
+        });
+
         box.appendChild(r);
       });
 
-      // ensure the list can scroll but doesn't create bottom empty area:
-      // the container .music-left has padding-bottom enough to avoid overlap with player,
-      // but we ensure scrollTop won't create extra whitespace by CSS overflow hidden elsewhere.
+      // remove trailing space: ensure scroll height fits content — handled by CSS, but we reset any extra padding
+      // if content shorter than container, we don't want to allow "overscroll" blank area — rely on CSS overscroll-behavior
+      // ensure initially highlight curIdx if playing
+      highlightRow(curIdx, false);
     }
 
-    function clearActiveRows() {
-      var rows = document.querySelectorAll('.row');
-      rows.forEach(function (el) { el.classList.remove('active'); });
-    }
-
-    /* ---------- audio playback handling ---------- */
-    var audio = new Audio(); audio.preload = 'metadata';
+    /* ---------- audio logic ---------- */
+    const audio = new Audio();
+    audio.preload = 'metadata';
     audio.crossOrigin = 'anonymous';
 
-    function firstPlayableIndex(albumId) { var a = LIB[albumId]; if (!a) return -1; for (var i = 0; i < a.tracks.length; i++) if (a.tracks[i].src) return i; return -1; }
-    function nextPlayableIndex(albumId, from) { var a = LIB[albumId]; if (!a) return from; var n = a.tracks.length; for (var k = 1; k <= n; k++) { var idx = (from + k) % n; if (a.tracks[idx].src) return idx; } return from; }
-    function prevPlayableIndex(albumId, from) { var a = LIB[albumId]; if (!a) return from; var n = a.tracks.length; for (var k = 1; k <= n; k++) { var idx = (from - k + n) % n; if (a.tracks[idx].src) return idx; } return from; }
+    function firstPlayableIndex(albumId) {
+      const a = LIB[albumId]; if (!a) return -1;
+      for (let i = 0; i < a.tracks.length; i++) if (a.tracks[i].src) return i;
+      return -1;
+    }
+    function nextPlayableIndex(albumId, from) {
+      const a = LIB[albumId]; if (!a) return from;
+      const n = a.tracks.length;
+      for (let k = 1; k <= n; k++) {
+        const idx = (from + k) % n;
+        if (a.tracks[idx].src) return idx;
+      }
+      return from;
+    }
+    function prevPlayableIndex(albumId, from) {
+      const a = LIB[albumId]; if (!a) return from;
+      const n = a.tracks.length;
+      for (let k = 1; k <= n; k++) {
+        const idx = (from - k + n) % n;
+        if (a.tracks[idx].src) return idx;
+      }
+      return from;
+    }
 
-    function setPlayIcon() { var el = $id('iconPlay'); if (el) el.innerHTML = '<path d="M8 5v14l11-7z"/>'; var tbIcon = $id('tbPlayIcon'); if (tbIcon) tbIcon.innerHTML = '<path d="M8 5v14l11-7z"/>'; }
-    function setPauseIcon() { var el = $id('iconPlay'); if (el) el.innerHTML = '<path d="M7 5h4v14H7zM13 5h4v14h-4z"/>'; var tbIcon = $id('tbPlayIcon'); if (tbIcon) tbIcon.innerHTML = '<path d="M7 5h4v14H7zM13 5h4v14h-4z"/>'; }
+    function setPlayIcon() {
+      const el = $id('iconPlay'); if (el) el.innerHTML = '<path d="M8 5v14l11-7z"/>';
+      const tbIcon = $id('tbPlayIcon'); if (tbIcon) tbIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+    }
+    function setPauseIcon() {
+      const el = $id('iconPlay'); if (el) el.innerHTML = '<path d="M7 5h4v14H7zM13 5h4v14h-4z"/>';
+      const tbIcon = $id('tbPlayIcon'); if (tbIcon) tbIcon.innerHTML = '<path d="M7 5h4v14H7zM13 5h4v14h-4z"/>';
+    }
 
     function playIdx(i) {
-      var album = LIB[curAlbum]; if (!album || !album.tracks || !album.tracks[i]) return;
-      var t = album.tracks[i];
-      if (!t || !t.src) { var n = nextPlayableIndex(curAlbum, i); if (n === i) return; return playIdx(n); }
+      const album = LIB[curAlbum]; if (!album || !album.tracks || !album.tracks[i]) return;
+      const t = album.tracks[i];
+      if (!t || !t.src) {
+        const n = nextPlayableIndex(curAlbum, i);
+        if (n === i) return;
+        return playIdx(n);
+      }
       try {
         audio.src = t.src;
-        audio.play().then(function () { setPauseIcon(); }).catch(function () { setPlayIcon(); });
+        // keep current index in state before playing
+        curIdx = i;
+        audio.play().then(() => setPauseIcon()).catch(() => setPlayIcon());
       } catch (err) { console.warn('Audio play error', err); }
-      var npTitleEl = $id('npTitle'), npMetaEl = $id('npMeta'), npArtEl = $id('npArt');
+      const npTitleEl = $id('npTitle'), npMetaEl = $id('npMeta'), npArtEl = $id('npArt');
       if (npTitleEl) npTitleEl.textContent = t.t;
       if (npMetaEl) npMetaEl.textContent = album.artist + ' • ' + ((album.title && (album.title[lang] || album.title['zh-CN'] || album.title.en)) || '');
       if (npArtEl) npArtEl.style.backgroundImage = 'url("' + (album.cover || '') + '")';
-      curIdx = i;
-
-      // highlight playing row in the list
-      clearActiveRows();
-      var row = document.querySelector('.row[data-idx="' + i + '"]');
-      if (row) { row.classList.add('active'); scrollRowIntoViewIfNeeded(row); }
-    }
-
-    function scrollRowIntoViewIfNeeded(row) {
-      try {
-        var container = row.closest('.music-left');
-        if (!container) container = document.querySelector('.playlist');
-        if (!container) return;
-        var rRect = row.getBoundingClientRect();
-        var cRect = container.getBoundingClientRect();
-        if (rRect.top < cRect.top) container.scrollTop -= (cRect.top - rRect.top) + 12;
-        else if (rRect.bottom > cRect.bottom) container.scrollTop += (rRect.bottom - cRect.bottom) + 12;
-      } catch (e) {}
+      highlightRow(i, true);
     }
 
     audio.addEventListener('loadedmetadata', function () {
-      var d = Math.floor(audio.duration || 0);
-      var durEl = $id('dur'); if (durEl) durEl.textContent = fmtSeconds(d);
+      const d = Math.floor(audio.duration || 0);
+      const durEl = $id('dur'); if (durEl) durEl.textContent = fmtSeconds(d);
       updateProgressUI();
     });
 
     audio.addEventListener('timeupdate', function () {
       updateProgressUI();
-      var curEl = $id('cur'); if (curEl) curEl.textContent = fmtSeconds(Math.floor(audio.currentTime || 0));
+      const curEl = $id('cur'); if (curEl) curEl.textContent = fmtSeconds(Math.floor(audio.currentTime || 0));
     });
 
-    audio.addEventListener('play', function () {
-      // ensure the currently playing index is highlighted in list
-      var currently = curIdx;
-      clearActiveRows();
-      var row = document.querySelector('.row[data-idx="' + currently + '"]');
-      if (row) row.classList.add('active');
+    audio.addEventListener('ended', function () {
+      const n = nextPlayableIndex(curAlbum, curIdx);
+      if (n !== curIdx) { curIdx = n; playIdx(n); updateLyricsForIndex(n); highlightRow(n, true); } else { setPlayIcon(); }
     });
 
-    audio.addEventListener('ended', function () { var n = nextPlayableIndex(curAlbum, curIdx); if (n !== curIdx) { playIdx(n); updateLyricsForIndex(n); } else { setPlayIcon(); } });
     audio.addEventListener('error', function (ev) { console.warn('Audio element error', ev); });
 
     function updateProgressUI() {
-      var rail = $id('rail'), bar = $id('bar');
+      const rail = $id('rail'), bar = $id('bar');
       if (!rail || !bar) return;
-      var total = audio.duration || 0;
-      var current = audio.currentTime || 0;
-      var innerW = Math.max(24, rail.getBoundingClientRect().width - 24);
-      var p = (total > 0) ? (current / total) : 0;
-      var px = Math.max(0, Math.min(innerW, Math.round(p * innerW)));
+      const total = audio.duration || 0;
+      const current = audio.currentTime || 0;
+      const railRect = rail.getBoundingClientRect();
+      const innerW = Math.max(24, railRect.width - 24);
+      const p = (total > 0) ? (current / total) : 0;
+      const px = Math.max(0, Math.min(innerW, Math.round(p * innerW)));
       bar.style.width = px + 'px';
+      // sync thumb if visible
+      const seekThumb = rail.querySelector('.thumb');
+      if (seekThumb) seekThumb.style.left = (12 + px) + 'px';
     }
 
+    // pointer -> ratio for rail and volume
     function pointerToRatio(e, el) {
-      var r = el.getBoundingClientRect();
-      var x = (e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0] && e.touches[0].clientX));
-      var px = Math.max(12, Math.min(r.width - 12, x - r.left));
+      const r = el.getBoundingClientRect();
+      const x = (e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0] && e.touches[0].clientX));
+      const px = Math.max(12, Math.min(r.width - 12, x - r.left));
       return (px - 12) / Math.max(1, (r.width - 24));
     }
 
-    var railEl = $id('rail');
+    const railEl = $id('rail');
     if (railEl) {
       railEl.addEventListener('pointerdown', function (e) {
         try { railEl.setPointerCapture(e.pointerId); } catch (_) { }
         function ratioFromEvent(ev) {
-          var r = railEl.getBoundingClientRect();
-          var clientX = (ev.clientX !== undefined ? ev.clientX : (ev.touches && ev.touches[0] && ev.touches[0].clientX));
-          var px = Math.max(12, Math.min(r.width - 12, clientX - r.left));
+          const r = railEl.getBoundingClientRect();
+          const clientX = (ev.clientX !== undefined ? ev.clientX : (ev.touches && ev.touches[0] && ev.touches[0].clientX));
+          const px = Math.max(12, Math.min(r.width - 12, clientX - r.left));
           return (px - 12) / Math.max(1, (r.width - 24));
         }
-        var r0 = ratioFromEvent(e);
+        const r0 = ratioFromEvent(e);
         if (isFinite(audio.duration)) audio.currentTime = r0 * audio.duration;
-        var move = function (ev) { var rr = ratioFromEvent(ev); if (isFinite(audio.duration)) audio.currentTime = rr * audio.duration; };
-        var up = function () { try { railEl.releasePointerCapture(e.pointerId); } catch (_) { } window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up); };
-        window.addEventListener('pointermove', move);
-        window.addEventListener('pointerup', up);
+        const move = function (ev) { const rr = ratioFromEvent(ev); if (isFinite(audio.duration)) audio.currentTime = rr * audio.duration; };
+        const up = function () { try { railEl.releasePointerCapture(e.pointerId); } catch (_) { } window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up); };
+        window.addEventListener('pointermove', move); window.addEventListener('pointerup', up);
       });
     }
 
-    var volRail = $id('volRail');
+    const volRail = $id('volRail');
     if (volRail) {
       volRail.addEventListener('pointerdown', function (e) {
         try { volRail.setPointerCapture(e.pointerId); } catch (_) { }
-        var r0 = pointerToRatio(e, volRail);
-        audio.volume = r0; var volBar = $id('volBar'), volThumb = $id('volThumb');
+        const r0 = pointerToRatio(e, volRail);
+        audio.volume = r0; const volBar = $id('volBar'), volThumb = $id('volThumb');
         if (volBar) volBar.style.width = (r0 * 100) + '%';
         if (volThumb) volThumb.style.left = (r0 * (volRail.getBoundingClientRect().width - 16) + 8) + 'px';
-        var move = function (ev) { var r = pointerToRatio(ev, volRail); audio.volume = r; if (volBar) volBar.style.width = (r * 100) + '%'; if (volThumb) volThumb.style.left = (r * (volRail.getBoundingClientRect().width - 16) + 8) + 'px'; };
-        var up = function () { try { volRail.releasePointerCapture(e.pointerId); } catch (_) { } window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up); };
+        const move = function (ev) { const r = pointerToRatio(ev, volRail); audio.volume = r; if (volBar) volBar.style.width = (r * 100) + '%'; if (volThumb) volThumb.style.left = (r * (volRail.getBoundingClientRect().width - 16) + 8) + 'px'; };
+        const up = function () { try { volRail.releasePointerCapture(e.pointerId); } catch (_) { } window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up); };
         window.addEventListener('pointermove', move); window.addEventListener('pointerup', up);
       });
       volRail.addEventListener('click', function (e) {
-        var r = pointerToRatio(e, volRail);
-        audio.volume = r; var volBar = $id('volBar'), volThumb = $id('volThumb');
+        const r = pointerToRatio(e, volRail);
+        audio.volume = r; const volBar = $id('volBar'), volThumb = $id('volThumb');
         if (volBar) volBar.style.width = (r * 100) + '%'; if (volThumb) volThumb.style.left = (r * (volRail.getBoundingClientRect().width - 16) + 8) + 'px';
       });
     }
 
-    /* ---------- lyrics loading ---------- */
+    /* ---------- lyrics (non-blocking) ---------- */
     function updateLyricsForIndex(i) {
-      var a = LIB[curAlbum]; var t = a && a.tracks && a.tracks[i];
-      if (!t) { var lb = $id('lyricsBody'); if (lb) lb.textContent = '—'; return; }
-      var lyricsTitle = $id('lyricsH'); if (lyricsTitle) lyricsTitle.textContent = (I18N[lang] || I18N.en).ui.lyrics;
-      loadLyrics(curAlbum, t.t).then(function (txt) { var body = $id('lyricsBody'); if (body) body.textContent = (txt || '').replace(/\r?\n/g, '\n'); });
+      const a = LIB[curAlbum]; const t = a && a.tracks && a.tracks[i];
+      if (!t) { const lb = $id('lyricsBody'); if (lb) lb.textContent = '—'; return; }
+      const lyricsTitle = $id('lyricsH'); if (lyricsTitle) lyricsTitle.textContent = (I18N[lang] || I18N.en).ui.lyrics;
+      loadLyrics(curAlbum, t.t).then(txt => { const body = $id('lyricsBody'); if (body) body.textContent = (txt || '').replace(/\r?\n/g, '\n'); });
     }
     function loadLyrics(albumId, title) {
-      var file = 'lyrics/' + albumId + '/' + slug(title) + '.txt';
-      return fetch(file, { cache: 'no-store' }).then(function (r) { if (r.ok) return r.text(); return ''; }).catch(function () { return ''; });
+      const file = 'lyrics/' + albumId + '/' + slug(title) + '.txt';
+      return fetch(file, { cache: 'no-store' }).then(r => { if (r.ok) return r.text(); return ''; }).catch(() => '');
     }
 
-    /* ---------- dominant color extractor ---------- */
+    /* ---------- dominant color extraction (small canvas) ---------- */
     function extractDominantColor(imgEl, cb) {
       try {
-        var img = new Image(); img.crossOrigin = 'anonymous'; img.src = imgEl.src;
+        const img = new Image(); img.crossOrigin = 'anonymous'; img.src = imgEl.src;
         img.onload = function () {
           try {
-            var w = 40, h = 40;
-            var canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h;
-            var ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, w, h);
-            var data = ctx.getImageData(0, 0, w, h).data;
-            var r = 0, g = 0, b = 0, count = 0;
-            for (var i = 0; i < data.length; i += 4) {
-              var alpha = data[i + 3]; if (alpha < 125) continue;
+            const w = 40, h = 40;
+            const canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h;
+            const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, w, h);
+            const data = ctx.getImageData(0, 0, w, h).data;
+            let r = 0, g = 0, b = 0, count = 0;
+            for (let i = 0; i < data.length; i += 4) {
+              const alpha = data[i + 3]; if (alpha < 125) continue;
               r += data[i]; g += data[i + 1]; b += data[i + 2]; count++;
             }
             if (count === 0) return cb(null);
             r = Math.round(r / count); g = Math.round(g / count); b = Math.round(b / count);
-            return cb({ r: r, g: g, b: b });
+            return cb({ r, g, b });
           } catch (err) { return cb(null); }
         };
         img.onerror = function () { return cb(null); };
       } catch (e) { return cb(null); }
     }
 
-    /* ---------- keyboard shortcuts ---------- */
+    /* ---------- keyboard shortcuts — fixed to avoid skipping behavior ---------- */
     window.addEventListener('keydown', function (e) {
       if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
-      if (e.code === 'Space') { e.preventDefault(); var btn = $id('playPause'); if (btn) btn.click(); }
-      if (e.code === 'ArrowRight') { e.preventDefault(); var n = $id('btnNext'); if (n) n.click(); /* highlight in list */ curIdx = nextPlayableIndex(curAlbum, curIdx); playIdx(curIdx); updateLyricsForIndex(curIdx); }
-      if (e.code === 'ArrowLeft') { e.preventDefault(); var p = $id('btnPrev'); if (p) p.click(); curIdx = prevPlayableIndex(curAlbum, curIdx); playIdx(curIdx); updateLyricsForIndex(curIdx); }
+      if (e.code === 'Space') {
+        e.preventDefault();
+        const btn = $id('playPause');
+        if (btn) { // emulate play/pause logic directly
+          if (!audio.src) {
+            const f = firstPlayableIndex(curAlbum);
+            if (f !== -1) { playIdx(f); updateLyricsForIndex(f); highlightRow(f, true); return; }
+          }
+          if (audio.paused) audio.play().then(() => setPauseIcon()).catch(() => setPlayIcon()); else { audio.pause(); setPlayIcon(); }
+        }
+        return;
+      }
+      if (e.code === 'ArrowRight') {
+        e.preventDefault();
+        // move one track forward (no click simulation)
+        const n = nextPlayableIndex(curAlbum, curIdx);
+        if (n !== undefined && n !== null) {
+          curIdx = n;
+          playIdx(curIdx);
+          updateLyricsForIndex(curIdx);
+          highlightRow(curIdx, true);
+        }
+        return;
+      }
+      if (e.code === 'ArrowLeft') {
+        e.preventDefault();
+        const p = prevPlayableIndex(curAlbum, curIdx);
+        if (p !== undefined && p !== null) {
+          curIdx = p;
+          playIdx(curIdx);
+          updateLyricsForIndex(curIdx);
+          highlightRow(curIdx, true);
+        }
+        return;
+      }
     });
 
     /* ---------- language modal ---------- */
     function ensureLangModal() {
-      var screen = $id('langScreen'); var listEl = $id('langList');
+      const screen = $id('langScreen'); const listEl = $id('langList');
       if (listEl) {
         listEl.innerHTML = '';
-        for (var i = 0; i < LANG_ORDER.length; i++) {
-          var code = LANG_ORDER[i];
-          var mapNames = { "zh-CN": "简体中文", "zh-TW": "繁體中文", "es": "Español", "ru": "Русский", "fr": "Français", "en": "English" };
-          var btn = document.createElement('button'); btn.className = 'lang-btn'; btn.dataset.lang = code; btn.textContent = mapNames[code] || code;
+        const mapNames = { "zh-CN": "简体中文", "zh-TW": "繁體中文", "es": "Español", "ru": "Русский", "fr": "Français", "en": "English" };
+        for (let i = 0; i < LANG_ORDER.length; i++) {
+          const code = LANG_ORDER[i];
+          const btn = document.createElement('button');
+          btn.className = 'lang-btn';
+          btn.dataset.lang = code;
+          btn.textContent = mapNames[code] || code;
           listEl.appendChild(btn);
         }
       }
     }
     ensureLangModal();
 
-    /* ---------- UI: header buttons ---------- */
+    /* ---------- header / control handlers ---------- */
     function closeAllPanels() {
-      var panels = document.querySelectorAll('.panel');
-      for (var i = 0; i < panels.length; i++) panels[i].classList.remove('visible');
-      var home = document.getElementById('home');
+      const panels = document.querySelectorAll('.panel');
+      panels.forEach(p => p.classList.remove('visible'));
+      const home = $id('home');
       if (home) home.style.display = 'grid';
-      var ms = document.getElementById('music-selection');
-      if (ms) ms.style.display = 'none';
-      var pm = document.getElementById('panel-music'); if (pm) {
-        var mg = pm.querySelector('.music-grid'); if (mg) mg.style.display = 'none';
+      const ms = $id('music-selection'); if (ms) ms.style.display = 'none';
+      const pm = $id('panel-music'); if (pm) {
+        const mg = pm.querySelector('.music-grid'); if (mg) mg.style.display = 'none';
       }
       hideAlbumToolbar();
     }
 
-    var btnHomeEl = document.getElementById('btnHome');
-    if (btnHomeEl) {
-      btnHomeEl.addEventListener('click', function (ev) { ev.stopPropagation(); closeAllPanels(); });
-    }
-    var btnBeltEl = document.getElementById('btnBelt');
-    if (btnBeltEl) {
-      btnBeltEl.addEventListener('click', function (ev) { ev.stopPropagation(); alert((I18N[lang] || I18N[lang]).ui.seatbeltOn); });
-    }
-    var userBtnEl = document.getElementById('userBtn');
-    if (userBtnEl) {
-      userBtnEl.addEventListener('click', function (ev) { ev.stopPropagation(); alert('Profile (占位)'); });
-    }
-    var btnLangEl = document.getElementById('btnLang');
+    const btnHomeEl = $id('btnHome');
+    if (btnHomeEl) btnHomeEl.addEventListener('click', ev => { ev.stopPropagation(); closeAllPanels(); });
+
+    const btnBeltEl = $id('btnBelt');
+    if (btnBeltEl) btnBeltEl.addEventListener('click', ev => { ev.stopPropagation(); alert((I18N[lang] || I18N.en).ui.seatbeltOn); });
+
+    const userBtnEl = $id('userBtn');
+    if (userBtnEl) userBtnEl.addEventListener('click', ev => { ev.stopPropagation(); alert('Profile (占位)'); });
+
+    const btnLangEl = $id('btnLang');
     if (btnLangEl) {
-      btnLangEl.addEventListener('click', function (ev) { ev.stopPropagation(); var ls = document.getElementById('langScreen'); if (!ls) return; ls.style.display = (ls.style.display === 'grid' || ls.style.display === 'flex') ? 'none' : 'grid'; });
+      btnLangEl.addEventListener('click', ev => {
+        ev.stopPropagation();
+        const ls = $id('langScreen'); if (!ls) return;
+        ls.style.display = (ls.style.display === 'grid' || ls.style.display === 'flex') ? 'none' : 'grid';
+      });
     }
 
-    /* ---------- delegated click handling ---------- */
+    /* ---------- delegated body click (tiles, album cards, row-btn, lang-btn) ---------- */
     document.body.addEventListener('click', function (e) {
-      // tile click (open modules)
-      var tile = e.target.closest('.tile');
+      // tiles open modules
+      const tile = e.target.closest('.tile');
       if (tile && tile.dataset && tile.dataset.open) {
-        var key = tile.dataset.open;
+        const key = tile.dataset.open;
         if (key === 'music') {
           renderMusicSelection();
-          var panelMusic = document.getElementById('panel-music');
+          const panelMusic = $id('panel-music');
           if (panelMusic) {
-            var allPanels = document.querySelectorAll('.panel'); for (var i = 0; i < allPanels.length; i++) allPanels[i].classList.remove('visible');
+            const allPanels = document.querySelectorAll('.panel'); allPanels.forEach(p => p.classList.remove('visible'));
             panelMusic.classList.add('visible');
-            var homeEl = document.getElementById('home'); if (homeEl) homeEl.style.display = 'none';
-            var ms = document.getElementById('music-selection'); if (ms) { ms.style.display = 'block'; ms.classList.add('visible'); }
-            var mg = panelMusic.querySelector('.music-grid'); if (mg) mg.style.display = 'none';
-          } else {
-            var grid = document.getElementById('albumGrid'); if (grid) grid.style.display = 'block';
-            var homeE = document.getElementById('home'); if (homeE) homeE.style.display = 'none';
+            const homeEl = $id('home'); if (homeEl) homeEl.style.display = 'none';
+            const ms = $id('music-selection'); if (ms) { ms.style.display = 'block'; ms.classList.add('visible'); }
+            const mg = panelMusic.querySelector('.music-grid'); if (mg) mg.style.display = 'none';
           }
           window.scrollTo({ top: 0, behavior: 'smooth' });
           return;
         }
-
-        var panel = document.getElementById('panel-' + key);
+        const panel = $id('panel-' + key);
         if (panel) {
-          var panels2 = document.querySelectorAll('.panel');
-          for (var pi = 0; pi < panels2.length; pi++) panels2[pi].classList.remove('visible');
+          const panels2 = document.querySelectorAll('.panel'); panels2.forEach(p => p.classList.remove('visible'));
           panel.classList.add('visible');
-          var h = document.getElementById('home'); if (h) h.style.display = 'none';
+          const h = $id('home'); if (h) h.style.display = 'none';
         } else {
           alert('模块“' + key + '”尚未实现（placeholder）。');
         }
@@ -654,12 +735,12 @@ document.addEventListener('DOMContentLoaded', function () {
       }
 
       // album card click -> open album
-      var albumCard = e.target.closest('.album-card');
+      const albumCard = e.target.closest('.album-card');
       if (albumCard && albumCard.dataset && albumCard.dataset.album) {
-        var albumId = albumCard.dataset.album;
-        var panelMusic2 = document.getElementById('panel-music');
-        var ms2 = document.getElementById('music-selection');
-        var mg2 = panelMusic2 ? panelMusic2.querySelector('.music-grid') : null;
+        const albumId = albumCard.dataset.album;
+        const panelMusic2 = $id('panel-music');
+        const ms2 = $id('music-selection');
+        const mg2 = panelMusic2 ? panelMusic2.querySelector('.music-grid') : null;
         if (ms2) ms2.style.display = 'none';
         if (mg2) mg2.style.display = '';
         openMusicAlbum(albumId);
@@ -667,69 +748,91 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
       }
 
-      // row btn click (play)
-      var rowBtn = e.target.closest('.row-btn');
-      if (rowBtn && rowBtn.dataset && rowBtn.dataset.idx !== undefined) { var idx = parseInt(rowBtn.dataset.idx, 10); clearActiveRows(); var row = document.querySelector('.row[data-idx="' + idx + '"]'); if (row) row.classList.add('active'); playIdx(idx); updateLyricsForIndex(idx); return; }
+      // row-btn is handled on render (delegated fallback)
+      const rowBtn = e.target.closest('.row-btn');
+      if (rowBtn && rowBtn.dataset && rowBtn.dataset.idx !== undefined) {
+        const idx = parseInt(rowBtn.dataset.idx, 10);
+        playIdx(idx); updateLyricsForIndex(idx); highlightRow(idx, true);
+        return;
+      }
 
-      // generic controls: pill, btn, icon-btn, badge, lang-btn
-      var btn = e.target.closest('.pill, .btn, button, .icon-btn, .badge, .lang-btn, .play-pill');
+      // generic controls
+      const btn = e.target.closest('.pill, .btn, button, .icon-btn, .badge, .lang-btn, .play-pill');
       if (btn) {
-        var id = btn.id || (btn.dataset && btn.dataset.action);
+        const id = btn.id || (btn.dataset && btn.dataset.action);
         if (id === 'musicBack') { closeAllPanels(); return; }
-        if (id === 'musicPlayAll' || btn.classList.contains('play-pill')) { var first = firstPlayableIndex(curAlbum); if (first !== -1) { playIdx(first); updateLyricsForIndex(first); } return; }
+        if (id === 'musicPlayAll' || btn.classList.contains('play-pill')) { const first = firstPlayableIndex(curAlbum); if (first !== -1) { playIdx(first); updateLyricsForIndex(first); } return; }
         if (id === 'btnPrev') { curIdx = prevPlayableIndex(curAlbum, curIdx); playIdx(curIdx); updateLyricsForIndex(curIdx); return; }
         if (id === 'btnNext') { curIdx = nextPlayableIndex(curAlbum, curIdx); playIdx(curIdx); updateLyricsForIndex(curIdx); return; }
         if (id === 'playPause') {
-          if (!audio.src) { var f = firstPlayableIndex(curAlbum); if (f !== -1) { playIdx(f); updateLyricsForIndex(f); return; } }
-          if (audio.paused) { audio.play().then(function () { setPauseIcon(); }).catch(function () { setPlayIcon(); }); } else { audio.pause(); setPlayIcon(); }
+          if (!audio.src) { const f = firstPlayableIndex(curAlbum); if (f !== -1) { playIdx(f); updateLyricsForIndex(f); return; } }
+          if (audio.paused) audio.play().then(() => setPauseIcon()).catch(() => setPlayIcon()); else { audio.pause(); setPlayIcon(); }
           return;
         }
         if (id === 'btnHome') { closeAllPanels(); return; }
         if (id === 'btnCall') { alert((I18N[lang] || I18N.en).ui.crew); return; }
         if (btn.classList.contains('lang-btn') && btn.dataset && btn.dataset.lang) {
-          var chosen = btn.dataset.lang;
+          const chosen = btn.dataset.lang;
           applyLang(chosen);
           renderMusicSelection();
-          var pm = document.getElementById('panel-music');
+          const pm = $id('panel-music');
           if (pm && pm.classList.contains('visible')) openMusicAlbum(curAlbum);
-          var ls2 = document.getElementById('langScreen'); if (ls2) ls2.style.display = 'none';
+          const ls2 = $id('langScreen'); if (ls2) ls2.style.display = 'none';
           return;
         }
       }
 
       // click outside lang modal to close
-      var langScreen = $id('langScreen');
+      const langScreen = $id('langScreen');
       if (langScreen && (e.target === langScreen)) { langScreen.style.display = 'none'; return; }
     }, true);
 
-    /* ---------- flight remaining countdown ---------- */
-    var FIVE_H_FORTY_MS = (5 * 3600 + 40 * 60) * 1000;
-    var arrive = new Date(Date.now() + FIVE_H_FORTY_MS);
-    function updateFlight() {
-      var now = new Date(); var total = Math.max(0, arrive - now); var secs = Math.floor(total / 1000);
-      var hours = Math.floor(secs / 3600); var mins = Math.floor((secs % 3600) / 60); var s = secs % 60;
-      var center = $id('remain');
-      if (center) { if (hours > 0) center.textContent = hours + ':' + String(mins).padStart(2, '0'); else center.textContent = mins + ':' + String(s).padStart(2, '0'); }
+    /* ---------- highlight row & scroll sync ---------- */
+    function highlightRow(index, scrollIntoView) {
+      const rows = document.querySelectorAll('#trackList .row');
+      rows.forEach(r => r.classList.remove('active'));
+      const row = document.querySelector(`#trackList .row[data-idx="${index}"]`);
+      if (row) {
+        row.classList.add('active');
+        // apply strong liquid-glass style via class; CSS handles glow (ensure class name .active present)
+        if (scrollIntoView) {
+          // ensure the list scrolls so the row is visible but we don't scroll the whole page
+          try {
+            row.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+          } catch (e) { /* ignore */ }
+        }
+      }
+      // update player small np title (already done in playIdx), ensure bottom player shows current song
     }
-    updateFlight(); setInterval(updateFlight, 1000);
 
-    // initial volume UI
+    /* ---------- lyrics fetch & progress sync already implemented above ---------- */
+
+    /* ---------- initial setup ---------- */
+    // apply i18n
+    applyLang(lang);
+
+    // ensure album grid rendering and home visible
+    renderMusicSelection();
+    const homeEl = $id('home'); if (homeEl) homeEl.style.display = 'grid';
+    const playerEl = $id('player'); if (playerEl) playerEl.style.display = '';
+
+    // set initial volume UI
     setTimeout(function () {
       try {
-        var vol = audio.volume || 0.6;
-        var vb = $id('volBar'), vt = $id('volThumb'), vr = $id('volRail');
+        const vol = audio.volume || 0.6;
+        const vb = $id('volBar'), vt = $id('volThumb'), vr = $id('volRail');
         if (vb) vb.style.width = (vol * 100) + '%';
         if (vt && vr) vt.style.left = (vol * (vr.getBoundingClientRect().width - 16) + 8) + 'px';
-      } catch (e) { }
+      } catch (e) { /* ignore */ }
     }, 200);
 
-    // init cleanup & view
-    setTimeout(function () { cleanBannerControls(); }, 150);
-    renderMusicSelection();
-    var homeEl = $id('home'); if (homeEl) homeEl.style.display = 'grid';
-    var playerEl = $id('player'); if (playerEl) playerEl.style.display = '';
+    // remove stray banner controls
+    setTimeout(() => { cleanBannerControls(); }, 150);
 
-    applyLang(lang);
+    // expose some helpers for debugging in console if needed
+    window.IFE = {
+      LIB, openMusicAlbum, renderMusicSelection, playIdx, highlightRow, ensureAlbumToolbar, hideAlbumToolbar
+    };
 
   } catch (err) {
     console.error('Initialization error', err);

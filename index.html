@@ -10,14 +10,14 @@
   <header>
     <div class="left">
       <strong id="brandTitle">JW Airlines</strong>
-      <div class="muted" id="destText">目的地： Paris CDG</div>
+      <div class="muted" id="destText">Destination: Paris CDG</div>
     </div>
 
     <div id="remain">5:40</div>
 
     <div class="actions">
       <button id="userBtn" class="icon-btn" title="Profile" aria-label="profile">👤</button>
-      <button id="btnBelt" class="badge" aria-label="seatbelt">系好安全带</button>
+      <button id="btnBelt" class="badge" aria-label="seatbelt">Seatbelt On</button>
       <button id="btnHome" class="icon-btn" title="Home" aria-label="home">🏠</button>
       <button id="btnLang" class="icon-btn" title="语言" aria-label="language">🌐</button>
     </div>
@@ -27,7 +27,7 @@
     <!-- HOME grid -->
     <div id="home" class="hub">
       <div class="hero">
-        <img src="images/paris_big.jpg" alt="paris">
+        <img src="images/paris.jpg" alt="paris">
         <div class="label">
           <div class="city">PARIS</div>
           <div class="code">CDG</div>
@@ -67,27 +67,29 @@
         <div class="album-grid" id="albumGrid" aria-live="polite"></div>
       </div>
 
-      <!-- Album page: banner (with floating toolbar injected by JS) + tracks + right column -->
+      <!-- Album page: left list + right column -->
       <div class="music-grid" style="display:none;">
         <div class="music-left">
-          <div class="album-banner" id="albumBannerRoot">
-            <div class="banner-left">
-              <img id="bannerCover" src="" alt="cover">
-            </div>
+          <!-- 左侧整体滚动容器：banner + list 一起滚动 -->
+          <div class="left-scroll" id="leftScroll">
+            <div class="album-banner" id="albumBannerRoot">
+              <div class="banner-left">
+                <img id="bannerCover" src="" alt="cover">
+              </div>
 
-            <div class="banner-right">
-              <div class="banner-meta">
-                <div class="small">Album</div>
-                <h1 id="toolbarTitle">Album Title</h1>
-                <div id="bannerSub" class="submeta">Artist • Year</div>
-                <div id="bannerBlurb" class="banner-blurb">Blurb...</div>
+              <div class="banner-right">
+                <div class="banner-meta">
+                  <div class="small">Album</div>
+                  <h1 id="toolbarTitle">Album Title</h1>
+                  <div id="bannerSub" class="submeta">Artist • Year</div>
+                  <div id="bannerBlurb" class="banner-blurb">Blurb...</div>
+                </div>
               </div>
             </div>
 
+            <!-- track list (现在与 banner 同一滚动容器) -->
+            <div id="trackList" class="playlist" aria-live="polite"></div>
           </div>
-
-          <!-- track list -->
-          <div id="trackList" class="playlist" aria-live="polite"></div>
         </div>
 
         <aside class="music-right">
@@ -97,26 +99,21 @@
             <p id="artistBio" class="card-text">Artist bio</p>
           </div>
           <div class="card">
-            <h4 id="albumNotesTitle">专辑简介</h4>
+            <h4 id="albumNotesTitle">About this album</h4>
             <p id="albumNotes" class="card-text">Notes...</p>
           </div>
           <div class="card">
-            <h4 id="lyricsH">歌词</h4>
+            <h4 id="lyricsH">Lyrics</h4>
             <pre id="lyricsBody" class="card-lyrics">—</pre>
           </div>
         </aside>
       </div>
     </section>
 
-    <!-- dining panel placeholder (added but minimal; does not change music behavior) -->
-    <section id="panel-dining" class="panel" aria-hidden="true">
-      <div class="dining-grid">
-        <!-- dining content will be injected by app.js when requested -->
-        <div id="diningContainer" class="dining-container"></div>
-      </div>
-    </section>
-
   </main>
+
+  <!-- Floating album toolbar (only on album page) -->
+  <div id="albumToolbar" aria-hidden="true" style="display:none;"></div>
 
   <!-- Player (fixed bottom) -->
   <div id="player" class="player" role="region" aria-label="player">
@@ -131,19 +128,18 @@
     <div class="center-col">
       <div class="now np">
         <div id="npArt" class="art" role="img" aria-label="now playing art"></div>
-        <div>
+        <div class="np-meta">
           <div id="npTitle" class="t">—</div>
           <div id="npMeta" class="m">—</div>
         </div>
       </div>
 
       <div class="timeline">
-        <div class="time" id="cur">0:00</div>
+        <div class="time left-time" id="cur">0:00</div>
         <div id="rail" class="rail" aria-label="progress">
           <div id="bar" class="bar" style="width:0%"></div>
-          <div id="seekThumb" class="thumb" style="left:12px" aria-hidden="true"></div>
         </div>
-        <div class="time" id="dur">0:00</div>
+        <div class="time right-time" id="dur">0:00</div>
       </div>
     </div>
 
@@ -151,7 +147,6 @@
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10v4h4l5 5V5L7 10H3z"/></svg>
       <div id="volRail" class="vol-rail" aria-label="volume">
         <div id="volBar" class="vol-bar" style="width:60%"></div>
-        <div id="volThumb" class="thumb" style="left:60%" aria-hidden="true"></div>
       </div>
     </div>
   </div>
