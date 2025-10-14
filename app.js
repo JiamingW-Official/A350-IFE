@@ -370,8 +370,8 @@ document.addEventListener('DOMContentLoaded', function () {
       const split = Math.round(route.length/3);
       const flown = route.slice(0, split+1);
       const unflown = route.slice(split);
-      L.polyline(flown, { color: '#9ff3cf', weight: 5, opacity: 0.95 }).addTo(map);
-      L.polyline(unflown, { color: 'rgba(61,160,255,0.6)', weight: 4, opacity: 0.9 }).addTo(map);
+      L.polyline(flown, { color: '#7dd3af', weight: 5, opacity: 0.95 }).addTo(map);
+      L.polyline(unflown, { color: 'rgba(45,120,200,0.8)', weight: 4, opacity: 0.9 }).addTo(map);
       const line = L.polyline(route, { opacity:0 });
       map.fitBounds(line.getBounds(), { padding: [20,20] });
 
@@ -385,8 +385,8 @@ document.addEventListener('DOMContentLoaded', function () {
         return (toDeg(Math.atan2(y,x))+360)%360;
       }
       const brg = bearing(route[idx-1], route[idx+1]);
-      const svg = `<svg width="28" height="28" viewBox="0 0 64 64" fill="#ffd67a" xmlns="http://www.w3.org/2000/svg"><path d="M6 36l20-6 0-14 4-4 4 4 0 14 20 6 0 4-20-2 0 10 6 6 0 4-10-4-10 4 0-4 6-6 0-10-20 2z"/></svg>`;
-      const aircraftIcon = L.divIcon({ className: 'ac-icon', html: `<div style="transform:rotate(${brg}deg)">${svg}</div>`, iconSize:[36,36], iconAnchor:[18,18] });
+      const svg = `<svg width="50" height="50" viewBox="0 0 64 64" fill="#ffd67a" xmlns="http://www.w3.org/2000/svg"><path d="M6 30l20-6 0-14 4-4 4 4 0 14 20 6 0 4-20-2 0 10 6 6 0 4-10-4-10 4 0-4 6-6 0-10-20 2z"/></svg>`;
+      const aircraftIcon = L.divIcon({ className: 'ac-icon', html: `<div style="transform:rotate(${brg}deg)">${svg}</div>`, iconSize:[60,60], iconAnchor:[30,30] });
       L.marker(pos, { icon: aircraftIcon, rotationAngle:brg }).addTo(map);
 
       // info panel
@@ -418,14 +418,39 @@ document.addEventListener('DOMContentLoaded', function () {
       // Flight info pages populated successfully
       const conn = $id('sfoConn'); if (conn) {
         conn.innerHTML = '';
-        const dests = ['HNL','LAX','SEA','YVR','ORD','DFW','PHX','IAD','BOS','MIA','ATL','DEN','MSP','DTW','YYZ','YUL','SJD','AUS','SAN','PDX','SNA','RSW','TPA','BNA','PHL','EWR','JFK','DAL','STL','CLE'];
+        const destinations = [
+          {city: 'Honolulu', code: 'HNL'}, {city: 'Los Angeles', code: 'LAX'}, {city: 'Seattle', code: 'SEA'},
+          {city: 'Vancouver', code: 'YVR'}, {city: 'Chicago', code: 'ORD'}, {city: 'Dallas', code: 'DFW'},
+          {city: 'Phoenix', code: 'PHX'}, {city: 'Washington', code: 'IAD'}, {city: 'Boston', code: 'BOS'},
+          {city: 'Miami', code: 'MIA'}, {city: 'Atlanta', code: 'ATL'}, {city: 'Denver', code: 'DEN'},
+          {city: 'Minneapolis', code: 'MSP'}, {city: 'Detroit', code: 'DTW'}, {city: 'Toronto', code: 'YYZ'},
+          {city: 'Montreal', code: 'YUL'}, {city: 'San Jose', code: 'SJD'}, {city: 'Austin', code: 'AUS'},
+          {city: 'San Diego', code: 'SAN'}, {city: 'Portland', code: 'PDX'}, {city: 'Orange County', code: 'SNA'},
+          {city: 'Fort Myers', code: 'RSW'}, {city: 'Tampa', code: 'TPA'}, {city: 'Nashville', code: 'BNA'},
+          {city: 'Philadelphia', code: 'PHL'}, {city: 'Newark', code: 'EWR'}, {city: 'New York', code: 'JFK'},
+          {city: 'Dallas Love', code: 'DAL'}, {city: 'St. Louis', code: 'STL'}, {city: 'Cleveland', code: 'CLE'}
+        ];
+        
         function randFlight(){ return 'JW' + (600 + Math.floor(Math.random()*400)); }
         function randGate(){ const letters='BCDEFG'; return letters[Math.floor(Math.random()*letters.length)]+((Math.floor(Math.random()*9))+1); }
+        function randTime(baseHour, baseMin) {
+          // 基础时间 ±20分钟随机
+          const totalMinutes = baseHour * 60 + baseMin;
+          const randomOffset = Math.floor(Math.random() * 41) - 20; // -20到+20分钟
+          const finalMinutes = totalMinutes + randomOffset;
+          const hr = Math.floor(finalMinutes / 60) % 24;
+          const min = finalMinutes % 60;
+          return `${hr.toString().padStart(2,'0')}:${min.toString().padStart(2,'0')}`;
+        }
+        
+        // 生成30个航班，时间从20:00开始，每20分钟一个基础时间点
         for (let i=0;i<30;i++){
-          const hr = 20 + Math.floor(Math.random()*6); const min = (Math.random()<0.5?0:30); const t = `${(hr%24).toString().padStart(2,'0')}:${min.toString().padStart(2,'0')}`;
+          const baseHour = 20 + Math.floor(i * 20 / 60);
+          const baseMin = (i * 20) % 60;
+          const dest = destinations[i % destinations.length];
           const status = ['On Time','Delayed','Cancelled'][Math.floor(Math.random()*3)];
           const row = document.createElement('div'); row.className = 'board-row';
-          row.innerHTML = `<div>${randFlight()}</div><div>${dests[i]}</div><div>${t}</div><div>${randGate()}</div><div class="status">${status}</div>`;
+          row.innerHTML = `<div>${randFlight()}</div><div>${dest.city} ${dest.code}</div><div>${randTime(baseHour, baseMin)}</div><div>${randGate()}</div><div class="status">${status}</div>`;
           conn.appendChild(row);
         }
       }
@@ -451,8 +476,8 @@ document.addEventListener('DOMContentLoaded', function () {
         
         currentPage = pageIndex;
         if (track) {
-          // 使用像素值而不是百分比，每个页面280px
-          const translateY = -currentPage * 280;
+          // 使用像素值而不是百分比，每个页面240px
+          const translateY = -currentPage * 240;
           track.style.transform = `translateY(${translateY}px)`;
           // Flight info page switching: currentPage, translateY
         }

@@ -1,12 +1,12 @@
 .fi-card{ position:relative; padding:8px !important }
-.fi-header{ text-align:left }
+.fi-header{ text-align:left; padding:8px 12px }
 .fi-header .card-title{ text-align:left; margin:0 }
-.fi-carousel{ overflow:hidden; height:280px; position:relative }
-.fi-track{ position:relative; transition:transform 0.5s ease; height:840px }
-.fi-page{ position:absolute; width:100%; height:280px; padding:8px 12px; box-sizing:border-box }
+.fi-carousel{ overflow:hidden; height:240px; position:relative }
+.fi-track{ position:relative; transition:transform 0.5s ease; height:720px }
+.fi-page{ position:absolute; width:100%; height:240px; padding:8px 12px; box-sizing:border-box }
 .fi-page:nth-child(1){ top:0 }
-.fi-page:nth-child(2){ top:280px }
-.fi-page:nth-child(3){ top:560px }
+.fi-page:nth-child(2){ top:240px }
+.fi-page:nth-child(3){ top:480px }
 :root{
   --bg:#0a0d12;
   --panel:#0b121c;
@@ -244,14 +244,15 @@ main{
 .info-col{ overflow:hidden }
 .leaflet-container{ background:#081018 }
 .leaflet-control-zoom{ display:none !important; }
-.ac-icon{ filter: drop-shadow(0 2px 4px rgba(0,0,0,.6)); font-size:22px }
+.ac-icon{ filter: drop-shadow(0 2px 4px rgba(0,0,0,.6)); font-size:36px; display:flex; align-items:center; justify-content:center }
 .tick-label{ background:rgba(16,22,34,.8); color:#e8f0ff; padding:2px 6px; border-radius:6px; font-size:12px; border:1px solid rgba(255,255,255,.08) }
 .board-list{ display:grid; gap:14px; }
-.board-row{ display:grid; grid-template-columns: 120px 1fr 120px 90px 110px; gap:12px; font-variant-numeric: tabular-nums; padding:12px 4px; border-bottom:1px solid rgba(255,255,255,0.08); font-size:16px }
+.board-header{ display:grid; grid-template-columns: 120px 1fr 120px 90px 110px; gap:12px; font-variant-numeric: tabular-nums; padding:12px 4px; border-bottom:2px solid rgba(255,255,255,0.15); font-size:22px; font-weight:900; color:var(--text) }
+.board-row{ display:grid; grid-template-columns: 120px 1fr 120px 90px 110px; gap:12px; font-variant-numeric: tabular-nums; padding:12px 4px; border-bottom:1px solid rgba(255,255,255,0.08); font-size:22px }
 .board-row .status{ font-weight:800 }
 .flight-info{ display:grid; grid-template-columns: auto 1fr; gap:12px 16px; font-variant-numeric: tabular-nums; font-size:22px; color:var(--text); grid-auto-rows:minmax(28px,auto); align-items:center; min-width:0; text-align:left; width:100%; height:auto; min-height:200px }
-.flight-info .label{ color: var(--muted); grid-column:1; text-align:left }
-.flight-info .value{ font-weight:900; font-size:26px; text-align:right; color:var(--text) !important; justify-self:end; word-break:break-word; overflow-wrap:break-word; grid-column:2 }
+.flight-info .label{ color: var(--muted); grid-column:1; text-align:left; font-size:22px }
+.flight-info .value{ font-weight:900; font-size:22px; text-align:right; color:var(--text) !important; justify-self:end; word-break:break-word; overflow-wrap:break-word; grid-column:2 }
 
 /* Map overlays */
 .map-col{ position:relative }
