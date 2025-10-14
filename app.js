@@ -54,26 +54,32 @@ document.addEventListener('DOMContentLoaded', function () {
       "zh-CN": { title: "用餐", sub: "头等舱品鉴菜单", wine: "酒精饮品",
         course: { starter: "前菜", main: "主菜", soup: "热汤", bread: "面包篮", dessert: "甜点", cheese: "奶酪", icecream: "冰淇淋" },
         drinks: { soft: "软饮", tea: "茶", coffee: "咖啡" },
+        alcoholHeadings: { champagne: "香槟", white: "白葡萄酒", red: "红葡萄酒", dessert: "甜型酒", fortified: "加强酒" },
         tags: { vegan: "Vegan", gf: "无麸质", halal: "清真", spicy: "辣度" }, kcal: "千卡" },
       "zh-TW": { title: "用餐", sub: "頭等艙品嚐菜單", wine: "酒精飲品",
         course: { starter: "前菜", main: "主菜", soup: "熱湯", bread: "麵包籃", dessert: "甜點", cheese: "起司", icecream: "冰淇淋" },
         drinks: { soft: "軟飲", tea: "茶", coffee: "咖啡" },
+        alcoholHeadings: { champagne: "香檳", white: "白酒", red: "紅酒", dessert: "甜酒", fortified: "加烈酒" },
         tags: { vegan: "Vegan", gf: "無麩質", halal: "清真", spicy: "辣" }, kcal: "千卡" },
       en: { title: "Dining", sub: "First Class Tasting Menu", wine: "Alcohol",
         course: { starter: "Starters", main: "Mains", soup: "Soup", bread: "Bread Basket", dessert: "Dessert", cheese: "Cheese", icecream: "Ice Cream" },
         drinks: { soft: "Soft Drinks", tea: "Tea", coffee: "Coffee" },
+        alcoholHeadings: { champagne: "Champagne", white: "White", red: "Red", dessert: "Dessert", fortified: "Fortified" },
         tags: { vegan: "Vegan", gf: "Gluten‑free", halal: "Halal", spicy: "Spicy" }, kcal: "kcal" },
       fr: { title: "Restauration", sub: "Menu Dégustation Première Classe", wine: "Alcools",
         course: { starter: "Entrées", main: "Plats", soup: "Soupe", bread: "Panier de pain", dessert: "Dessert", cheese: "Fromages", icecream: "Glace" },
         drinks: { soft: "Boissons fraîches", tea: "Thé", coffee: "Café" },
+        alcoholHeadings: { champagne: "Champagne", white: "Blanc", red: "Rouge", dessert: "Liquoreux", fortified: "Vins mutés" },
         tags: { vegan: "Vegan", gf: "Sans gluten", halal: "Halal", spicy: "Épicé" }, kcal: "kcal" },
       es: { title: "Gastronomía", sub: "Menú Degustación Primera Clase", wine: "Alcohol",
         course: { starter: "Entrantes", main: "Principales", soup: "Sopa", bread: "Panera", dessert: "Postre", cheese: "Quesos", icecream: "Helado" },
         drinks: { soft: "Refrescos", tea: "Té", coffee: "Café" },
+        alcoholHeadings: { champagne: "Champagne", white: "Blanco", red: "Tinto", dessert: "Dulce", fortified: "Generoso" },
         tags: { vegan: "Vegano", gf: "Sin gluten", halal: "Halal", spicy: "Picante" }, kcal: "kcal" },
       ru: { title: "Питание", sub: "Дегустационное меню Первого класса", wine: "Алкоголь",
         course: { starter: "Закуски", main: "Горячие блюда", soup: "Суп", bread: "Хлебная корзина", dessert: "Десерт", cheese: "Сыры", icecream: "Мороженое" },
         drinks: { soft: "Безалкогольные", tea: "Чай", coffee: "Кофе" },
+        alcoholHeadings: { champagne: "Шампанское", white: "Белые", red: "Красные", dessert: "Десертные", fortified: "Креплёные" },
         tags: { vegan: "Веган", gf: "Без глютена", halal: "Халяль", spicy: "Острое" }, kcal: "ккал" }
     };
 
@@ -214,11 +220,11 @@ document.addEventListener('DOMContentLoaded', function () {
         wineBox && wineBox.appendChild(g);
       }
       const W = DINING.wine; const B = DINING.beverages;
-      addGroup('Champagne', W.sparkling, 'wine');
-      addGroup('White', W.white);
-      addGroup('Red', W.red);
-      addGroup('Dessert', W.dessert);
-      addGroup('Fortified', W.fortified);
+      addGroup(L.alcoholHeadings.champagne, W.sparkling, 'wine');
+      addGroup(L.alcoholHeadings.white, W.white);
+      addGroup(L.alcoholHeadings.red, W.red);
+      addGroup(L.alcoholHeadings.dessert, W.dessert);
+      addGroup(L.alcoholHeadings.fortified, W.fortified);
       addGroup(L.drinks.soft, B.soft, 'soft');
       addGroup(L.drinks.tea, B.tea, 'tea');
       addGroup(L.drinks.coffee, B.coffee, 'coffee');
@@ -248,6 +254,11 @@ document.addEventListener('DOMContentLoaded', function () {
       const albumNotesTitle = $id("albumNotesTitle"); if (albumNotesTitle) albumNotesTitle.textContent = t.ui.about;
       const lyricsH = $id("lyricsH"); if (lyricsH) lyricsH.textContent = t.ui.lyrics;
       const tbBack = $id('tbBack'); if (tbBack) tbBack.textContent = (I18N[lang] || I18N.en).ui.back;
+      // refresh dining in-place if open
+      const diningPanel = $id('panel-dining');
+      if (diningPanel && diningPanel.classList.contains('visible')) {
+        renderDining();
+      }
     }
 
     // Library (kept from your last version, durations present where available)
