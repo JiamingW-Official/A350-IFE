@@ -19,6 +19,7 @@
   --track-thickness: 10px; /* 统一：进度条与音量条的粗细 */
   --timeline-w: clamp(400px, 46vw, 820px); /* 稍微缩短时间轴宽度，避免被挤压 */
   --font-sans: "SF Pro", "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-hero: "SF Pro Display", "Avenir Next", "AvenirNext-Heavy", "Montserrat", "Helvetica Neue", Arial, sans-serif; /* 先锋感无衬线 */
   --glass-bg: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015));
   --glass-border: 1px solid rgba(255,255,255,0.08);
   --glass-shadow: 0 18px 50px rgba(0,0,0,0.6);
@@ -127,7 +128,8 @@ main{
 .hub > .hero:hover{ transform: translateY(-2px); box-shadow:0 26px 64px rgba(0,0,0,0.6) }
 .hub > .hero .label .city{
   font-size:calc(64px * var(--text-scale));
-  font-weight:900;letter-spacing:2px;line-height:1.02;
+  font-family: var(--font-hero), var(--font-sans);
+  font-weight:900;letter-spacing:1.6px;line-height:1.02;
   text-align:left;word-break:keep-all;overflow-wrap:normal;hyphens:manual
 }
 /* JS will auto-fit font-size; media queries kept minimal */
