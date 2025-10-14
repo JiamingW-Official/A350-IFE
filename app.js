@@ -48,6 +48,127 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     };
 
+    // Dining i18n labels
+    const DINING_I18N = {
+      "zh-CN": { title: "用餐", sub: "头等舱品鉴菜单", wine: "酒单",
+        course: { starter: "前菜", main: "主菜", soup: "热汤", bread: "面包篮", dessert: "甜点", cheese: "奶酪", icecream: "冰淇淋" },
+        tags: { vegan: "Vegan", gf: "无麸质", halal: "清真", spicy: "辣度" }, kcal: "千卡" },
+      "zh-TW": { title: "用餐", sub: "頭等艙品嚐菜單", wine: "酒單",
+        course: { starter: "前菜", main: "主菜", soup: "熱湯", bread: "麵包籃", dessert: "甜點", cheese: "起司", icecream: "冰淇淋" },
+        tags: { vegan: "Vegan", gf: "無麩質", halal: "清真", spicy: "辣" }, kcal: "千卡" },
+      en: { title: "Dining", sub: "First Class Tasting Menu", wine: "Wine List",
+        course: { starter: "Starters", main: "Mains", soup: "Soup", bread: "Bread Basket", dessert: "Dessert", cheese: "Cheese", icecream: "Ice Cream" },
+        tags: { vegan: "Vegan", gf: "Gluten‑free", halal: "Halal", spicy: "Spicy" }, kcal: "kcal" },
+      fr: { title: "Restauration", sub: "Menu Dégustation Première Classe", wine: "Carte des vins",
+        course: { starter: "Entrées", main: "Plats", soup: "Soupe", bread: "Panier de pain", dessert: "Dessert", cheese: "Fromages", icecream: "Glace" },
+        tags: { vegan: "Vegan", gf: "Sans gluten", halal: "Halal", spicy: "Épicé" }, kcal: "kcal" },
+      es: { title: "Gastronomía", sub: "Menú Degustación Primera Clase", wine: "Carta de vinos",
+        course: { starter: "Entrantes", main: "Principales", soup: "Sopa", bread: "Panera", dessert: "Postre", cheese: "Quesos", icecream: "Helado" },
+        tags: { vegan: "Vegano", gf: "Sin gluten", halal: "Halal", spicy: "Picante" }, kcal: "kcal" },
+      ru: { title: "Питание", sub: "Дегустационное меню Первого класса", wine: "Винная карта",
+        course: { starter: "Закуски", main: "Горячие блюда", soup: "Суп", bread: "Хлебная корзина", dessert: "Десерт", cheese: "Сыры", icecream: "Мороженое" },
+        tags: { vegan: "Веган", gf: "Без глютена", halal: "Халяль", spicy: "Острое" }, kcal: "ккал" }
+    };
+
+    // Dining data model
+    const DINING = {
+      starters: [
+        { t: { en: "Oscietra caviar service", "zh-CN": "奥西特拉鱼子酱礼遇", fr: "Service de caviar Oscietra" }, kcal: 210, tags: ["gf"], d: { en: "Traditional garnish: blinis, crème fraîche, chives" } },
+        { t: { en: "Langoustine carpaccio", "zh-CN": "挪威海螯虾薄片", fr: "Carpaccio de langoustine" }, kcal: 180, tags: ["gf"], d: { en: "Citrus gel, basil oil, sea salt" } },
+        { t: { en: "Heirloom tomato tart", "zh-CN": "传家宝蕃茄塔", fr: "Tarte à la tomate ancienne" }, kcal: 240, tags: ["vegan"], d: { en: "Black olive tapenade, micro basil" } }
+      ],
+      mains: [
+        { t: { en: "A5 wagyu tenderloin", "zh-CN": "A5 和牛菲力", fr: "Filet de wagyu A5" }, kcal: 640, tags: ["gf", "halal"], d: { en: "Truffle jus, Paris mash" } },
+        { t: { en: "Glacier cod à la plancha", "zh-CN": "铁板冰岛鳕鱼", fr: "Cabillaud à la plancha" }, kcal: 520, tags: ["gf"], d: { en: "Charred leek, champagne beurre blanc" } },
+        { t: { en: "Sichuan mapo tofu couture", "zh-CN": "川味麻婆豆腐·高定", fr: "Mapo tofu couture" }, kcal: 430, tags: ["vegan", "spicy"], d: { en: "Green peppercorn, smoked chili oil" } }
+      ],
+      soup: [
+        { t: { en: "Porcini cappuccino", "zh-CN": "牛肝菌卡布奇诺", fr: "Cappuccino de cèpes" }, kcal: 120, tags: ["gf"], d: { en: "Foam of parmesan, chive dust" } },
+        { t: { en: "Lobster bisque", "zh-CN": "龙虾浓汤", fr: "Bisque de homard" }, kcal: 210, tags: ["gf"], d: { en: "Cognac cream" } },
+        { t: { en: "Garden pea velouté", "zh-CN": "花园青豆浓汤", fr: "Velouté de petits pois" }, kcal: 160, tags: ["vegan", "gf"], d: { en: "Mint emulsion" } }
+      ],
+      bread: [
+        { t: { en: "Warm bakery selection", "zh-CN": "暖心法棍拼篮", fr: "Assortiment de pains chauds" }, kcal: 280, tags: [], d: { en: "EVOO, cultured butter" } }
+      ],
+      dessert: [
+        { t: { en: "Mille‑feuille ‘cloud’", "zh-CN": "千层云酥", fr: "Mille‑feuille nuage" }, kcal: 390, tags: [], d: { en: "Vanilla diplomat, caramel lace" } },
+        { t: { en: "Single‑origin chocolate soufflé", "zh-CN": "单一产地巧克力舒芙蕾", fr: "Soufflé chocolat grand cru" }, kcal: 420, tags: [], d: { en: "Crème anglaise" } },
+        { t: { en: "Yuzu pavlova", "zh-CN": "柚子帕芙洛娃", fr: "Pavlova au yuzu" }, kcal: 310, tags: ["gf"], d: { en: "Lemon verbena cream" } }
+      ],
+      cheese: [
+        { t: { en: "Fromage trolley", "zh-CN": "法式奶酪推车", fr: "Chariot de fromages" }, kcal: 350, tags: [], d: { en: "Comté 24m, Roquefort, Époisses" } }
+      ],
+      icecream: [
+        { t: { en: "Seasonal ice cream & sorbet", "zh-CN": "当季冰淇淋与雪葩", fr: "Glaces & sorbets de saison" }, kcal: 260, tags: [], d: { en: "Vanilla Tahiti, Matcha, Raspberry" } }
+      ],
+      wine: {
+        sparkling: [
+          { name: "Krug Grande Cuvée 171ème", meta: "Champagne, France" },
+          { name: "Dom Pérignon Vintage", meta: "Champagne, France" }
+        ],
+        white: [
+          { name: "Domaine Leflaive Puligny‑Montrachet", meta: "Burgundy, France" },
+          { name: "Cloudy Bay Sauvignon Blanc", meta: "Marlborough, NZ" }
+        ],
+        red: [
+          { name: "Château Margaux", meta: "Bordeaux, France" },
+          { name: "Screaming Eagle Cabernet Sauvignon", meta: "Napa Valley, USA" }
+        ],
+        dessert: [
+          { name: "Château d'Yquem Sauternes", meta: "Bordeaux, France" }
+        ]
+      }
+    };
+
+    function tagBadge(code) {
+      const map = { vegan: 'vegan', gf: 'gf', halal: 'halal', spicy: 'spicy' };
+      return map[code] || '';
+    }
+
+    function tPick(map) { return (map && (map[lang] || map['zh-CN'] || map.en)) || ''; }
+
+    function renderDining() {
+      const root = $id('panel-dining'); if (!root) return;
+      const L = DINING_I18N[lang] || DINING_I18N.en;
+      setText('diningTitle', L.title); setText('diningSub', L.sub); setText('wineTitle', L.wine);
+      const box = $id('diningMenu'); if (box) box.innerHTML = '';
+
+      const sections = [
+        ['starter', DINING.starters], ['soup', DINING.soup], ['main', DINING.mains], ['bread', DINING.bread], ['dessert', DINING.dessert], ['cheese', DINING.cheese], ['icecream', DINING.icecream]
+      ];
+      sections.forEach(([key, arr]) => {
+        const sec = document.createElement('div'); sec.className = 'menu-section';
+        const h = document.createElement('h4'); h.textContent = L.course[key] || key; sec.appendChild(h);
+        arr.forEach(d => {
+          const row = document.createElement('div'); row.className = 'dish';
+          const left = document.createElement('div');
+          const title = document.createElement('div'); title.className = 'dish-title'; title.textContent = tPick(d.t);
+          const meta = document.createElement('div'); meta.className = 'dish-meta'; meta.textContent = tPick(d.d);
+          const tags = document.createElement('div'); tags.className = 'tags';
+          (d.tags||[]).forEach(code => { const span = document.createElement('span'); span.className = 'tag ' + tagBadge(code); span.textContent = (L.tags[code]||code); tags.appendChild(span); });
+          left.appendChild(title); left.appendChild(meta); left.appendChild(tags);
+          const right = document.createElement('div'); right.innerHTML = '<span class="kcal">' + (d.kcal||0) + '</span> ' + L.kcal;
+          row.appendChild(left); row.appendChild(right);
+          sec.appendChild(row);
+        });
+        if (box) box.appendChild(sec);
+      });
+
+      // wine list
+      const wineBox = $id('wineList'); if (wineBox) wineBox.innerHTML='';
+      function addGroup(title, items){
+        const g = document.createElement('div');
+        const h = document.createElement('h4'); h.textContent = title; g.appendChild(h);
+        (items||[]).forEach(w => { const it = document.createElement('div'); it.className='wine-item'; it.innerHTML = '<div class="name">'+w.name+'</div><div class="meta">'+w.meta+'</div>'; g.appendChild(it); });
+        wineBox && wineBox.appendChild(g);
+      }
+      const W = DINING.wine;
+      addGroup('Champagne', W.sparkling);
+      addGroup('White', W.white);
+      addGroup('Red', W.red);
+      addGroup('Dessert', W.dessert);
+    }
+
     const LANG_ORDER = ["zh-CN", "zh-TW", "es", "ru", "fr", "en"];
     let lang = localStorage.getItem("ife_lang") || "zh-CN";
     if (!I18N[lang]) lang = "zh-CN";
@@ -727,6 +848,17 @@ document.addEventListener('DOMContentLoaded', function () {
             const homeEl = $id('home'); if (homeEl) homeEl.style.display = 'none';
             const ms = $id('music-selection'); if (ms) { ms.style.display = 'block'; ms.classList.add('visible'); }
             const mg = panelMusic.querySelector('.music-grid'); if (mg) mg.style.display = 'none';
+          }
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          return;
+        }
+        if (key === 'dining') {
+          const panel = $id('panel-dining');
+          if (panel) {
+            const allPanels = document.querySelectorAll('.panel'); allPanels.forEach(p => p.classList.remove('visible'));
+            panel.classList.add('visible');
+            const homeEl = $id('home'); if (homeEl) homeEl.style.display = 'none';
+            renderDining();
           }
           window.scrollTo({ top: 0, behavior: 'smooth' });
           return;

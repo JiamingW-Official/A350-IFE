@@ -221,6 +221,29 @@ main{
   .album-grid{ grid-template-columns:1fr; }
 }
 
+/* =============== Dining (liquid glass first-class menu) =============== */
+.dining-grid{ height:100%; display:grid; grid-template-columns: 2fr 1fr; gap:20px; overflow:hidden }
+.menu-column{ height:100%; overflow-y:auto; padding-right:8px }
+.wine-column{ height:100%; overflow-y:auto }
+.menu-sections{ display:grid; gap:16px }
+.menu-section{ background:var(--glass-bg); border:var(--glass-border); border-radius:14px; padding:14px; backdrop-filter: blur(14px) saturate(1.12) }
+.menu-section h4{ margin:0 0 10px 0; font-size:calc(18px * var(--text-scale)); font-weight:900 }
+.dish{ display:grid; grid-template-columns: 1fr auto; gap:8px; align-items:start; padding:10px 12px; border-radius:12px; background: linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.005)); border:1px solid rgba(255,255,255,0.05) }
+.dish + .dish{ margin-top:8px }
+.dish-title{ font-weight:800; font-size:calc(16px * var(--text-scale)) }
+.dish-meta{ color:var(--muted); font-size:calc(12px * var(--text-scale)) }
+.tags{ display:flex; gap:6px; flex-wrap:wrap; margin-top:6px }
+.tag{ padding:4px 8px; border-radius:999px; font-size:12px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.06) }
+.tag.vegan{ background:rgba(56,200,120,0.18); border-color:rgba(56,200,120,0.45) }
+.tag.gf{ background:rgba(120,180,240,0.18); border-color:rgba(120,180,240,0.45) }
+.tag.halal{ background:rgba(240,200,80,0.18); border-color:rgba(240,200,80,0.45) }
+.tag.spicy{ background:rgba(240,90,90,0.2); border-color:rgba(240,90,90,0.5) }
+.kcal{ color:#ffd67a; font-weight:800 }
+.wine-list{ display:grid; gap:10px }
+.wine-item{ padding:10px 12px; border-radius:12px; border:1px solid rgba(255,255,255,0.05); background: linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.004)) }
+.wine-item .name{ font-weight:800; font-size:calc(15px * var(--text-scale)) }
+.wine-item .meta{ color:var(--muted); font-size:calc(12px * var(--text-scale)); margin-top:4px }
+
 /* =============== Playlist rows =============== */
 /* playlist container */
 .playlist{display:grid;gap:12px;margin-top:6px}
