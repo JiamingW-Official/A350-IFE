@@ -53,32 +53,32 @@ document.addEventListener('DOMContentLoaded', function () {
     const DINING_I18N = {
       "zh-CN": { title: "用餐", sub: "头等舱品鉴菜单", wine: "酒精饮品",
         course: { starter: "前菜", main: "主菜", soup: "热汤", bread: "面包篮", dessert: "甜点", cheese: "奶酪", icecream: "冰淇淋" },
-        drinks: { soft: "软饮", tea: "茶", coffee: "咖啡" },
+        drinks: { non: "非酒精饮品", juice: "果汁", mocktail: "无酒精鸡尾酒", soft: "软饮", tea: "茶", coffee: "咖啡" },
         alcoholHeadings: { champagne: "香槟", white: "白葡萄酒", red: "红葡萄酒", dessert: "甜型酒", fortified: "加强酒" },
         tags: { vegan: "Vegan", gf: "无麸质", halal: "清真", spicy: "辣度" }, kcal: "千卡" },
       "zh-TW": { title: "用餐", sub: "頭等艙品嚐菜單", wine: "酒精飲品",
         course: { starter: "前菜", main: "主菜", soup: "熱湯", bread: "麵包籃", dessert: "甜點", cheese: "起司", icecream: "冰淇淋" },
-        drinks: { soft: "軟飲", tea: "茶", coffee: "咖啡" },
+        drinks: { non: "非酒精飲品", juice: "果汁", mocktail: "無酒精雞尾酒", soft: "軟飲", tea: "茶", coffee: "咖啡" },
         alcoholHeadings: { champagne: "香檳", white: "白酒", red: "紅酒", dessert: "甜酒", fortified: "加烈酒" },
         tags: { vegan: "Vegan", gf: "無麩質", halal: "清真", spicy: "辣" }, kcal: "千卡" },
       en: { title: "Dining", sub: "First Class Tasting Menu", wine: "Alcohol",
         course: { starter: "Starters", main: "Mains", soup: "Soup", bread: "Bread Basket", dessert: "Dessert", cheese: "Cheese", icecream: "Ice Cream" },
-        drinks: { soft: "Soft Drinks", tea: "Tea", coffee: "Coffee" },
+        drinks: { non: "Non‑alcoholic", juice: "Juice", mocktail: "Mocktail", soft: "Soft Drinks", tea: "Tea", coffee: "Coffee" },
         alcoholHeadings: { champagne: "Champagne", white: "White", red: "Red", dessert: "Dessert", fortified: "Fortified" },
         tags: { vegan: "Vegan", gf: "Gluten‑free", halal: "Halal", spicy: "Spicy" }, kcal: "kcal" },
       fr: { title: "Restauration", sub: "Menu Dégustation Première Classe", wine: "Alcools",
         course: { starter: "Entrées", main: "Plats", soup: "Soupe", bread: "Panier de pain", dessert: "Dessert", cheese: "Fromages", icecream: "Glace" },
-        drinks: { soft: "Boissons fraîches", tea: "Thé", coffee: "Café" },
+        drinks: { non: "Sans alcool", juice: "Jus", mocktail: "Mocktail", soft: "Boissons fraîches", tea: "Thé", coffee: "Café" },
         alcoholHeadings: { champagne: "Champagne", white: "Blanc", red: "Rouge", dessert: "Liquoreux", fortified: "Vins mutés" },
         tags: { vegan: "Vegan", gf: "Sans gluten", halal: "Halal", spicy: "Épicé" }, kcal: "kcal" },
       es: { title: "Gastronomía", sub: "Menú Degustación Primera Clase", wine: "Alcohol",
         course: { starter: "Entrantes", main: "Principales", soup: "Sopa", bread: "Panera", dessert: "Postre", cheese: "Quesos", icecream: "Helado" },
-        drinks: { soft: "Refrescos", tea: "Té", coffee: "Café" },
+        drinks: { non: "Sin alcohol", juice: "Zumos", mocktail: "Cócteles sin alcohol", soft: "Refrescos", tea: "Té", coffee: "Café" },
         alcoholHeadings: { champagne: "Champagne", white: "Blanco", red: "Tinto", dessert: "Dulce", fortified: "Generoso" },
         tags: { vegan: "Vegano", gf: "Sin gluten", halal: "Halal", spicy: "Picante" }, kcal: "kcal" },
       ru: { title: "Питание", sub: "Дегустационное меню Первого класса", wine: "Алкоголь",
         course: { starter: "Закуски", main: "Горячие блюда", soup: "Суп", bread: "Хлебная корзина", dessert: "Десерт", cheese: "Сыры", icecream: "Мороженое" },
-        drinks: { soft: "Безалкогольные", tea: "Чай", coffee: "Кофе" },
+        drinks: { non: "Безалкогольные", juice: "Соки", mocktail: "Безалк. коктейли", soft: "Газированные напитки", tea: "Чай", coffee: "Кофе" },
         alcoholHeadings: { champagne: "Шампанское", white: "Белые", red: "Красные", dessert: "Десертные", fortified: "Креплёные" },
         tags: { vegan: "Веган", gf: "Без глютена", halal: "Халяль", spicy: "Острое" }, kcal: "ккал" }
     };
@@ -140,12 +140,22 @@ document.addEventListener('DOMContentLoaded', function () {
         ]
       },
       beverages: {
+        juice: [
+          { name: "Fresh orange juice", meta: "100% squeezed" },
+          { name: "Apple juice", meta: "Cloudy" },
+          { name: "Watermelon juice", meta: "Chilled" }
+        ],
+        mocktail: [
+          { name: "Nojito", meta: "Mint, lime, soda" },
+          { name: "Yuzu Spritz", meta: "Yuzu, tonic" },
+          { name: "Ginger Mule", meta: "Ginger beer, lime" }
+        ],
         soft: [
-          { name: "Acqua Panna / San Pellegrino", meta: "Still / Sparkling Mineral Water" },
-          { name: "Cold‑pressed juices", meta: "Orange, Apple, Watermelon, Celery" },
-          { name: "Artisanal sodas", meta: "Yuzu, Ginger, Sicilian Lemon" },
-          { name: "Kombucha", meta: "Yunnan black tea ferment" },
-          { name: "Virgin cocktails", meta: "Nojito, Yuzu Spritz, Ginger Mule" }
+          { name: "Coca‑Cola", meta: "Classic" },
+          { name: "Coca‑Cola Zero", meta: "Zero sugar" },
+          { name: "Fanta Orange", meta: "" },
+          { name: "Sprite", meta: "" },
+          { name: "Acqua Panna / San Pellegrino", meta: "Still / Sparkling Mineral Water" }
         ],
         tea: [
           { name: "Da Hong Pao (大红袍)", meta: "Rock oolong — Wuyi, China" },
@@ -179,7 +189,8 @@ document.addEventListener('DOMContentLoaded', function () {
     function renderDining() {
       const root = $id('panel-dining'); if (!root) return;
       const L = DINING_I18N[lang] || DINING_I18N.en;
-      setText('diningTitle', L.title); setText('diningSub', L.sub); setText('wineTitle', L.wine);
+      setText('diningTitle', L.title); setText('diningSub', L.sub);
+      setText('alcoholTitle', L.wine); setText('nonAlcoholTitle', L.drinks.non || L.drinks.soft);
       const box = $id('diningMenu'); if (box) box.innerHTML = '';
 
       const sections = [
@@ -202,6 +213,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         if (box) box.appendChild(sec);
       });
+
 
       // quick chips (recreate to ensure language reflects immediately)
       const chips = $id('diningChips'); if (chips) {
@@ -232,9 +244,20 @@ document.addEventListener('DOMContentLoaded', function () {
       addGroup(L.alcoholHeadings.red, W.red);
       addGroup(L.alcoholHeadings.dessert, W.dessert);
       addGroup(L.alcoholHeadings.fortified, W.fortified);
-      addGroup(L.drinks.soft, B.soft, 'soft');
-      addGroup(L.drinks.tea, B.tea, 'tea');
-      addGroup(L.drinks.coffee, B.coffee, 'coffee');
+      // right column non-alcoholic
+      const nonBox = $id('nonAlcoholList'); if (nonBox) nonBox.innerHTML = '';
+      function addNon(title, items, anchorKey){
+        const g = document.createElement('div');
+        if (anchorKey) g.dataset.anchor = anchorKey;
+        const h = document.createElement('h4'); h.textContent = title; g.appendChild(h);
+        (items||[]).forEach(w => { const it = document.createElement('div'); it.className='wine-item'; it.innerHTML = '<div class="name">'+w.name+'</div><div class="meta">'+(w.meta||'')+'</div>'; g.appendChild(it); });
+        nonBox && nonBox.appendChild(g);
+      }
+      addNon(L.drinks.juice || 'Juice', B.juice, 'juice');
+      addNon('Mocktail', B.mocktail, 'mocktail');
+      addNon(L.drinks.soft, B.soft, 'soft');
+      addNon(L.drinks.tea, B.tea, 'tea');
+      addNon(L.drinks.coffee, B.coffee, 'coffee');
     }
 
     const LANG_ORDER = ["zh-CN", "zh-TW", "es", "ru", "fr", "en"];
