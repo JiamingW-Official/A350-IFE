@@ -82,10 +82,11 @@ main{
   height:calc(100vh - var(--header-h) - var(--player-h) - var(--player-bottom-offset));
   margin:0;padding:var(--gap);
   box-sizing:border-box;
+  overflow:hidden; /* panel itself does not scroll; columns handle their own scroll */
 }
 
 /* Panels are hidden by default; shown only when .visible */
-.panel { display:none; }
+.panel { display:none; height:100%; }
 .panel.visible { display:block; }
 
 /* Hub / Home grid (when on home) */
@@ -141,7 +142,7 @@ main{
 .music-grid{
   height:100%;
   display:grid;
-  grid-template-columns: 1fr 380px; /* left flexible, right fixed 380px (~30% typical) */
+  grid-template-columns: 2fr 1fr; /* left 2/3, right 1/3 */
   gap:20px;
   overflow:hidden;
 }
@@ -154,8 +155,10 @@ main{
   overflow-x:hidden; /* 禁止横向滚动 */
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
+  min-height:0; /* allow inner scroll containers to shrink inside grid area */
 }
 .music-left{ padding-right: 24px; overflow: hidden; } /* 左列内部自定义滚动容器 */
+.music-right{ overflow-y:auto; } /* 右列独立滚动 */
 .left-scroll{ height:100%; overflow-y:auto; }
 
 /* Ensure banner scrolls together with list (banner not fixed) */
