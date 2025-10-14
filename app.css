@@ -178,6 +178,32 @@ main{
 /* hide any accidental toolbar-like nodes inside banner (protect against previous injection) */
 .album-banner .tb-play, .album-banner .tb-title, .album-banner .tb-back { display: none !important; }
 
+/* =============== Music selection (Spotify-like two-card grid) =============== */
+#music-selection{ padding:6px 10px; }
+.album-grid{
+  display:grid;
+  grid-template-columns:repeat(2, minmax(260px, 1fr));
+  gap:16px;
+}
+.album-card{
+  display:grid;grid-template-rows:auto 1fr;gap:12px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.004));
+  border:1px solid rgba(255,255,255,0.04);
+  border-radius:14px; padding:14px; cursor:pointer;
+  box-shadow:0 14px 38px rgba(0,0,0,0.5);
+  transition:transform .12s ease, box-shadow .14s ease, background .12s ease;
+}
+.album-card:hover{ transform: translateY(-2px); box-shadow:0 22px 60px rgba(0,0,0,0.6); }
+.album-card img{ width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:12px; display:block; box-shadow:0 10px 30px rgba(0,0,0,0.55); border:1px solid rgba(255,255,255,0.04); }
+.album-info{ min-width:0; }
+.album-info .title{ font-size:calc(18px * var(--text-scale)); font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.album-info .meta{ margin-top:6px; color:var(--muted); font-size:calc(13px * var(--text-scale)); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.album-info .blurb{ margin-top:10px; color:#d9e5ff; font-size:calc(13px * var(--text-scale)); line-height:1.5; max-height:3.1em; overflow:hidden; }
+
+@media (max-width:900px){
+  .album-grid{ grid-template-columns:1fr; }
+}
+
 /* =============== Playlist rows =============== */
 /* playlist container */
 .playlist{display:grid;gap:12px;margin-top:6px}
