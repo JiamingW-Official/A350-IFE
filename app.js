@@ -105,18 +105,43 @@ document.addEventListener('DOMContentLoaded', function () {
       wine: {
         sparkling: [
           { name: "Krug Grande Cuvée 171ème", meta: "Champagne, France" },
-          { name: "Dom Pérignon Vintage", meta: "Champagne, France" }
+          { name: "Dom Pérignon Vintage", meta: "Champagne, France" },
+          { name: "Louis Roederer Cristal", meta: "Champagne, France" }
         ],
         white: [
           { name: "Domaine Leflaive Puligny‑Montrachet", meta: "Burgundy, France" },
-          { name: "Cloudy Bay Sauvignon Blanc", meta: "Marlborough, NZ" }
+          { name: "Cloudy Bay Sauvignon Blanc", meta: "Marlborough, NZ" },
+          { name: "Riesling Grosses Gewächs", meta: "Mosel, Germany" }
         ],
         red: [
           { name: "Château Margaux", meta: "Bordeaux, France" },
-          { name: "Screaming Eagle Cabernet Sauvignon", meta: "Napa Valley, USA" }
+          { name: "Screaming Eagle Cabernet Sauvignon", meta: "Napa Valley, USA" },
+          { name: "Sassicaia Bolgheri", meta: "Tuscany, Italy" }
         ],
         dessert: [
-          { name: "Château d'Yquem Sauternes", meta: "Bordeaux, France" }
+          { name: "Château d'Yquem Sauternes", meta: "Bordeaux, France" },
+          { name: "Tokaji Aszú 6 Puttonyos", meta: "Hungary" }
+        ],
+        fortified: [
+          { name: "Taylor's Very Old Tawny", meta: "Porto, Portugal" },
+          { name: "González Byass Apóstoles Palo Cortado", meta: "Jerez, Spain" }
+        ]
+      },
+      beverages: {
+        soft: [
+          { name: "Acqua Panna / San Pellegrino", meta: "Still / Sparkling Mineral Water" },
+          { name: "Cold‑pressed juices", meta: "Orange, Apple, Watermelon, Celery" },
+          { name: "Artisanal sodas", meta: "Yuzu, Ginger, Sicilian Lemon" }
+        ],
+        tea: [
+          { name: "Da Hong Pao (大红袍)", meta: "Rock oolong — Wuyi, China" },
+          { name: "Gyokuro", meta: "Shade‑grown green — Uji, Japan" },
+          { name: "Darjeeling First Flush", meta: "Single‑estate — India" }
+        ],
+        coffee: [
+          { name: "Single‑origin espresso", meta: "Ethiopia / Colombia rotation" },
+          { name: "V60 hand‑brew", meta: "Seasonal roaster selection" },
+          { name: "Affogato", meta: "Vanilla gelato, espresso" }
         ]
       }
     };
@@ -155,19 +180,38 @@ document.addEventListener('DOMContentLoaded', function () {
         if (box) box.appendChild(sec);
       });
 
-      // wine list
+      // quick chips
+      const chips = $id('diningChips'); if (chips) {
+        chips.innerHTML = '';
+        const chipMap = [ ['starter', L.course.starter], ['soup', L.course.soup], ['main', L.course.main], ['dessert', L.course.dessert], ['cheese', L.course.cheese], ['icecream', L.course.icecream], ['wine', L.wine], ['tea', 'Tea'], ['coffee', 'Coffee'] ];
+        chipMap.forEach(([key, label]) => {
+          const c = document.createElement('button'); c.className = 'chip'; c.textContent = label;
+          c.addEventListener('click', () => {
+            const target = document.querySelector('[data-anchor="' + key + '"]');
+            if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          });
+          chips.appendChild(c);
+        });
+      }
+
+      // wine & beverages list
       const wineBox = $id('wineList'); if (wineBox) wineBox.innerHTML='';
-      function addGroup(title, items){
+      function addGroup(title, items, anchorKey){
         const g = document.createElement('div');
+        if (anchorKey) g.dataset.anchor = anchorKey;
         const h = document.createElement('h4'); h.textContent = title; g.appendChild(h);
         (items||[]).forEach(w => { const it = document.createElement('div'); it.className='wine-item'; it.innerHTML = '<div class="name">'+w.name+'</div><div class="meta">'+w.meta+'</div>'; g.appendChild(it); });
         wineBox && wineBox.appendChild(g);
       }
-      const W = DINING.wine;
-      addGroup('Champagne', W.sparkling);
+      const W = DINING.wine; const B = DINING.beverages;
+      addGroup('Champagne', W.sparkling, 'wine');
       addGroup('White', W.white);
       addGroup('Red', W.red);
       addGroup('Dessert', W.dessert);
+      addGroup('Fortified', W.fortified);
+      addGroup('Soft Drinks', B.soft, 'soft');
+      addGroup('Tea', B.tea, 'tea');
+      addGroup('Coffee', B.coffee, 'coffee');
     }
 
     const LANG_ORDER = ["zh-CN", "zh-TW", "es", "ru", "fr", "en"];

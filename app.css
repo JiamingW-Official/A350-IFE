@@ -244,6 +244,11 @@ main{
 .wine-item .name{ font-weight:800; font-size:calc(15px * var(--text-scale)) }
 .wine-item .meta{ color:var(--muted); font-size:calc(12px * var(--text-scale)); margin-top:4px }
 
+/* quick chips for fast jump */
+.chips{ display:flex; flex-wrap:wrap; gap:8px; margin: 0 0 12px 0 }
+.chip{ padding:8px 12px; border-radius:999px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.06); cursor:pointer; font-weight:800; font-size:calc(12px * var(--text-scale)) }
+.chip.active{ background:rgba(255,255,255,0.16) }
+
 /* =============== Playlist rows =============== */
 /* playlist container */
 .playlist{display:grid;gap:12px;margin-top:6px}
