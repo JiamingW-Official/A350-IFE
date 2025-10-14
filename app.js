@@ -496,6 +496,14 @@ document.addEventListener('DOMContentLoaded', function () {
       } catch (err) { console.warn('Audio play error', err); }
       const npTitleEl = $id('npTitle'), npMetaEl = $id('npMeta'), npArtEl = $id('npArt');
       if (npTitleEl) npTitleEl.textContent = t.t;
+      // toggle marquee when overflow occurs
+      if (npTitleEl) {
+        npTitleEl.classList.remove('marquee');
+        try {
+          const needs = npTitleEl.scrollWidth > npTitleEl.clientWidth + 2;
+          if (needs) npTitleEl.classList.add('marquee');
+        } catch (_) {}
+      }
       if (npMetaEl) npMetaEl.textContent = album.artist + ' • ' + ((album.title && (album.title[lang] || album.title['zh-CN'] || album.title.en)) || '');
       if (npArtEl) npArtEl.style.backgroundImage = 'url("' + (album.cover || '') + '")';
       highlightRow(i, true);
