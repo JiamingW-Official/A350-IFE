@@ -84,6 +84,10 @@ main{
   box-sizing:border-box;
 }
 
+/* Panels are hidden by default; shown only when .visible */
+.panel { display:none; }
+.panel.visible { display:block; }
+
 /* Hub / Home grid (when on home) */
 .hub{
   height:100%;
@@ -184,6 +188,8 @@ main{
   display:grid;
   grid-template-columns:repeat(2, minmax(260px, 1fr));
   gap:16px;
+  max-width:880px;
+  margin:0 auto; /* center within panel; avoid full-width */
 }
 .album-card{
   display:grid;grid-template-rows:auto 1fr;gap:12px;
