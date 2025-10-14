@@ -218,6 +218,7 @@ document.addEventListener('DOMContentLoaded', function () {
       // quick chips (recreate to ensure language reflects immediately)
       const chips = $id('diningChips'); if (chips) {
         chips.innerHTML = '';
+
         const chipMap = [
           ['starter', L.course.starter], ['soup', L.course.soup], ['main', L.course.main], ['dessert', L.course.dessert], ['cheese', L.course.cheese], ['icecream', L.course.icecream],
           ['wine', L.wine], ['juice', L.drinks.juice], ['mocktail', L.drinks.mocktail], ['soft', L.drinks.soft], ['tea', L.drinks.tea], ['coffee', L.drinks.coffee]
@@ -904,7 +905,7 @@ document.addEventListener('DOMContentLoaded', function () {
     /* ---------- header / control handlers ---------- */
     function closeAllPanels() {
       const panels = document.querySelectorAll('.panel');
-      panels.forEach(p => p.classList.remove('visible'));
+      panels.forEach(p => { p.classList.remove('visible'); p.style.display = 'none'; });
       const home = $id('home');
       if (home) home.style.display = 'grid';
       const ms = $id('music-selection'); if (ms) ms.style.display = 'none';
@@ -942,8 +943,8 @@ document.addEventListener('DOMContentLoaded', function () {
           renderMusicSelection();
           const panelMusic = $id('panel-music');
           if (panelMusic) {
-            const allPanels = document.querySelectorAll('.panel'); allPanels.forEach(p => p.classList.remove('visible'));
-            panelMusic.classList.add('visible');
+            const allPanels = document.querySelectorAll('.panel'); allPanels.forEach(p => { p.classList.remove('visible'); p.style.display = 'none'; });
+            panelMusic.classList.add('visible'); panelMusic.style.display = 'block';
             const homeEl = $id('home'); if (homeEl) homeEl.style.display = 'none';
             const ms = $id('music-selection'); if (ms) { ms.style.display = 'block'; ms.classList.add('visible'); }
             const mg = panelMusic.querySelector('.music-grid'); if (mg) mg.style.display = 'none';
@@ -954,7 +955,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (key === 'dining') {
           const panel = $id('panel-dining');
           if (panel) {
-            const allPanels = document.querySelectorAll('.panel'); allPanels.forEach(p => p.classList.remove('visible'));
+            const allPanels = document.querySelectorAll('.panel'); allPanels.forEach(p => { p.classList.remove('visible'); p.style.display = 'none'; });
             panel.classList.add('visible'); panel.style.display = 'block';
             const homeEl = $id('home'); if (homeEl) homeEl.style.display = 'none';
             renderDining();
@@ -964,8 +965,8 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         const panel = $id('panel-' + key);
         if (panel) {
-          const panels2 = document.querySelectorAll('.panel'); panels2.forEach(p => p.classList.remove('visible'));
-          panel.classList.add('visible');
+          const panels2 = document.querySelectorAll('.panel'); panels2.forEach(p => { p.classList.remove('visible'); p.style.display = 'none'; });
+          panel.classList.add('visible'); panel.style.display = 'block';
           const h = $id('home'); if (h) h.style.display = 'none';
         } else {
           alert('模块“' + key + '”尚未实现（placeholder）。');
