@@ -189,7 +189,7 @@ main{
   grid-template-columns:repeat(2, minmax(260px, 1fr));
   gap:16px;
   max-width:880px;
-  margin:0 auto; /* center within panel; avoid full-width */
+  margin:0; /* left-align within panel */
 }
 .album-card{
   display:grid;grid-template-rows:auto 1fr;gap:12px;
